@@ -316,6 +316,13 @@ legend{font-size:12.5px;font-weight:600;color:var(--ink-2);padding:0 4px}
 .linkbtn:hover{text-decoration:underline}
 .linkbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
 .gate .err{color:var(--bad);font-size:13px;font-weight:600}
+.gbtn{min-height:44px;font-size:14.5px}
+.gbtn svg{width:18px;height:18px}
+.gate .or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px}
+.gate .or::before,.gate .or::after{content:"";flex:1;border-top:1px solid var(--line)}
+.gate-qr{display:flex;justify-content:center}
+.gate-qr svg{width:min(240px,100%);height:auto;border-radius:8px;border:1px solid var(--line)}
+.steps{margin:0;padding-left:20px;color:var(--ink-2);font-size:13.5px;display:flex;flex-direction:column;gap:4px}
 .gate-paste{border-top:1px solid var(--line);padding-top:12px}
 .gate-paste>:not(summary){margin-top:10px}
 
@@ -478,6 +485,7 @@ const ICONS = {
   plus:'<path d="M12 5v14M5 12h14"/>', check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
   left:'<path d="M14.5 6l-6 6 6 6"/>', right:'<path d="M9.5 6l6 6-6 6"/>', close:'<path d="M6 6l12 12M18 6L6 18"/>',
   search:'<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/>', chat:'<path d="M4 19.5l1.4-4A7.8 7.8 0 1 1 8.6 19z"/>',
+  qr:'<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M14 14h2v2h-2zM18 18h2v2h-2zM14 20h2M20 14v2"/>',
   phone:'<circle cx="12" cy="12" r="9.5"/><path d="M9.2 7.5l1.3 2.6-1 1a6.5 6.5 0 0 0 3.4 3.4l1-1 2.6 1.3-.5 1.6c-4 .5-8.4-3.9-7.9-7.9z"/>',
   mobile:'<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>',
   mail:'<circle cx="12" cy="12" r="9.5"/><rect x="7" y="8.5" width="10" height="7" rx="1"/><path d="M7.3 9l4.7 3.6L16.7 9"/>',
@@ -488,7 +496,7 @@ const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 /* ================= État ================= */
 const S = {
   db:null, user:null, canWrite:null, readonly:false,
-  fdb:null, fbAuth:null, fbUser:null, gate:null, started:false, legacy:null, verifySent:false, leaving:false,
+  fdb:null, fbAuth:null, fbUser:null, gate:null, started:false, legacy:null, verifySent:false, leaving:false, qr:null, lier:null,
   status:"loading", loadTimer:null, lostMsg:"",
   config:null, patients:new Map(), patientsReady:false,
   months:new Map(),
@@ -1357,6 +1365,10 @@ async function onAction(btn, e){
     case "gate-verified": await gateVerified(btn); break;
     case "gate-resend": await gateResend(btn); break;
     case "gate-link": await gateLink(btn); break;
+    case "google-login": await googleLogin(btn); break;
+    case "qr-start": await qrStart(); break;
+    case "lier-google": await lierGoogle(btn); break;
+    case "lier-cancel": S.lier = null; if (S.fbAuth.currentUser) await onAuth(S.fbAuth.currentUser); else showGate("login"); break;
     case "reload": location.reload(); break;
   }
 }
@@ -1423,7 +1435,7 @@ window.addEventListener("hashchange", () => {
 // Les données vivent dans Firestore (projet cabinet-sebti-assia, en Europe, protégé contre la suppression).
 // Ces clés identifient le projet et sont publiques par nature : l'accès est contrôlé par firestore.rules.
 const FIREBASE_CONFIG = {
-  apiKey:"AIzaSyC5jTvvTllfAo_K9uaFR_Ckg1OK8DJN9YA", authDomain:"cabinet-sebti-assia.firebaseapp.com", projectId:"cabinet-sebti-assia",
+  apiKey:"AIzaSyC5jTvvTllfAo_K9uaFR_Ckg1OK8DJN9YA", authDomain:"cabinet-sebti-assia.web.app", projectId:"cabinet-sebti-assia",
   storageBucket:"cabinet-sebti-assia.firebasestorage.app", messagingSenderId:"255493261882", appId:"1:255493261882:web:aba15d530ecad769b38303"
 };
 const COMPTES = ["cabinetkinesebti@gmail.com", "bilalnahil05@gmail.com"]; // garder identique à firestore.rules
@@ -1526,11 +1538,17 @@ const AUTH_ERR = {
   "auth/network-request-failed":"Pas de connexion internet. Vérifie le réseau puis réessaie.",
   "auth/email-already-in-use":"Ce compte existe déjà : connecte-toi avec son mot de passe.",
   "auth/weak-password":"Mot de passe trop court : 8 caractères minimum.",
-  "auth/operation-not-allowed":AUTH_OFF, "auth/configuration-not-found":AUTH_OFF
+  "auth/operation-not-allowed":AUTH_OFF, "auth/configuration-not-found":AUTH_OFF,
+  "auth/popup-blocked":"Le navigateur a bloqué la fenêtre Google : autorise les fenêtres pop-up pour ce site, puis réessaie.",
+  "auth/operation-not-supported-in-this-environment":"La connexion Google marche sur le site https://cabinet-sebti-assia.web.app ouvert dans Chrome (pas depuis un fichier ni dans WhatsApp).",
+  "auth/unauthorized-domain":"Ce site n'est pas autorisé pour la connexion Google.",
+  "auth/web-storage-unsupported":"Ce navigateur bloque la connexion (navigation privée ?) : ouvre le site dans Chrome en mode normal."
 };
+const GOOGLE_G = `<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>`;
 const authMsg = e => AUTH_ERR[e && e.code] || `Connexion impossible (${(e && e.code) || "erreur inconnue"}).`;
 
 function showGate(step, err){
+  if (step !== "qr" && S.qr) qrStop();
   S.gate = step;
   const g = $("#gate"), body = $("#gateBody");
   if (!step){ g.hidden = true; return; }
@@ -1542,8 +1560,11 @@ function showGate(step, err){
     loading: `<p class="hint">Connexion à la base du cabinet…</p>`,
     offline: `<h2>Base en ligne injoignable</h2><p class="hint">Vérifie la connexion internet puis recharge la page.</p>
       <button type="button" class="btn primary" data-action="reload">Recharger</button>`,
-    login: `<h2>Connexion</h2>${mail}
-      <label class="f">Mot de passe<input id="gPass" type="password" autocomplete="current-password"></label>${errHtml}
+    login: `<h2>Connexion</h2>${errHtml}
+      <button type="button" class="btn gbtn" data-action="google-login">${GOOGLE_G}Continuer avec Google</button>
+      <button type="button" class="btn" data-action="qr-start">${ic("qr")}Se connecter avec le téléphone (QR code)</button>
+      <div class="or">ou avec e-mail et mot de passe</div>${mail}
+      <label class="f">Mot de passe<input id="gPass" type="password" autocomplete="current-password"></label>
       <button type="submit" class="btn primary">Se connecter</button>
       <div class="gate-links"><button type="button" class="linkbtn" data-action="gate-step" data-step="reset">Mot de passe oublié ?</button>
       <button type="button" class="linkbtn" data-action="gate-step" data-step="create">Première fois : créer le compte</button></div>`,
@@ -1557,6 +1578,8 @@ function showGate(step, err){
       <div class="gate-links"><button type="button" class="linkbtn" data-action="gate-step" data-step="login">Retour à la connexion</button></div>`,
     verify: `<h2>Confirme l'adresse e-mail</h2><p class="hint">Un lien de confirmation a été envoyé à <b>${esc(u ? u.email : "")}</b>. Ouvre la boîte mail (regarde aussi dans les spams), clique sur le lien, puis reviens ici.</p>${errHtml}
       <button type="button" class="btn primary" data-action="gate-verified">J'ai cliqué sur le lien</button>
+      <div class="or">ou, sans e-mail de confirmation</div>
+      <button type="button" class="btn gbtn" data-action="google-login">${GOOGLE_G}Continuer avec Google</button>
       <details class="gate-paste"><summary class="linkbtn">Le lien affiche une erreur ?</summary>
         <p class="hint">Sur l'e-mail, appui long sur le lien › « Copier l'adresse du lien » (ou copie l'adresse de la page d'erreur), colle-la ici puis valide.</p>
         <label class="f">Lien de confirmation<input id="gLink" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://cabinet-sebti-assia.firebaseapp.com/__/auth/action?…"></label>
@@ -1565,10 +1588,22 @@ function showGate(step, err){
       <div class="gate-links"><button type="button" class="linkbtn" data-action="gate-resend">Renvoyer l'e-mail</button>
       <button type="button" class="linkbtn" data-action="logout">Se déconnecter</button></div>`,
     denied: `<h2>Accès non autorisé</h2><p class="hint">Le compte <b>${esc(u ? u.email : "")}</b> n'a pas accès aux données du cabinet. Connecte-toi avec ${esc(COMPTES.join(" ou "))}.</p>
-      <button type="button" class="btn primary" data-action="logout">Changer de compte</button>`
+      <button type="button" class="btn primary" data-action="logout">Changer de compte</button>`,
+    qr: `<h2>Connexion avec le téléphone</h2>
+      <div class="gate-qr">${S.qr ? S.qr.svg : ""}</div>
+      <ol class="steps"><li>Sur ton téléphone, ouvre l'appareil photo et scanne ce QR code.</li><li>Continue avec ton compte Gmail du cabinet.</li><li>Cet ordinateur se connecte tout seul.</li></ol>${errHtml}
+      <div class="gate-links"><button type="button" class="linkbtn" data-action="gate-step" data-step="login">Retour</button><span class="hint">Valable 5 minutes</span></div>`,
+    "qr-old": `<h2>QR code expiré</h2><p class="hint">Par sécurité, un QR code de connexion ne sert que 5 minutes.</p>
+      <button type="button" class="btn primary" data-action="qr-start">Afficher un nouveau QR code</button>
+      <div class="gate-links"><button type="button" class="linkbtn" data-action="gate-step" data-step="login">Retour</button></div>`,
+    lier: `<h2>Connecter l'ordinateur</h2><p class="hint">Tu as scanné le QR code affiché sur un ordinateur. Continue avec ton compte Gmail du cabinet : l'ordinateur se connectera tout seul.</p>
+      <div class="banner warn">Ne le fais que pour un ordinateur du cabinet, devant toi : il aura accès aux dossiers patients.</div>${errHtml}
+      <button type="button" class="btn gbtn" data-action="lier-google">${GOOGLE_G}Continuer avec Google</button>
+      <div class="gate-links"><button type="button" class="linkbtn" data-action="lier-cancel">Annuler</button></div>`
   };
   body.innerHTML = H[step] || "";
-  const f = $("#gPass", body) || $("#gMail", body); if (f) f.focus();
+  // pas de clavier qui surgit sur téléphone : on ne place le curseur que sur ordinateur
+  const f = $("#gPass", body) || $("#gMail", body); if (f && matchMedia("(pointer:fine)").matches) f.focus();
 }
 async function gateSubmit(){
   const step = S.gate, a = S.fbAuth;
@@ -1623,9 +1658,79 @@ async function gateResend(btn){
   try { await u.sendEmailVerification(); toast(`E-mail renvoyé à ${u.email}.`); btn.disabled = false; }
   catch(e){ showGate("verify", authMsg(e)); }
 }
+/* ---------- Google et QR code ---------- */
+const QRGEN = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js";
+const SITE = /^https?:$/.test(location.protocol) ? location.origin : "https://cabinet-sebti-assia.web.app";
+const loaded = new Map();
+const loadOnce = src => { if (!loaded.has(src)) loaded.set(src, loadScript(src).catch(e => { loaded.delete(src); throw e; })); return loaded.get(src); };
+const b64u = u8 => btoa(String.fromCharCode(...u8)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const unb64u = s => { const t = s.replace(/-/g, "+").replace(/_/g, "/"); return Uint8Array.from(atob(t + "=".repeat((4 - t.length % 4) % 4)), c => c.charCodeAt(0)); };
+function qrSvg(text){
+  const q = qrcode(0, "M"); q.addData(text); q.make();
+  const n = q.getModuleCount(), m = 4, size = n + 2 * m; let d = "";
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += `M${c + m} ${r + m}h1v1h-1z`;
+  return `<svg viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges" role="img" aria-label="QR code de connexion"><rect width="${size}" height="${size}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;
+}
+function googleProvider(){ const p = new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({prompt:"select_account"}); return p; }
+const popupClosed = e => e && (e.code === "auth/popup-closed-by-user" || e.code === "auth/cancelled-popup-request");
+async function googleLogin(btn){
+  const step = S.gate; btn.disabled = true;
+  try { await S.fbAuth.signInWithPopup(googleProvider()); } // la suite passe par onAuth
+  catch(e){
+    if (e.code === "auth/popup-blocked" && /^https?:$/.test(location.protocol)){ try { return await S.fbAuth.signInWithRedirect(googleProvider()); } catch(e2){ e = e2; } }
+    if (popupClosed(e)){ btn.disabled = false; return; }
+    console.error(e); showGate(step, authMsg(e));
+  }
+}
+// Connexion d'un ordinateur depuis le téléphone (comme WhatsApp Web). L'ordinateur affiche un QR code qui porte
+// un identifiant et une clé secrète ; le téléphone se connecte avec Google, chiffre l'autorisation Google avec cette clé
+// et la dépose dans liaisons/{id} ; l'ordinateur la lit, la déchiffre et se connecte avec. La clé ne quitte jamais le QR code.
+async function qrStart(){
+  qrStop(); showGate("loading");
+  try { await loadOnce(QRGEN); } catch(e){ return showGate("login", "Générateur de QR code injoignable : vérifie la connexion internet."); }
+  const id = b64u(crypto.getRandomValues(new Uint8Array(16))), raw = crypto.getRandomValues(new Uint8Array(32));
+  const key = await crypto.subtle.importKey("raw", raw, "AES-GCM", false, ["decrypt"]);
+  const Q = S.qr = {id, url:`${SITE}/#lier=${id}.${b64u(raw)}`, unsub:null, timer:0};
+  Q.svg = qrSvg(Q.url);
+  showGate("qr");
+  Q.timer = setTimeout(() => { if (S.qr === Q) showGate("qr-old"); }, 5 * 60 * 1000);
+  Q.unsub = S.fdb.collection("liaisons").doc(id).onSnapshot(async snap => {
+    if (S.qr !== Q || !snap.exists) return;
+    const d = snap.data(); showGate("loading");
+    try {
+      const plain = await crypto.subtle.decrypt({name:"AES-GCM", iv:unb64u(d.iv)}, key, unb64u(d.data));
+      const {idToken} = JSON.parse(new TextDecoder().decode(plain));
+      await S.fbAuth.signInWithCredential(firebase.auth.GoogleAuthProvider.credential(idToken)); // la suite passe par onAuth
+      snap.ref.delete().catch(() => {});
+    } catch(e){ console.error(e); showGate("login", "La connexion par QR code a échoué. " + authMsg(e)); }
+  }, e => { console.error(e); if (S.qr === Q) showGate("login", "QR code indisponible. " + authMsg(e)); });
+}
+function qrStop(){ const Q = S.qr; if (!Q) return; S.qr = null; clearTimeout(Q.timer); if (Q.unsub) Q.unsub(); }
+async function lierGoogle(btn){
+  btn.disabled = true;
+  let res;
+  try { res = await S.fbAuth.signInWithPopup(googleProvider()); }
+  catch(e){ if (popupClosed(e)){ btn.disabled = false; return; } console.error(e); return showGate("lier", authMsg(e)); }
+  await lierFinish(res);
+}
+async function lierFinish(res){
+  const L = S.lier; if (!L) return;
+  if (!COMPTES.includes(String(res.user.email || "").toLowerCase())) return; // onAuth affiche « Accès non autorisé »
+  const idToken = res.credential && res.credential.idToken;
+  if (!idToken) return showGate("lier", "Google n'a pas transmis d'autorisation : réessaie.");
+  try {
+    const key = await crypto.subtle.importKey("raw", unb64u(L.key), "AES-GCM", false, ["encrypt"]);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const data = new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM", iv}, key, new TextEncoder().encode(JSON.stringify({idToken}))));
+    await S.fdb.collection("liaisons").doc(L.id).set({iv:b64u(iv), data:b64u(data), cree:firebase.firestore.FieldValue.serverTimestamp()});
+  } catch(e){ console.error(e); return showGate("lier", "Envoi à l'ordinateur impossible. " + authMsg(e)); }
+  S.lier = null; toast("Ordinateur connecté.");
+  await onAuth(S.fbAuth.currentUser);
+}
+
 async function onAuth(u){
   S.fbUser = null;
-  if (!u){ if (S.started) location.reload(); else showGate("login"); return; }
+  if (!u){ if (S.started) location.reload(); else showGate(S.lier ? "lier" : "login"); return; }
   if (!COMPTES.includes(String(u.email || "").toLowerCase())) return showGate("denied");
   if (!u.emailVerified){
     if (!S.verifySent){ S.verifySent = true; u.sendEmailVerification().catch(e => console.error(e)); }
@@ -1633,7 +1738,7 @@ async function onAuth(u){
   }
   // les règles de la base lisent email_verified dans le jeton : on le renouvelle s'il date d'avant la confirmation
   try { const t = await u.getIdTokenResult(); if (!t.claims.email_verified) await u.getIdToken(true); } catch(e){ console.warn(e); }
-  S.fbUser = u; S.navKey = ""; showGate(null);
+  S.fbUser = u; S.navKey = ""; showGate(S.lier ? "lier" : null);
   if (!S.started) start(S.fdb);
   schedule();
 }
@@ -1651,6 +1756,9 @@ async function logout(){
 
 /* ================= Démarrage ================= */
 (async function init(){
+  // QR code scanné sur un ordinateur : #lier=<id>.<clé>. On retire la clé de l'adresse aussitôt lue.
+  const lm = /^#lier=([\w-]{16,})\.([\w-]{40,})$/.exec(location.hash);
+  if (lm){ S.lier = {id:lm[1], key:lm[2]}; history.replaceState(null, "", location.pathname + location.search); }
   readHash(); render();
   const cl = window.claude;
   if (cl && typeof cl.use === "function"){
@@ -1674,6 +1782,7 @@ async function logout(){
   S.legacy = readLegacy();
   S.fbAuth = firebase.auth();
   S.fbAuth.onAuthStateChanged(u => { onAuth(u).catch(e => { console.error(e); showGate("login", authMsg(e)); }); });
+  if (/^https?:$/.test(location.protocol)) S.fbAuth.getRedirectResult().catch(e => { console.error(e); showGate("login", authMsg(e)); }); // retour de Google si la fenêtre a été bloquée
 })();
 function start(db){
   S.db = db; S.started = true;

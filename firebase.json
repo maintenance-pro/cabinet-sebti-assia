@@ -31,7 +31,15 @@
   },
   "auth": {
     "providers": {
-      "emailPassword": true
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "Cabinet Sebti Assia",
+        "supportEmail": "bilalnahil05@gmail.com",
+        "authorizedRedirectUris": [
+          "https://cabinet-sebti-assia.web.app/__/auth/handler",
+          "https://cabinet-sebti-assia.firebaseapp.com/__/auth/handler"
+        ]
+      }
     }
   }
 }
