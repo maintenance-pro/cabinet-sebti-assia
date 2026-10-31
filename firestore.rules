@@ -2,7 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // Seuls les comptes autorisés, avec leur adresse e-mail confirmée, lisent et modifient les données.
-    // Garder cette liste identique à COMPTES dans index.html.
+    // C'est la seule liste des comptes autorisés : l'application ne la connaît pas et demande à la base.
     function cabinet() {
       return request.auth != null
         && request.auth.token.email_verified == true

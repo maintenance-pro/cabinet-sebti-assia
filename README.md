@@ -8,7 +8,7 @@ Site : https://cabinet-sebti-assia.web.app
 
 Tout tient dans `index.html`. Les données sont dans **Firestore** (projet Firebase `cabinet-sebti-assia`, région `eur3`, protection contre la suppression activée) et restent consultables hors ligne grâce au cache du navigateur.
 
-- Accès réservé aux comptes listés dans `COMPTES` (`index.html`) et dans `firestore.rules` (garder les deux listes identiques, puis déployer), avec une adresse e-mail confirmée.
+- Accès réservé aux comptes listés dans `firestore.rules` (seul endroit où figure la liste, jamais affichée ni présente dans la page), avec une adresse e-mail confirmée. Pour ajouter un compte : l'ajouter dans `firestore.rules` puis `firebase deploy --only firestore:rules`.
 - Connexion : **Continuer avec Google**, e-mail et mot de passe, ou **QR code** — l'ordinateur affiche un QR code, le téléphone le scanne et se connecte avec Google ; l'autorisation Google passe chiffrée (AES-GCM, clé contenue seulement dans le QR code) par `liaisons/{id}`, puis l'ordinateur se connecte avec.
 - **Réglages › Données et compte** : télécharger une sauvegarde complète (JSON) ou en importer une.
 - Les données saisies avec l'ancienne version (stockées dans le navigateur) sont proposées une fois à l'envoi en ligne.

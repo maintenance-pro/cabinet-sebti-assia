@@ -1438,7 +1438,6 @@ const FIREBASE_CONFIG = {
   apiKey:"AIzaSyC5jTvvTllfAo_K9uaFR_Ckg1OK8DJN9YA", authDomain:"cabinet-sebti-assia.web.app", projectId:"cabinet-sebti-assia",
   storageBucket:"cabinet-sebti-assia.firebasestorage.app", messagingSenderId:"255493261882", appId:"1:255493261882:web:aba15d530ecad769b38303"
 };
-const COMPTES = ["cabinetkinesebti@gmail.com", "bilalnahil05@gmail.com"]; // garder identique à firestore.rules
 const FB_SDK = ["app","auth","firestore"].map(m => `https://www.gstatic.com/firebasejs/10.14.1/firebase-${m}-compat.js`);
 const COLL_OK = c => c === "patients" || c === "config" || /^mois\/\d{4}-\d{2}\/(rdv|paiements|charges)$/.test(c);
 const loadScript = src => new Promise((ok, ko) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = () => ko(new Error("Chargement impossible : " + src)); document.head.appendChild(s); });
@@ -1500,7 +1499,7 @@ function backupSection(){
   if (S.mode !== "firebase") return "";
   const pi = S.pendingImport;
   return `<section class="box" style="margin-top:14px"><h3>Données et compte</h3>
-    <p class="hint">Les données sont enregistrées en ligne, dans la base Firebase du cabinet (en Europe, protégée contre la suppression). Elles sont disponibles sur tout appareil connecté avec ${esc(COMPTES.join(" ou "))}.</p>
+    <p class="hint">Les données sont enregistrées en ligne, dans la base Firebase du cabinet (en Europe, protégée contre la suppression). Elles sont disponibles sur tout appareil connecté avec un compte autorisé.</p>
     <p class="hint" style="margin-top:6px">Connecté : <b>${esc(S.fbUser ? S.fbUser.email : "")}</b>. Télécharger une copie de temps en temps (clé USB, Drive) reste une bonne précaution.</p>
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">
       <button type="button" class="btn" data-action="export">Télécharger une sauvegarde</button>
@@ -1554,7 +1553,7 @@ function showGate(step, err){
   if (!step){ g.hidden = true; return; }
   g.hidden = false;
   const u = S.fbAuth && S.fbAuth.currentUser;
-  const mail = `<label class="f">E-mail<input id="gMail" type="email" autocomplete="username" value="${esc(u ? u.email : COMPTES[0])}"></label>`;
+  const mail = `<label class="f">E-mail<input id="gMail" type="email" autocomplete="username" value="${esc(u ? u.email : "")}"></label>`;
   const errHtml = err ? `<p class="err" role="alert">${esc(err)}</p>` : "";
   const H = {
     loading: `<p class="hint">Connexion à la base du cabinet…</p>`,
@@ -1587,7 +1586,7 @@ function showGate(step, err){
       </details>
       <div class="gate-links"><button type="button" class="linkbtn" data-action="gate-resend">Renvoyer l'e-mail</button>
       <button type="button" class="linkbtn" data-action="logout">Se déconnecter</button></div>`,
-    denied: `<h2>Accès non autorisé</h2><p class="hint">Le compte <b>${esc(u ? u.email : "")}</b> n'a pas accès aux données du cabinet. Connecte-toi avec ${esc(COMPTES.join(" ou "))}.</p>
+    denied: `<h2>Accès non autorisé</h2><p class="hint">Le compte <b>${esc(u ? u.email : "")}</b> n'a pas accès aux données du cabinet. Connecte-toi avec un compte autorisé.</p>
       <button type="button" class="btn primary" data-action="logout">Changer de compte</button>`,
     qr: `<h2>Connexion avec le téléphone</h2>
       <div class="gate-qr">${S.qr ? S.qr.svg : ""}</div>
@@ -1612,7 +1611,6 @@ async function gateSubmit(){
   const mail = ($("#gMail") ? $("#gMail").value : "").trim().toLowerCase(), pass = $("#gPass") ? $("#gPass").value : "";
   const fail = msg => { showGate(step, msg); $("#gMail").value = mail; };
   if (!mail) return fail("Saisis l'adresse e-mail.");
-  if (step !== "reset" && !COMPTES.includes(mail)) return fail(`Seul ${COMPTES.join(" ou ")} a accès aux données du cabinet.`);
   if (step === "create"){
     if (pass.length < 8) return fail("Mot de passe trop court : 8 caractères minimum.");
     if (pass !== $("#gPass2").value) return fail("Les deux mots de passe ne sont pas identiques.");
@@ -1715,7 +1713,6 @@ async function lierGoogle(btn){
 }
 async function lierFinish(res){
   const L = S.lier; if (!L) return;
-  if (!COMPTES.includes(String(res.user.email || "").toLowerCase())) return; // onAuth affiche « Accès non autorisé »
   const idToken = res.credential && res.credential.idToken;
   if (!idToken) return showGate("lier", "Google n'a pas transmis d'autorisation : réessaie.");
   try {
@@ -1723,7 +1720,7 @@ async function lierFinish(res){
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const data = new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM", iv}, key, new TextEncoder().encode(JSON.stringify({idToken}))));
     await S.fdb.collection("liaisons").doc(L.id).set({iv:b64u(iv), data:b64u(data), cree:firebase.firestore.FieldValue.serverTimestamp()});
-  } catch(e){ console.error(e); return showGate("lier", "Envoi à l'ordinateur impossible. " + authMsg(e)); }
+  } catch(e){ console.error(e); return errCode(e) === "permission_denied" ? showGate("denied") : showGate("lier", "Envoi à l'ordinateur impossible. " + authMsg(e)); }
   S.lier = null; toast("Ordinateur connecté.");
   await onAuth(S.fbAuth.currentUser);
 }
@@ -1731,13 +1728,18 @@ async function lierFinish(res){
 async function onAuth(u){
   S.fbUser = null;
   if (!u){ if (S.started) location.reload(); else showGate(S.lier ? "lier" : "login"); return; }
-  if (!COMPTES.includes(String(u.email || "").toLowerCase())) return showGate("denied");
   if (!u.emailVerified){
     if (!S.verifySent){ S.verifySent = true; u.sendEmailVerification().catch(e => console.error(e)); }
     return showGate("verify");
   }
   // les règles de la base lisent email_verified dans le jeton : on le renouvelle s'il date d'avant la confirmation
   try { const t = await u.getIdTokenResult(); if (!t.claims.email_verified) await u.getIdToken(true); } catch(e){ console.warn(e); }
+  // La liste des comptes autorisés n'existe que dans firestore.rules (jamais dans la page) : on demande à la base.
+  // Hors ligne, la lecture échoue autrement : on laisse passer, le cache ne contient que ce que ce compte a déjà pu lire.
+  if (!S.started){
+    try { await S.fdb.doc("config/cabinet").get(); }
+    catch(e){ if (errCode(e) === "permission_denied") return showGate("denied"); console.warn(e); }
+  }
   S.fbUser = u; S.navKey = ""; showGate(S.lier ? "lier" : null);
   if (!S.started) start(S.fdb);
   schedule();
