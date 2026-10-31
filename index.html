@@ -1504,6 +1504,7 @@ function backupSection(){
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">
       <button type="button" class="btn" data-action="export">Télécharger une sauvegarde</button>
       <label class="btn" for="importFile" data-write>Importer une sauvegarde…</label><input type="file" id="importFile" accept=".json,application/json" hidden>
+      <a class="btn" href="https://console.firebase.google.com/project/${esc(FIREBASE_CONFIG.projectId)}/firestore/databases/-default-/data" target="_blank" rel="noopener">Ouvrir la base dans Firebase</a>
       <button type="button" class="btn ghost" data-action="logout">Se déconnecter</button>
     </div>
     ${pi ? `<div class="banner warn" style="margin:12px 0 0"><span>« ${esc(pi.name)} » : ${pi.nPat} patients, ${pi.nRdv} rendez-vous${pi.date ? ", sauvegardé le " + esc(new Date(pi.date).toLocaleDateString("fr-FR")) : ""}. L'import ajoute ces éléments à la base en ligne ; ceux qui y sont déjà sont remplacés par la version de la sauvegarde.</span>
