@@ -316,6 +316,8 @@ legend{font-size:12.5px;font-weight:600;color:var(--ink-2);padding:0 4px}
 .linkbtn:hover{text-decoration:underline}
 .linkbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
 .gate .err{color:var(--bad);font-size:13px;font-weight:600}
+.gate-paste{border-top:1px solid var(--line);padding-top:12px}
+.gate-paste>:not(summary){margin-top:10px}
 
 @media (max-width:1180px){
   .ag{grid-template-columns:minmax(0,1fr)}
@@ -1354,6 +1356,7 @@ async function onAction(btn, e){
     case "gate-step": showGate(ds.step); break;
     case "gate-verified": await gateVerified(btn); break;
     case "gate-resend": await gateResend(btn); break;
+    case "gate-link": await gateLink(btn); break;
     case "reload": location.reload(); break;
   }
 }
@@ -1554,6 +1557,11 @@ function showGate(step, err){
       <div class="gate-links"><button type="button" class="linkbtn" data-action="gate-step" data-step="login">Retour à la connexion</button></div>`,
     verify: `<h2>Confirme l'adresse e-mail</h2><p class="hint">Un lien de confirmation a été envoyé à <b>${esc(u ? u.email : "")}</b>. Ouvre la boîte mail (regarde aussi dans les spams), clique sur le lien, puis reviens ici.</p>${errHtml}
       <button type="button" class="btn primary" data-action="gate-verified">J'ai cliqué sur le lien</button>
+      <details class="gate-paste"><summary class="linkbtn">Le lien affiche une erreur ?</summary>
+        <p class="hint">Sur l'e-mail, appui long sur le lien › « Copier l'adresse du lien » (ou copie l'adresse de la page d'erreur), colle-la ici puis valide.</p>
+        <label class="f">Lien de confirmation<input id="gLink" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://cabinet-sebti-assia.firebaseapp.com/__/auth/action?…"></label>
+        <button type="button" class="btn" data-action="gate-link">Valider avec ce lien</button>
+      </details>
       <div class="gate-links"><button type="button" class="linkbtn" data-action="gate-resend">Renvoyer l'e-mail</button>
       <button type="button" class="linkbtn" data-action="logout">Se déconnecter</button></div>`,
     denied: `<h2>Accès non autorisé</h2><p class="hint">Le compte <b>${esc(u ? u.email : "")}</b> n'a pas accès aux données du cabinet. Connecte-toi avec ${esc(COMPTES.join(" ou "))}.</p>
@@ -1563,7 +1571,9 @@ function showGate(step, err){
   const f = $("#gPass", body) || $("#gMail", body); if (f) f.focus();
 }
 async function gateSubmit(){
-  const step = S.gate, a = S.fbAuth; if (!a || !["login","create","reset"].includes(step)) return;
+  const step = S.gate, a = S.fbAuth;
+  if (step === "verify" && $("#gLink") && $("#gLink").value.trim()) return gateLink($('[data-action="gate-link"]'));
+  if (!a || !["login","create","reset"].includes(step)) return;
   const mail = ($("#gMail") ? $("#gMail").value : "").trim().toLowerCase(), pass = $("#gPass") ? $("#gPass").value : "";
   const fail = msg => { showGate(step, msg); $("#gMail").value = mail; };
   if (!mail) return fail("Saisis l'adresse e-mail.");
@@ -1586,6 +1596,26 @@ async function gateVerified(btn){
   const u = a.currentUser;
   if (!u.emailVerified) return showGate("verify", "L'adresse n'est pas encore confirmée. Clique sur le lien reçu par e-mail, puis réessaie.");
   await onAuth(u);
+}
+// Certaines applis (Gmail, WhatsApp…) abîment le lien de l'e-mail et la page Firebase répond
+// « The selected page mode is invalid » : on accepte le lien collé, même abîmé, et on valide le code ici.
+function oobFrom(s){
+  let t = String(s || "").trim().replace(/&amp;/g, "&");
+  for (let i = 0; i < 3; i++){
+    const m = t.match(/[?&]oobCode=([^&#\s]+)/); if (m) return decodeURIComponent(m[1]);
+    try { t = decodeURIComponent(t); } catch(e){ break; } // lien emballé par une redirection (…?q=https%3A…)
+  }
+  return "";
+}
+async function gateLink(btn){
+  const a = S.fbAuth, code = oobFrom($("#gLink") && $("#gLink").value);
+  if (!a.currentUser) return showGate("login");
+  if (!code) return showGate("verify", "Ce lien ne contient pas de code de confirmation : copie le lien entier de l'e-mail.");
+  btn.disabled = true;
+  try { await a.applyActionCode(code); await a.currentUser.reload(); }
+  catch(e){ return showGate("verify", e && e.code === "auth/invalid-action-code" ? "Ce lien a expiré ou a déjà servi. Clique sur « J'ai cliqué sur le lien », ou sur « Renvoyer l'e-mail »." : authMsg(e)); }
+  if (!a.currentUser.emailVerified) return showGate("verify", "L'adresse n'est pas encore confirmée.");
+  await onAuth(a.currentUser);
 }
 async function gateResend(btn){
   const u = S.fbAuth.currentUser; if (!u) return;
