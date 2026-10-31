@@ -6,7 +6,7 @@ service cloud.firestore {
     function cabinet() {
       return request.auth != null
         && request.auth.token.email_verified == true
-        && request.auth.token.email in ['cabinetkinesebti@gmail.com', 'admine@leoni.com'];
+        && request.auth.token.email in ['cabinetkinesebti@gmail.com', 'bilalnahil05@gmail.com'];
     }
 
     match /patients/{id} {
