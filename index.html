@@ -305,6 +305,26 @@ legend{font-size:12.5px;font-weight:600;color:var(--ink-2);padding:0 4px}
 .loading{padding:40px 10px;text-align:center;color:var(--muted)}
 .rail-foot .who{display:flex;flex-direction:column;align-items:flex-start;gap:4px;overflow-wrap:anywhere}
 
+/* ---------- Réservation en ligne ---------- */
+.rdv.demande{border:1.5px dashed var(--tape);background:var(--tape-soft)}
+.rdv .dn{font-weight:600;font-size:14px;overflow-wrap:anywhere}
+.resa{display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:16px;align-items:start}
+.resa-qr svg{width:180px;height:auto;display:block;border:1px solid var(--line);border-radius:8px}
+.resa-qr small{display:block;margin-top:6px;font-size:11px;color:var(--muted);text-align:center;overflow-wrap:anywhere}
+#printArea{display:none}
+.poster{max-width:150mm;margin:0 auto;text-align:center;font-family:var(--f-body);color:#1B2F4E;display:flex;flex-direction:column;align-items:center;gap:6mm}
+.poster .brand{--accent-ink:#0D6858;--tape:#A8368B;--accent:#13826D;--logo-blue:#2F4F91;align-self:stretch}
+.poster .brand svg{width:22mm;height:22mm}.poster .brand b{font-size:30pt}.poster .brand small{font-size:12pt}.poster .brand .ar{font-size:14pt}
+.poster h1{font-family:var(--f-display);font-size:30pt;margin:0}
+.poster .ar2{font-family:var(--f-ar);font-weight:700;font-size:20pt;margin:0;color:#A8368B}
+.poster .qbox svg{width:95mm;height:95mm;display:block}
+.poster p{margin:0;font-size:13pt}
+@media print{
+  body > *:not(#printArea):not(#defs){display:none!important}
+  #printArea{display:block!important;padding:12mm}
+}
+@media (max-width:640px){ .resa{grid-template-columns:minmax(0,1fr)} }
+
 /* ---------- Connexion (au-dessus de l'app, sous les toasts) ---------- */
 .gate{position:fixed;inset:0;z-index:70;background:var(--bg);display:grid;place-items:center;overflow-y:auto;
   padding:calc(24px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
@@ -380,7 +400,7 @@ legend{font-size:12.5px;font-weight:600;color:var(--ink-2);padding:0 4px}
 </head>
 <body>
 <!-- Logo de la carte de visite : sportif dans un arc vert d'eau → magenta -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<svg id="defs" width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
   <linearGradient id="logoArc" x1="0" y1="1" x2="1" y2="0"><stop offset=".15" style="stop-color:var(--accent)"/><stop offset=".6" style="stop-color:var(--tape)"/></linearGradient>
   <symbol id="logo" viewBox="0 0 48 48">
     <path d="M17 42.5C7.5 39.5 2.6 30.5 5 21.5 7.6 11.6 18 5.2 29 5.6c6.8.3 12.3 3.3 14.6 8.4" fill="none" stroke="url(#logoArc)" stroke-width="3" stroke-linecap="round"/>
@@ -441,6 +461,7 @@ const DEFAULTS = {
   adresse:"Bd Med V, Résidence Aymen, N° 16/17, 1er étage, Lot Berkoure (en face Clinique Ibn Zohr), Berrechid",
   tarifDefaut:150, dureeDefaut:30, coutVariableSeance:6,
   ouverture:"08:30", fermeture:"19:00", samediFermeture:"13:00", pas:30, postes:3, joursOuvres:[1,2,3,4,5,6],
+  resaActive:true, resaHorizon:21, resaDelai:2,
   tauxImpot:0, chargesFixes:[], materiel:[],
   messageRappel:"Bonjour {patient}, nous vous rappelons votre séance de kinésithérapie {jour} à {heure} au cabinet Sebti Assia. Merci de nous prévenir en cas d'empêchement."
 };
@@ -497,6 +518,7 @@ const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 const S = {
   db:null, user:null, canWrite:null, readonly:false,
   fdb:null, fbAuth:null, fbUser:null, gate:null, started:false, legacy:null, verifySent:false, leaving:false, qr:null, lier:null,
+  demandes:new Map(), demLoaded:false, occ:new Map(), occLoaded:false, pub:null, pubLoaded:false, syncT:0,
   status:"loading", loadTimer:null, lostMsg:"",
   config:null, patients:new Map(), patientsReady:false,
   months:new Map(),
@@ -531,7 +553,8 @@ function ensureMonth(m){
     try{
       e.unsubs.push(watch(S.db.collection(`mois/${m}/${coll}`), snap => {
         const map = new Map(); snap.docs.forEach(d => map.set(d.id, d.data()));
-        e[k] = map; markFresh(snap.metadata.fromCache); schedule();
+        e[k] = map; if (k === "rdv" && !snap.metadata.fromCache) e.rdvFresh = true;
+        markFresh(snap.metadata.fromCache); schedule();
       }));
     }catch(err){ console.error(err); }
   });
@@ -737,12 +760,13 @@ function render(){
     $("#plistWrap").innerHTML = patientsList(D);
   } else if (S.view === "reglages"){
     const fs = $("#fSettings"); const editing = fs && fs.contains(document.activeElement);
-    if (S.shellKey !== key || (!S.settingsDirty && !editing)){ v.innerHTML = settingsView(D); S.shellKey = key; S.settingsDirty = false; }
+    if (S.shellKey !== key || (!S.settingsDirty && !editing)){ v.innerHTML = settingsView(D); S.shellKey = key; S.settingsDirty = false; resaQr(); }
   } else {
     v.innerHTML = ({agenda:viewAgenda, caisse:viewCaisse, charges:viewCharges, resultat:viewResultat})[S.view](D);
     S.shellKey = key;
   }
   if (S.drawer && S.drawer.type === "patient" && S.drawer.id) { const lb = $("#pLive"); if (lb) lb.innerHTML = patientLive(S.drawer.id, D); }
+  queueSync();
 }
 
 /* ================= Agenda ================= */
@@ -763,7 +787,7 @@ function viewAgenda(D){
   let week = "";
   for (let i=0;i<7;i++){
     const d = addDays(monday, i); const dd = parseYmd(d);
-    const n = (D.byDay.get(d)||[]).filter(active).length;
+    const n = (D.byDay.get(d)||[]).filter(active).length + [...S.demandes.values()].filter(x => x.date === d).length;
     const isOpen = (c.joursOuvres||[]).map(Number).includes(dd.getDay());
     week += `<button class="wd ${d===TODAY?"today":""} ${isOpen?"":"closed"}" aria-pressed="${d===day}" data-action="day" data-day="${d}">
       <span class="l">${esc(dd.toLocaleDateString("fr-FR",{weekday:"short"}).replace(".",""))}</span><span class="n">${dd.getDate()}</span><span class="c">${n ? n+" rdv" : "—"}</span></button>`;
@@ -779,15 +803,18 @@ function viewAgenda(D){
     for (const x of slots){ if (toMin(x) <= t) s = x; else break; }
     if (s && t < toMin(slots[slots.length-1]) + step) bySlot.get(s).push(r); else outside.push(r);
   });
+  const dems = new Map(); // demandes en ligne du jour, rangées par créneau
+  for (const [id, x] of S.demandes) if (x.date === day) push(dems, bySlot.has(x.heure) ? x.heure : "", [id, x]);
   const postes = Math.max(1, +c.postes || 1);
   const nowMin = new Date().getHours()*60 + new Date().getMinutes();
   let rows = "";
-  if (outside.length) rows += `<div class="slot"><time>Hors<br>horaire</time><div class="cards" style="--postes:${postes}">${outside.map(r => rdvCard(r, D)).join("")}</div></div>`;
+  const outDems = dems.get("") || [];
+  if (outside.length || outDems.length) rows += `<div class="slot"><time>Hors<br>horaire</time><div class="cards" style="--postes:${postes}">${outside.map(r => rdvCard(r, D)).join("")}${outDems.map(demandeCard).join("")}</div></div>`;
   slots.forEach(s => {
-    const rs = bySlot.get(s); const used = rs.filter(active).length;
+    const rs = bySlot.get(s); const ds = dems.get(s) || []; const used = rs.filter(active).length + ds.length;
     const isNow = day === TODAY && nowMin >= toMin(s) && nowMin < toMin(s) + step;
     const addBtn = used < postes ? `<button class="add" data-action="new-rdv" data-date="${day}" data-time="${s}" data-write aria-label="Ajouter un rendez-vous à ${s}">+ ${s}</button>` : "";
-    rows += `<div class="slot ${isNow?"now":""}"><time>${s}</time><div class="cards" style="--postes:${postes}">${rs.map(r => rdvCard(r, D)).join("")}${addBtn}</div></div>`;
+    rows += `<div class="slot ${isNow?"now":""}"><time>${s}</time><div class="cards" style="--postes:${postes}">${rs.map(r => rdvCard(r, D)).join("")}${ds.map(demandeCard).join("")}${addBtn}</div></div>`;
   });
   const tl = `<section class="tl" aria-label="Rendez-vous du jour">
     <div class="tl-head"><span>${open ? `${slots[0]||""} – ${fromMin(toMin(slots[slots.length-1]||"0:0")+step)} · ${postes} patient${postes>1?"s":""} en parallèle` : "Cabinet fermé ce jour"}</span><span>${list.filter(active).length} rendez-vous</span></div>
@@ -798,7 +825,25 @@ function viewAgenda(D){
       <div class="navpair"><button class="btn icon-btn" data-action="day-shift" data-n="7" aria-label="Semaine suivante">${ic("right")}</button>
       <button class="btn" data-action="day" data-day="${TODAY}">Aujourd'hui</button></div>
     </div>${stats}
-    <div class="ag">${tl}<aside class="side stack">${remindersBox(D)}${followBox(D)}</aside></div>`;
+    <div class="ag">${tl}<aside class="side stack">${demandesBox()}${remindersBox(D)}${followBox(D)}</aside></div>`;
+}
+function demandeCard([id, x]){
+  const wa = waNumber(x.tel);
+  return `<article class="rdv demande">
+    <div class="rh"><span class="t">${esc(x.heure)}</span><span class="chip tape">En ligne</span><span class="chip st warn">À confirmer</span></div>
+    <span class="dn">${esc(x.nom)}</span>
+    <div class="mt">${esc([x.tel, x.motif].filter(Boolean).join(" · "))}</div>
+    <div class="ra"><button class="btn sm ok" data-action="dem-ok" data-id="${esc(id)}" data-write>${ic("check")}Confirmer</button>
+      ${wa ? `<a class="btn sm" href="https://wa.me/${wa}" target="_blank" rel="noopener">${ic("chat")}WhatsApp</a>` : ""}
+      <button class="btn sm danger" data-action="dem-no" data-id="${esc(id)}" data-confirm data-write>Refuser</button></div></article>`;
+}
+function demandesBox(){
+  const list = [...S.demandes.entries()].filter(([,x]) => x.date >= TODAY).sort((a,b) => (a[1].date + a[1].heure).localeCompare(b[1].date + b[1].heure));
+  if (!list.length) return "";
+  return `<section class="box"><h3>Demandes en ligne<span class="chip tape">${list.length}</span></h3><ul class="alist">${list.map(([,x]) => `<li>
+    <div class="r1"><button class="linkish" data-action="day" data-day="${esc(x.date)}">${esc(x.nom)}</button><span class="mono">${esc(dayShort(x.date))} · ${esc(x.heure)}</span></div>
+    <div class="r2">${esc(x.tel)}${x.motif ? " · " + esc(x.motif) : ""}</div></li>`).join("")}</ul>
+    <p class="hint" style="margin-top:8px">Clique sur un nom pour ouvrir le jour, puis confirme ou refuse dans l'agenda.</p></section>`;
 }
 function rdvCard(r, D){
   const p = S.patients.get(r.patientId); const st = D.pstats.get(r.patientId);
@@ -1064,6 +1109,16 @@ function settingsView(D){
     <section class="box"><h3>Message de rappel WhatsApp</h3><div class="form">
       <label class="f">Texte<textarea id="sMsg" rows="4">${esc(c.messageRappel)}</textarea></label>
       <p class="hint">Variables : {patient}, {jour}, {heure}.</p></div></section>
+    <section class="box wide"><h3>Réservation en ligne</h3><div class="resa"><div class="form">
+      <div class="checks"><label><input type="checkbox" id="sResa" ${c.resaActive ? "checked" : ""}>Les patients peuvent réserver en ligne</label></div>
+      <div class="g2"><label class="f">Réservable jusqu'à<select id="sResaH">${[7,14,21,30].map(v => `<option value="${v}" ${+c.resaHorizon === v ? "selected" : ""}>${v} jours à l'avance</option>`).join("")}</select></label>
+      <label class="f">Réservation au plus tard<select id="sResaD">${[[0,"jusqu'au dernier moment"],[1,"1 h avant"],[2,"2 h avant"],[4,"4 h avant"],[24,"la veille (24 h avant)"]].map(([v,l]) => `<option value="${v}" ${+c.resaDelai === v ? "selected" : ""}>${l}</option>`).join("")}</select></label></div>
+      <p class="hint">Un créneau de ${esc(Math.max(10, +c.pas || 30))} min n'est proposé en ligne que s'il est entièrement libre dans l'agenda ; dès qu'un patient le réserve, il n'est plus proposé. Les patients ne voient jamais les noms. Les demandes arrivent dans l'agenda, à confirmer ou refuser.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px"><a class="btn" href="${RESA_URL}" target="_blank" rel="noopener">Ouvrir la page</a>
+        <button type="button" class="btn" data-action="resa-copy">Copier le lien</button>
+        <a class="btn" href="https://wa.me/?text=${encodeURIComponent("Prenez rendez-vous au cabinet de kinésithérapie Sebti Assia : " + RESA_URL)}" target="_blank" rel="noopener">${ic("chat")}Partager sur WhatsApp</a>
+        <button type="button" class="btn" data-action="resa-print">${ic("qr")}Imprimer l'affiche QR code</button></div></div>
+      <div class="resa-qr" id="resaQr"></div></div></section>
     <section class="box wide"><h3>Données d'exemple</h3>
       ${exCount ? `<p class="hint" style="margin-bottom:10px">${exCount} éléments d'exemple (patients fictifs, rendez-vous, encaissements, dépenses). Les supprimer ne touche pas aux données que tu as saisies.</p>
       <button type="button" class="btn danger" data-action="clear-examples" data-confirm data-write>Effacer les exemples</button>` : `<p class="hint">Aucune donnée d'exemple.</p>`}</section>
@@ -1082,7 +1137,8 @@ function readSettings(){
     tarifDefaut:+v("sTarif")||0, dureeDefaut:+v("sDuree")||30, coutVariableSeance:+v("sCV")||0,
     ouverture:v("sOuv")||"08:30", fermeture:v("sFerm")||"19:00", samediFermeture:v("sSam")||"", pas:+v("sPas")||30, postes:Math.max(1, +v("sPostes")||1),
     joursOuvres:$$("[data-jour]", f).filter(x => x.checked).map(x => +x.dataset.jour),
-    chargesFixes:fixes, materiel:mat, tauxImpot:+v("sTaux")||0, messageRappel:v("sMsg"), exemple:false, majLe:new Date().toISOString()
+    chargesFixes:fixes, materiel:mat, tauxImpot:+v("sTaux")||0, messageRappel:v("sMsg"),
+    resaActive:$("#sResa", f).checked, resaHorizon:+v("sResaH")||21, resaDelai:+v("sResaD")||0, exemple:false, majLe:new Date().toISOString()
   };
 }
 
@@ -1102,14 +1158,19 @@ function rdvDrawer(opts){
   const c = cfg(); const edit = !!opts.id;
   const r = edit ? Object.assign({}, S.months.get(opts.m)?.rdv.get(opts.id) || {}) : {};
   if (edit && !r.date){ toast("Ce rendez-vous n'existe plus.", true); return; }
-  const pid = r.patientId || opts.patient || "";
+  // confirmation d'une demande en ligne : patient reconnu par son téléphone, sinon nouveau patient pré-rempli
+  const dm = opts.demande ? S.demandes.get(opts.demande) : null;
+  if (opts.demande && !dm){ toast("Cette demande n'existe plus.", true); return; }
+  const telKey = t => String(t || "").replace(/\D/g, "").slice(-9);
+  const known = dm ? [...S.patients.entries()].find(([,p]) => p.tel && telKey(p.tel) === telKey(dm.tel)) : null;
+  const pid = dm ? (known ? known[0] : "__new") : (r.patientId || opts.patient || "");
   const p = S.patients.get(pid);
   const montant = edit ? r.montant : (p ? (p.tarif || c.tarifDefaut) : c.tarifDefaut);
   const date = r.date || opts.date || S.day; const heure = r.heure || opts.time || c.ouverture;
   const st = edit ? S.D.pstats.get(pid) : null; const n = st && st.num.get(opts.id);
   const sub = edit ? `${esc(dayLabel(r.date))} · ${esc(r.heure)}${n?` · séance ${n}${st.pres?"/"+st.pres:""}`:""}` : "";
   const reg = r.reglement ? `<div class="banner info" style="margin:0"><span>Réglée le ${esc(dayShort(r.reglement.date))} · ${esc(MODES[r.reglement.mode]||"")} · ${fmtDH(r.reglement.montant)}</span><button type="button" class="btn sm" data-action="undo-pay" data-write>Annuler le règlement</button></div>` : "";
-  const html = dHead(edit ? "Rendez-vous" : "Nouveau rendez-vous", sub) + `<form id="fRdv" class="form" autocomplete="off">
+  const html = dHead(edit ? "Rendez-vous" : dm ? "Confirmer la demande en ligne" : "Nouveau rendez-vous", dm ? `${esc(dm.nom)} · ${esc(dm.tel)}` : sub) + `<form id="fRdv" class="form" autocomplete="off">
     <label class="f">Patient<select id="rPat" required><option value="">Choisir un patient…</option>${patientOptions(pid)}<option value="__new">+ Nouveau patient…</option></select></label>
     <fieldset id="rNew" hidden><legend>Nouveau patient</legend><div class="form">
       <div class="g2"><label class="f">Nom complet<input id="nNom"></label><label class="f">Téléphone<input id="nTel" type="tel" placeholder="06 12 34 56 78"></label></div>
@@ -1129,8 +1190,9 @@ function rdvDrawer(opts){
     <div class="dfoot">${edit ? `<button type="button" class="btn danger" data-action="del-rdv" data-confirm data-write>Supprimer</button>` : "<span></span>"}
       <div class="r"><button type="button" class="btn" data-action="close">Fermer</button><button type="submit" class="btn primary" data-write>${edit?"Enregistrer":"Créer"}</button></div></div>
   </form>${motifList}`;
-  openDrawer("rdv", html, {id:opts.id, m:opts.m, orig:r});
+  openDrawer("rdv", html, {id:opts.id, m:opts.m, orig:r, demande:dm ? opts.demande : null});
   const f = $("#fRdv");
+  if (dm){ $("#rPat").value = pid; if (pid === "__new"){ $("#nNom").value = dm.nom; $("#nTel").value = dm.tel; $("#nMotif").value = dm.motif || ""; } }
   const sync = () => {
     const ps = $("#rPat").value; $("#rNew").hidden = ps !== "__new";
     const pp = S.patients.get(ps); if (!edit && pp && !f.dataset.touchedMontant) $("#rMontant").value = pp.tarif || c.tarifDefaut;
@@ -1202,7 +1264,7 @@ async function saveRdv(edit){
     const tasks = dates.map(d => () => { const m = monthOf(d); ensureMonth(m); return S.db.collection(`mois/${m}/rdv`).doc().set(Object.assign({}, base, {date:d, statut:"prevu", createdAt:now})); });
     const ok = await write(() => pool(tasks, 3, k => { if (dates.length > 1) btn.textContent = `Création ${k}/${dates.length}…`; }),
       dates.length > 1 ? `${dates.length} rendez-vous créés` : "Rendez-vous créé");
-    if (ok){ closeDrawer(); S.day = dates[0]; if (S.view === "agenda") schedule(); } else btn.disabled = false;
+    if (ok){ if (o && o.demande) closeDemande(o.demande, true).catch(e => console.warn(e)); closeDrawer(); S.day = dates[0]; if (S.view === "agenda") schedule(); } else btn.disabled = false;
   }
 }
 
@@ -1368,6 +1430,10 @@ async function onAction(btn, e){
     case "google-login": await googleLogin(btn); break;
     case "qr-start": await qrStart(); break;
     case "lier-google": await lierGoogle(btn); break;
+    case "dem-ok": { const x = S.demandes.get(ds.id); if (x) rdvDrawer({date:x.date, time:x.heure, demande:ds.id}); break; }
+    case "dem-no": await write(() => closeDemande(ds.id), "Demande refusée : le créneau est de nouveau libre en ligne"); break;
+    case "resa-copy": try { await navigator.clipboard.writeText(RESA_URL); toast("Lien copié : " + RESA_URL); } catch(e){ toast(RESA_URL); } break;
+    case "resa-print": await resaPoster(); break;
     case "lier-cancel": S.lier = null; if (S.fbAuth.currentUser) await onAuth(S.fbAuth.currentUser); else showGate("login"); break;
     case "reload": location.reload(); break;
   }
@@ -1757,6 +1823,71 @@ async function logout(){
   location.reload();
 }
 
+/* ================= Réservation en ligne ================= */
+// Page publique rdv.html : les patients voient les créneaux libres (jamais les noms) et en réservent un.
+// L'application publie public/agenda (horaires, réglages) et occupation/{jour} (rendez-vous par créneau) ;
+// une réservation crée demandes/{id} + verrous/{jour_hhmm}, que les règles n'acceptent que sur un créneau libre.
+const RESA_URL = "https://cabinet-sebti-assia.web.app/rdv.html";
+const stable = o => JSON.stringify(Object.keys(o || {}).sort().map(k => [k, o[k]]));
+function queueSync(){
+  if (S.mode !== "firebase" || !S.fbUser || S.readonly) return;
+  clearTimeout(S.syncT); S.syncT = setTimeout(syncResa, 1500);
+}
+function publicAgenda(){
+  const c = cfg();
+  return {actif:!!c.resaActive, horizon:+c.resaHorizon || 21, delaiH:+c.resaDelai || 0, nom:c.nom || "", telFixe:c.telFixe || "", telMobile:c.telMobile || "",
+    adresse:c.adresse || "", ouverture:c.ouverture, fermeture:c.fermeture, samediFermeture:c.samediFermeture || "", pas:Math.max(10, +c.pas || 30),
+    joursOuvres:(c.joursOuvres || []).map(Number)};
+}
+function syncResa(){
+  if (!S.db || !S.D || S.status !== "ready" || !S.pubLoaded || !S.occLoaded) return;
+  const b = S.db.batch(); let n = 0;
+  const pub = publicAgenda();
+  if (stable(pub) !== stable(S.pub)){ b.set(S.db.doc("public/agenda"), pub); n++; }
+  // occupation : seulement quand les mois concernés sont arrivés du serveur, sinon on publierait un agenda incomplet
+  const last = addDays(TODAY, pub.horizon);
+  if ([monthOf(TODAY), monthOf(last)].every(m => S.months.get(m) && S.months.get(m).rdvFresh)){
+    for (let d = TODAY; d <= last; d = addDays(d, 1)){
+      const {slots, step} = slotsFor(d); const map = {};
+      (S.D.byDay.get(d) || []).filter(active).forEach(r => { // une séance de 60 min occupe deux créneaux de 30
+        const a = toMin(r.heure), z = a + Math.max(+r.duree || step, 1);
+        slots.forEach(s => { const t = toMin(s); if (t < z && t + step > a) map[s] = (map[s] || 0) + 1; });
+      });
+      if (stable(map) === stable(S.occ.get(d))) continue;
+      if (Object.keys(map).length) b.set(S.db.doc(`occupation/${d}`), {date:d, creneaux:map}); else b.delete(S.db.doc(`occupation/${d}`));
+      n++;
+    }
+  }
+  if (n) b.commit().catch(e => console.warn("Réservation en ligne : publication impossible", e));
+}
+// Confirmer ou refuser une demande : on retire la demande et son verrou. À la confirmation, le créneau reste
+// marqué occupé tout de suite (sans attendre la prochaine publication de l'occupation).
+function closeDemande(id, confirmed){
+  const x = S.demandes.get(id); const b = S.db.batch();
+  b.delete(S.db.doc(`demandes/${id}`));
+  if (x && x.verrou) b.delete(S.db.doc(`verrous/${x.verrou}`));
+  if (x && confirmed) b.set(S.db.doc(`occupation/${x.date}`), {date:x.date, creneaux:{[x.heure]:((S.occ.get(x.date) || {})[x.heure] || 0) + 1}}, {merge:true});
+  return b.commit();
+}
+function resaQr(){
+  if (!$("#resaQr")) return;
+  loadOnce(QRGEN).then(() => { const el = $("#resaQr"); if (el) el.innerHTML = qrSvg(RESA_URL) + `<small>${esc(RESA_URL)}</small>`; }).catch(() => {});
+}
+async function resaPoster(){
+  try { await loadOnce(QRGEN); } catch(e){ toast("Générateur de QR code injoignable : vérifie la connexion internet.", true); return; }
+  const c = cfg();
+  let pa = $("#printArea"); if (!pa){ pa = document.createElement("div"); pa.id = "printArea"; document.body.appendChild(pa); }
+  pa.innerHTML = `<div class="poster">
+    <div class="brand"><div class="brand-row"><svg aria-hidden="true"><use href="#logo"/></svg><div><small>Cabinet de kinésithérapie</small><b>Sebti Assia</b></div></div>
+      <div class="ar" lang="ar" dir="rtl">عيادة الترويض الطبي <b>السبتي أسية</b></div></div>
+    <h1>Prenez rendez-vous en ligne</h1><p class="ar2" lang="ar" dir="rtl">احجز موعدك عبر الإنترنت</p>
+    <div class="qbox">${qrSvg(RESA_URL)}</div>
+    <p>Scannez ce QR code avec l'appareil photo de votre téléphone<br><b>${esc(RESA_URL.replace("https://", ""))}</b></p>
+    <p>${esc([c.telFixe, c.telMobile].filter(Boolean).join(" · "))}</p></div>`;
+  window.addEventListener("afterprint", () => { pa.innerHTML = ""; }, {once:true});
+  window.print();
+}
+
 /* ================= Démarrage ================= */
 (async function init(){
   // QR code scanné sur un ordinateur : #lier=<id>.<clé>. On retire la clé de l'adresse aussitôt lue.
@@ -1797,6 +1928,18 @@ function start(db){
       markFresh(snap.metadata.fromCache); schedule();
     });
     watch(db.doc("config/cabinet"), snap => { S.config = snap.exists ? snap.data() : null; schedule(); });
+    if (S.mode === "firebase"){ // réservation en ligne
+      watch(db.collection("demandes"), snap => {
+        const map = new Map(); snap.docs.forEach(d => map.set(d.id, d.data()));
+        if (S.demLoaded) for (const [id, x] of map) if (!S.demandes.has(id)) toast(`Nouvelle demande en ligne : ${x.nom}, ${dayShort(x.date)} à ${x.heure}`);
+        S.demandes = map; if (!snap.metadata.fromCache) S.demLoaded = true; schedule();
+      });
+      watch(db.collection("occupation").where("date", ">=", TODAY), snap => {
+        const map = new Map(); snap.docs.forEach(d => map.set(d.id, (d.data() || {}).creneaux || {}));
+        S.occ = map; if (!snap.metadata.fromCache) S.occLoaded = true; queueSync();
+      });
+      watch(db.doc("public/agenda"), snap => { S.pub = snap.exists ? snap.data() : null; if (!snap.metadata.fromCache) S.pubLoaded = true; queueSync(); });
+    }
   }catch(e){ console.error(e); }
   baseWindow().forEach(ensureMonth);
 }

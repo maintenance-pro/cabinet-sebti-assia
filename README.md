@@ -2,7 +2,7 @@
 
 Application de gestion du cabinet de kinésithérapie Sebti Assia (Berrechid) : agenda, patients, caisse, charges et résultat.
 
-Site : https://cabinet-sebti-assia.web.app
+Site : https://cabinet-sebti-assia.web.app — réservation en ligne pour les patients : https://cabinet-sebti-assia.web.app/rdv.html
 
 ## Données
 
@@ -10,6 +10,7 @@ Tout tient dans `index.html`. Les données sont dans **Firestore** (projet Fireb
 
 - Accès réservé aux comptes listés dans `firestore.rules` (seul endroit où figure la liste, jamais affichée ni présente dans la page), avec une adresse e-mail confirmée. Pour ajouter un compte : l'ajouter dans `firestore.rules` puis `firebase deploy --only firestore:rules`.
 - Connexion : **Continuer avec Google**, e-mail et mot de passe, ou **QR code** — l'ordinateur affiche un QR code, le téléphone le scanne et se connecte avec Google ; l'autorisation Google passe chiffrée (AES-GCM, clé contenue seulement dans le QR code) par `liaisons/{id}`, puis l'ordinateur se connecte avec.
+- Réservation en ligne (`rdv.html`, page publique) : les patients voient les créneaux libres (jamais de noms) et en réservent un. L'application publie `public/agenda` et `occupation/{jour}` ; une réservation écrit `demandes/{id}` + `verrous/{jour_hhmm}`, que `firestore.rules` n'accepte que sur un créneau libre. Les demandes s'affichent dans l'agenda (Confirmer / Refuser). Réglages › Réservation en ligne : activation, délai, lien, affiche QR code.
 - **Réglages › Données et compte** : télécharger une sauvegarde complète (JSON) ou en importer une.
 - Les données saisies avec l'ancienne version (stockées dans le navigateur) sont proposées une fois à l'envoi en ligne.
 - `exemple-cabinet-sebti-assia.json` est une sauvegarde d'exemple (patients fictifs) à importer depuis les Réglages.

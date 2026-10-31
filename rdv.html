@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Rendez-vous · Cabinet Sebti Assia</title>
+<meta name="description" content="Prendre rendez-vous en ligne au cabinet de kinésithérapie Sebti Assia, Berrechid.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Kufi+Arabic:wght@600;700&family=Public+Sans:wght@400;500;600;700&family=Roboto+Condensed:wght@500;700&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath d='M17 42.5C7.5 39.5 2.6 30.5 5 21.5 7.6 11.6 18 5.2 29 5.6c6.8.3 12.3 3.3 14.6 8.4' fill='none' stroke='%23A8368B' stroke-width='3.4' stroke-linecap='round'/%3E%3Ccircle cx='32.5' cy='11.5' r='4.2' fill='%232F4F91'/%3E%3Cpath d='M29 18.5L21.5 28.5' stroke='%2313826D' stroke-width='5.6' stroke-linecap='round'/%3E%3Cpath d='M28 19.5L33.5 24.5 39 21.5M28 19.5L21.5 17.5 17.5 21.5M21.5 28.5L15.5 35.5 9.5 34.5' stroke='%232F4F91' stroke-width='3.8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M21.5 28.5L30 32.5 30.5 41' stroke='%2313826D' stroke-width='4.4' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+<style>
+/* Page publique de réservation : mêmes couleurs que la carte de visite et l'application du cabinet.
+   Les patients ne voient que des créneaux libres ou occupés, jamais de noms. */
+:root{
+  --bg:#F4F6F9; --surface:#FFFFFF; --sunken:#EDF1F5; --ink:#1B2F4E; --ink-2:#3B4F6E; --muted:#5F6E85;
+  --line:#DAE1E9; --line-strong:#B9C4D2;
+  --accent:#13826D; --accent-ink:#0D6858; --accent-soft:#DCF1EA; --on-accent:#FFFFFF;
+  --tape:#A8368B; --tape-soft:#F8E4F2; --logo-blue:#2F4F91; --bad:#B3352E; --bad-soft:#F8E1DF;
+  --shadow:0 1px 2px rgba(27,47,78,.06),0 12px 32px rgba(27,47,78,.12);
+  --f-display:"Roboto Condensed","Arial Narrow","Segoe UI",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --f-ar:"Noto Kufi Arabic","Segoe UI",Tahoma,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C1522; --surface:#132033; --sunken:#0F1A2A; --ink:#E3E9F2; --ink-2:#B3BFD1; --muted:#8492A8;
+  --line:#22314A; --line-strong:#33445F;
+  --accent:#45C2A8; --accent-ink:#7DD6C3; --accent-soft:#103A36; --on-accent:#03241E;
+  --tape:#E57CC8; --tape-soft:#3A1733; --logo-blue:#7F9BDB; --bad:#F07D74; --bad-soft:#3C1A17;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.45);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0C1522; --surface:#132033; --sunken:#0F1A2A; --ink:#E3E9F2; --ink-2:#B3BFD1; --muted:#8492A8;
+  --line:#22314A; --line-strong:#33445F;
+  --accent:#45C2A8; --accent-ink:#7DD6C3; --accent-soft:#103A36; --on-accent:#03241E;
+  --tape:#E57CC8; --tape-soft:#3A1733; --logo-blue:#7F9BDB; --bad:#F07D74; --bad-soft:#3C1A17;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.45);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:680px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(40px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.head{border-top:3px solid var(--tape);display:flex;flex-direction:column;gap:8px}
+.brand-row{display:flex;gap:10px;align-items:center}
+.brand-row svg{width:48px;height:48px;flex:none}
+.brand-row small{display:block;font-family:var(--f-display);font-weight:700;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-ink)}
+.brand-row b{display:block;font-family:var(--f-display);font-weight:700;font-size:24px;line-height:1.05;text-transform:uppercase;color:var(--tape)}
+.ar{font-family:var(--f-ar);font-weight:700}
+.head .ar{font-size:12.5px;color:var(--accent-ink);padding-top:8px;border-top:1px solid var(--tape)}
+.head .ar b{color:var(--tape)}
+h1{font-family:var(--f-display);font-weight:700;font-size:30px;line-height:1.1;margin:4px 0 0;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px}
+h1 .ar{font-size:18px;color:var(--tape)}
+.lead{margin:6px 0 0;color:var(--ink-2)}
+.step{font-family:var(--f-display);font-weight:700;font-size:19px;margin:0 0 10px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.step small{font-family:var(--f-body);font-weight:500;font-size:14px;color:var(--muted)}
+.hint{color:var(--muted);font-size:13.5px;margin:0}
+.center{text-align:center}
+.days{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scroll-snap-type:x proximity}
+.day{flex:none;width:78px;scroll-snap-align:start;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.day .w,.day .m{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.day .n{font-family:var(--f-display);font-weight:700;font-size:23px;line-height:1.2}
+.day .f{font-size:11.5px;font-weight:600;color:var(--accent-ink);margin-top:2px}
+.day:hover{border-color:var(--line-strong)}
+.day[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.day:disabled{opacity:.5;cursor:default}
+.day:disabled .f{color:var(--muted)}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.slot{border:1.5px solid var(--accent);background:var(--surface);color:var(--accent-ink);border-radius:10px;padding:8px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;min-height:56px;justify-content:center}
+.slot b{font-family:var(--f-mono);font-size:16px;font-weight:500}
+.slot small{font-size:11.5px;font-weight:600}
+.slot:hover{background:var(--accent-soft)}
+.slot[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.slot:disabled{border-color:var(--line);background:var(--sunken);color:var(--muted);cursor:not-allowed}
+.slot:disabled b{text-decoration:line-through}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;border:1.5px solid var(--accent)}
+.legend i.x{border-color:var(--line);background:var(--sunken)}
+.form{display:flex;flex-direction:column;gap:12px}
+.sum{margin:0;padding:10px 12px;border-radius:10px;background:var(--accent-soft);color:var(--accent-ink)}
+.f{display:flex;flex-direction:column;gap:4px;font-size:13.5px;font-weight:600;color:var(--ink-2)}
+input[type=text],input[type=tel]{border:1px solid var(--line-strong);background:var(--surface);border-radius:9px;padding:10px 12px;font-size:16px;min-height:44px;width:100%}
+.okbox{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--ink-2)}
+.okbox input{margin-top:3px;width:18px;height:18px;accent-color:var(--accent);flex:none}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);padding:10px 16px;border-radius:10px;font-weight:600;cursor:pointer;min-height:44px;text-decoration:none}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-size:16px;min-height:50px}
+.btn:disabled{opacity:.6;cursor:default}
+.err{color:var(--bad);background:var(--bad-soft);border-radius:9px;padding:10px 12px;margin:0;font-weight:600;font-size:14px}
+.done{text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;border-top:3px solid var(--accent)}
+.done .tick{width:56px;height:56px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
+.done .tick svg{width:30px;height:30px}
+.done h2{font-family:var(--f-display);font-size:24px;margin:0}
+.done .when{font-family:var(--f-display);font-weight:700;font-size:21px;color:var(--accent-ink);margin:0}
+.done p{margin:0}
+.contact{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink-2)}
+.contact a{color:var(--accent-ink);font-weight:600;text-decoration:none}
+.contact a:hover{text-decoration:underline}
+@media (prefers-reduced-motion:no-preference){ .slot,.day{transition:background-color .15s,border-color .15s} }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="logoArc" x1="0" y1="1" x2="1" y2="0"><stop offset=".15" style="stop-color:var(--accent)"/><stop offset=".6" style="stop-color:var(--tape)"/></linearGradient>
+  <symbol id="logo" viewBox="0 0 48 48">
+    <path d="M17 42.5C7.5 39.5 2.6 30.5 5 21.5 7.6 11.6 18 5.2 29 5.6c6.8.3 12.3 3.3 14.6 8.4" fill="none" stroke="url(#logoArc)" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="32.5" cy="11.5" r="3.9" fill="var(--logo-blue)"/>
+    <path d="M29 18.5L21.5 28.5" stroke="var(--accent)" stroke-width="5.2" stroke-linecap="round" fill="none"/>
+    <path d="M28 19.5L33.5 24.5 39 21.5M28 19.5L21.5 17.5 17.5 21.5" stroke="var(--logo-blue)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M21.5 28.5L30 32.5 30.5 41" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M21.5 28.5L15.5 35.5 9.5 34.5" stroke="var(--logo-blue)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </symbol>
+</defs></svg>
+<main class="wrap">
+  <header class="card head">
+    <div class="brand-row"><svg aria-hidden="true"><use href="#logo"/></svg><div><small>Cabinet de kinésithérapie</small><b>Sebti Assia</b></div></div>
+    <div class="ar" lang="ar" dir="rtl">عيادة الترويض الطبي <b>السبتي أسية</b></div>
+  </header>
+  <div>
+    <h1>Prendre rendez-vous <span class="ar" lang="ar" dir="rtl">حجز موعد</span></h1>
+    <p class="lead">Choisissez un jour puis un créneau libre. Les créneaux déjà pris sont grisés et ne peuvent pas être choisis.</p>
+  </div>
+  <div id="app"><p class="hint center">Chargement des créneaux…</p></div>
+  <footer class="card contact" id="contact" hidden></footer>
+</main>
+<script>
+"use strict";
+// Même projet Firebase que l'application du cabinet. Ces clés sont publiques par nature : l'accès est contrôlé
+// par firestore.rules (lecture des créneaux seulement ; une réservation n'est acceptée que sur un créneau libre).
+const FIREBASE_CONFIG = {
+  apiKey:"AIzaSyC5jTvvTllfAo_K9uaFR_Ckg1OK8DJN9YA", authDomain:"cabinet-sebti-assia.web.app", projectId:"cabinet-sebti-assia",
+  storageBucket:"cabinet-sebti-assia.firebasestorage.app", messagingSenderId:"255493261882", appId:"1:255493261882:web:aba15d530ecad769b38303"
+};
+const SDK = ["app","firestore"].map(m => `https://www.gstatic.com/firebasejs/10.14.1/firebase-${m}-compat.js`);
+
+const $ = (s, r=document) => r.querySelector(s);
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad = n => String(n).padStart(2,"0");
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parseYmd = s => { const [y,m,d] = String(s).split("-").map(Number); return new Date(y, (m||1)-1, d||1); };
+const addDays = (s,n) => { const d = parseYmd(s); d.setDate(d.getDate()+n); return ymd(d); };
+const toMin = t => { const [h,m] = String(t||"0:0").split(":").map(Number); return (h||0)*60+(m||0); };
+const fromMin = n => `${pad(Math.floor(n/60))}:${pad(n%60)}`;
+const cap = s => s ? s.charAt(0).toUpperCase()+s.slice(1) : s;
+const dayLong = s => cap(parseYmd(s).toLocaleDateString("fr-FR",{weekday:"long", day:"numeric", month:"long"}));
+const TODAY = ymd(new Date());
+const loadScript = src => new Promise((ok, ko) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = () => ko(new Error(src)); document.head.appendChild(s); });
+
+const P = {db:null, ag:undefined, occ:new Map(), locks:new Set(), day:null, slot:null, done:null, sending:false, msg:"", err:"", subbed:false,
+  ready:{ag:false, occ:false, locks:false}};
+
+function slotsFor(day){
+  const a = P.ag, dow = parseYmd(day).getDay();
+  const open = (a.joursOuvres || []).map(Number).includes(dow);
+  const end = (dow === 6 && a.samediFermeture) ? a.samediFermeture : a.fermeture;
+  const step = Math.max(10, +a.pas || 30), out = [];
+  for (let t = toMin(a.ouverture); t < toMin(end); t += step) out.push(fromMin(t));
+  return {open, slots:out, step};
+}
+// occupé : un rendez-vous du cabinet touche ce créneau, ou un autre patient vient de le réserver
+const taken = (d, s) => ((P.occ.get(d) || {})[s] || 0) > 0 || P.locks.has(d + "_" + s.replace(":", ""));
+const tooSoon = (d, s) => { const [y,m,j] = d.split("-").map(Number), [h,mi] = s.split(":").map(Number);
+  return new Date(y, m-1, j, h, mi).getTime() < Date.now() + (+P.ag.delaiH || 0) * 3600e3; };
+function dayList(){
+  const out = [];
+  for (let i = 0; i <= (+P.ag.horizon || 21); i++){
+    const d = addDays(TODAY, i), {open, slots} = slotsFor(d);
+    if (!open) continue;
+    const visible = slots.filter(s => !tooSoon(d, s));
+    if (!visible.length) continue;
+    out.push({d, free:visible.filter(s => !taken(d, s)).length});
+  }
+  return out;
+}
+
+const TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+function renderContact(){
+  const a = P.ag, el = $("#contact"); if (!a){ el.hidden = true; return; }
+  const tel = n => n ? `<a href="tel:${esc(n.replace(/[^\d+]/g, ""))}">${esc(n)}</a>` : "";
+  const tels = [tel(a.telFixe), tel(a.telMobile)].filter(Boolean).join(" · ");
+  el.innerHTML = `<b>Une question ? Appelez le cabinet</b>${tels ? `<span>${tels}</span>` : ""}${a.adresse ? `<span>${esc(a.adresse)}</span>` : ""}`;
+  el.hidden = !tels && !a.adresse;
+}
+function render(){
+  // les créneaux se mettent à jour en direct : on garde ce que le patient a déjà tapé
+  const keep = {}; ["fNom","fTel","fMotif"].forEach(id => { const el = $("#"+id); if (el) keep[id] = el.value; });
+  const okc = $("#fOk") ? $("#fOk").checked : false, act = document.activeElement, focusId = act && act.id, sel = act && act.selectionStart;
+  const app = $("#app");
+  renderContact();
+  if (P.err){ app.innerHTML = `<p class="err">${esc(P.err)}</p>`; return; }
+  if (!P.ready.ag){ app.innerHTML = `<p class="hint center">Chargement des créneaux…</p>`; return; }
+  if (!P.ag || !P.ag.actif){ app.innerHTML = `<div class="card"><p><b>La réservation en ligne n'est pas ouverte pour le moment.</b></p><p class="hint">Appelez le cabinet pour prendre rendez-vous.</p></div>`; return; }
+  if (P.done){
+    app.innerHTML = `<div class="card done"><div class="tick">${TICK}</div><h2>Votre créneau est réservé</h2>
+      <p class="when">${esc(dayLong(P.done.date))} à ${esc(P.done.heure)}</p>
+      <p>Le cabinet vous contactera par téléphone ou WhatsApp pour confirmer le rendez-vous.</p>
+      <p class="ar" lang="ar" dir="rtl">تم حجز موعدك، ستتصل بك العيادة للتأكيد.</p>
+      <button class="btn" data-act="again">Réserver un autre créneau</button></div>`;
+    return;
+  }
+  if (!P.ready.occ || !P.ready.locks){ app.innerHTML = `<p class="hint center">Chargement des créneaux…</p>`; return; }
+  const days = dayList();
+  if (!days.some(x => x.d === P.day && x.free)) { P.day = (days.find(x => x.free) || {}).d || null; P.slot = null; }
+  if (P.slot && !P.sending && (taken(P.day, P.slot) || tooSoon(P.day, P.slot))){ P.slot = null; P.msg = "Ce créneau vient d'être réservé : choisissez-en un autre."; }
+  if (!P.day){ app.innerHTML = `<div class="card"><p><b>Aucun créneau libre dans les ${esc(P.ag.horizon)} prochains jours.</b></p><p class="hint">Appelez le cabinet : nous trouverons un moment ensemble.</p></div>`; return; }
+  const {slots, step} = slotsFor(P.day);
+  const shown = slots.filter(s => !tooSoon(P.day, s));
+  const wd = d => parseYmd(d).toLocaleDateString("fr-FR",{weekday:"short"}).replace(".","");
+  const mo = d => parseYmd(d).toLocaleDateString("fr-FR",{month:"short"}).replace(".","");
+  app.innerHTML = `<section class="card"><h2 class="step">1. Choisissez un jour</h2>
+      <div class="days">${days.map(x => `<button class="day" data-day="${x.d}" aria-pressed="${x.d === P.day}" ${x.free ? "" : "disabled"} aria-label="${esc(dayLong(x.d))}, ${x.free ? x.free + " créneaux libres" : "complet"}">
+        <span class="w">${esc(wd(x.d))}</span><span class="n">${parseYmd(x.d).getDate()}</span><span class="m">${esc(mo(x.d))}</span><span class="f">${x.free ? x.free + " libre" + (x.free > 1 ? "s" : "") : "complet"}</span></button>`).join("")}</div></section>
+    <section class="card"><h2 class="step">2. Choisissez l'heure <small>${esc(dayLong(P.day))} · séance de ${step} min</small></h2>
+      ${P.msg && !P.slot ? `<p class="err" role="alert" style="margin-bottom:10px">${esc(P.msg)}</p>` : ""}
+      <div class="slots">${shown.map(s => { const t = taken(P.day, s);
+        return `<button class="slot" data-slot="${s}" aria-pressed="${s === P.slot}" ${t ? "disabled" : ""} aria-label="${s}, ${t ? "occupé" : "libre"}"><b>${s}</b><small>${t ? "Occupé" : "Libre"}</small></button>`; }).join("")}</div>
+      <div class="legend"><span><i></i>Libre</span><span><i class="x"></i>Occupé : impossible de le choisir</span></div></section>
+    ${P.slot ? `<section class="card"><h2 class="step">3. Vos coordonnées</h2>
+      <form id="fResa" class="form" novalidate>
+        <p class="sum">Rendez-vous <b>${esc(dayLong(P.day))} à ${esc(P.slot)}</b></p>
+        <label class="f">Nom et prénom<input id="fNom" type="text" autocomplete="name" maxlength="80"></label>
+        <label class="f">Téléphone (WhatsApp)<input id="fTel" type="tel" autocomplete="tel" inputmode="tel" maxlength="20" placeholder="06 12 34 56 78"></label>
+        <label class="f">Motif (facultatif)<input id="fMotif" type="text" maxlength="200" placeholder="Ex. douleur au dos, rééducation du genou…"></label>
+        <input id="fSite" class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <label class="okbox"><input type="checkbox" id="fOk">J'accepte que le cabinet utilise ces informations uniquement pour gérer mon rendez-vous.</label>
+        ${P.msg ? `<p class="err" role="alert">${esc(P.msg)}</p>` : ""}
+        <button class="btn primary" type="submit" ${P.sending ? "disabled" : ""}>${P.sending ? "Réservation…" : "Réserver ce créneau"}</button>
+      </form></section>` : ""}`;
+  for (const [id, v] of Object.entries(keep)){ const el = $("#"+id); if (el) el.value = v; }
+  if ($("#fOk")) $("#fOk").checked = okc;
+  if (focusId && $("#"+focusId)){ const el = $("#"+focusId); el.focus(); if (typeof sel === "number" && el.setSelectionRange) try { el.setSelectionRange(sel, sel); } catch(e){} }
+}
+
+async function submit(){
+  const nom = $("#fNom").value.trim(), tel = $("#fTel").value.trim(), motif = $("#fMotif").value.trim();
+  const fail = m => { P.msg = m; render(); };
+  if ($("#fSite").value){ P.done = {date:P.day, heure:P.slot}; return render(); } // champ piège rempli : robot
+  if (nom.length < 2) return fail("Indiquez votre nom et prénom.");
+  if (!/^[0-9 +.()-]{8,20}$/.test(tel) || tel.replace(/\D/g, "").length < 9) return fail("Indiquez un numéro de téléphone valide.");
+  if (!$("#fOk").checked) return fail("Cochez la case d'accord pour continuer.");
+  const day = P.day, slot = P.slot; // la réservation apparaît aussitôt comme « occupée » : on fige le créneau choisi
+  P.sending = true; P.msg = ""; render();
+  const db = P.db, dref = db.collection("demandes").doc(), vid = day + "_" + slot.replace(":", "");
+  const b = db.batch(); // le verrou et la demande partent ensemble : les règles refusent tout si le créneau est pris
+  b.set(db.collection("verrous").doc(vid), {date:day, heure:slot, demande:dref.id});
+  b.set(dref, {nom, tel, motif, date:day, heure:slot, verrou:vid, creeLe:firebase.firestore.FieldValue.serverTimestamp()});
+  try {
+    await Promise.race([b.commit(), new Promise((_, ko) => setTimeout(() => ko({code:"timeout"}), 20000))]);
+    P.done = {date:day, heure:slot}; P.slot = null;
+  } catch(e){
+    console.error(e);
+    if (e.code === "permission-denied"){ P.slot = null; P.msg = "Ce créneau n'est plus disponible : il vient d'être pris. Choisissez-en un autre."; }
+    else P.msg = e.code === "timeout" ? "La connexion est trop lente : vérifiez internet puis réessayez." : "La réservation n'a pas abouti. Réessayez ou appelez le cabinet.";
+  }
+  P.sending = false; render();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+document.addEventListener("click", e => {
+  const d = e.target.closest("[data-day]"), s = e.target.closest("[data-slot]"), a = e.target.closest("[data-act]");
+  if (d && !d.disabled){ P.day = d.dataset.day; P.slot = null; P.msg = ""; render(); }
+  else if (s && !s.disabled){ P.slot = s.dataset.slot; P.msg = ""; render(); const f = $("#fResa"); if (f) f.scrollIntoView({behavior:"smooth", block:"start"}); }
+  else if (a && a.dataset.act === "again"){ P.done = null; P.msg = ""; render(); }
+});
+document.addEventListener("submit", e => { if (e.target.id === "fResa"){ e.preventDefault(); if (!P.sending) submit(); } });
+setInterval(render, 60000); // les créneaux trop proches disparaissent au fil de la journée
+
+(async function init(){
+  try { for (const src of SDK) await loadScript(src); }
+  catch(e){ P.err = "Impossible de charger la page. Vérifiez la connexion internet puis rechargez."; return render(); }
+  firebase.initializeApp(FIREBASE_CONFIG);
+  P.db = firebase.firestore();
+  const fail = e => { console.error(e); P.err = "Impossible de charger les créneaux. Vérifiez la connexion internet puis rechargez la page."; render(); };
+  P.db.doc("public/agenda").onSnapshot(snap => {
+    P.ag = snap.exists ? snap.data() : null; P.ready.ag = true;
+    if (P.ag && !P.subbed){
+      P.subbed = true; const end = addDays(TODAY, +P.ag.horizon || 21);
+      P.db.collection("occupation").where("date", ">=", TODAY).where("date", "<=", end).onSnapshot(s => {
+        P.occ = new Map(s.docs.map(d => [d.id, (d.data() || {}).creneaux || {}])); P.ready.occ = true; render(); }, fail);
+      P.db.collection("verrous").where("date", ">=", TODAY).where("date", "<=", end).onSnapshot(s => {
+        P.locks = new Set(s.docs.map(d => d.id)); P.ready.locks = true; render(); }, fail);
+    }
+    render();
+  }, fail);
+})();
+</script>
+</body>
+</html>
