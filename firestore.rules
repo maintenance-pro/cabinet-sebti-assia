@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Seul le compte du cabinet, avec son adresse e-mail confirmée, lit et modifie les données.
+    // Garder cette liste identique à COMPTES dans index.html.
+    function cabinet() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in ['cabinetkinesebti@gmail.com'];
+    }
+
+    match /patients/{id} {
+      allow read, write: if cabinet();
+    }
+    match /config/{id} {
+      allow read, write: if cabinet();
+    }
+    match /mois/{mois}/{coll}/{id} {
+      allow read, write: if cabinet() && coll in ['rdv', 'paiements', 'charges'];
+    }
+  }
+}

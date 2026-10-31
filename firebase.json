@@ -1,7 +1,32 @@
 {
   "hosting": {
     "public": ".",
-    "ignore": ["firebase.json", ".firebaserc", "**/.*", ".git/**", ".vscode/**", ".firebase/**", "**/node_modules/**", "desktop.ini", "README.md", "exemple-cabinet-sebti-assia.json"],
-    "headers": [{ "source": "**/*.html", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] }]
+    "ignore": [
+      "firebase.json",
+      ".firebaserc",
+      "firestore.rules",
+      "**/.*",
+      ".git/**",
+      ".vscode/**",
+      ".firebase/**",
+      "**/node_modules/**",
+      "desktop.ini",
+      "README.md",
+      "exemple-cabinet-sebti-assia.json"
+    ],
+    "headers": [
+      {
+        "source": "**/*.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
   }
 }

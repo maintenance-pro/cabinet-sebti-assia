@@ -303,6 +303,19 @@ legend{font-size:12.5px;font-weight:600;color:var(--ink-2);padding:0 4px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:80;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:9px;font-weight:500;font-size:13.5px;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
 .toast.bad{background:var(--bad);color:#fff}
 .loading{padding:40px 10px;text-align:center;color:var(--muted)}
+.rail-foot .who{display:flex;flex-direction:column;align-items:flex-start;gap:4px;overflow-wrap:anywhere}
+
+/* ---------- Connexion (au-dessus de l'app, sous les toasts) ---------- */
+.gate{position:fixed;inset:0;z-index:70;background:var(--bg);display:grid;place-items:center;overflow-y:auto;
+  padding:calc(24px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.gate-card{width:min(400px,100%);background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--tape);border-radius:14px;padding:24px 22px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:18px}
+.gate-card h2{font-family:var(--f-display);font-weight:700;font-size:21px;margin:0}
+.gate-card p{margin:0}
+.gate-links{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 14px}
+.linkbtn{all:unset;cursor:pointer;color:var(--accent-ink);font-weight:600;font-size:13px}
+.linkbtn:hover{text-decoration:underline}
+.linkbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+.gate .err{color:var(--bad);font-size:13px;font-weight:600}
 
 @media (max-width:1180px){
   .ag{grid-template-columns:minmax(0,1fr)}
@@ -390,6 +403,15 @@ legend{font-size:12.5px;font-weight:600;color:var(--ink-2);padding:0 4px}
 </div>
 <nav class="tabbar" id="tabbar" aria-label="Navigation"></nav>
 <div class="drawer" id="drawer" hidden><div class="scrim" data-action="close"></div><section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="dTitle"></section></div>
+<div class="gate" id="gate" hidden>
+  <form class="gate-card" id="fLogin" autocomplete="on" novalidate>
+    <div class="brand">
+      <div class="brand-row"><svg aria-hidden="true"><use href="#logo"/></svg><div><small>Cabinet de kinésithérapie</small><b>Sebti Assia</b></div></div>
+      <div class="ar" lang="ar" dir="rtl">عيادة الترويض الطبي <b>السبتي أسية</b></div>
+    </div>
+    <div class="form" id="gateBody"></div>
+  </form>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script>
@@ -464,6 +486,7 @@ const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 /* ================= État ================= */
 const S = {
   db:null, user:null, canWrite:null, readonly:false,
+  fdb:null, fbAuth:null, fbUser:null, gate:null, started:false, legacy:null, verifySent:false, leaving:false,
   status:"loading", loadTimer:null, lostMsg:"",
   config:null, patients:new Map(), patientsReady:false,
   months:new Map(),
@@ -474,13 +497,19 @@ const S = {
 const cfg = () => Object.assign({}, DEFAULTS, S.config || {});
 
 /* ================= Base de données ================= */
+const errCode = e => String(e && e.code || "").replace(/-/g, "_"); // Firestore : "permission-denied" → "permission_denied"
 function onDbError(e){
+  if (!e || S.leaving) return; // à la déconnexion, la base ferme ses écoutes : rien à signaler
   console.error(e);
-  if (!e) return;
-  if (e.code === "revoked"){ S.status = "lost"; S.lostMsg = "L'accès aux données a été retiré pour cette vue."; }
-  else if (e.code === "unavailable"){ S.status = "lost"; S.lostMsg = "La connexion aux données est interrompue. Recharge la page."; }
+  const c = errCode(e);
+  if (c === "revoked"){ S.status = "lost"; S.lostMsg = "L'accès aux données a été retiré pour cette vue."; }
+  else if (c === "permission_denied"){ S.status = "lost"; S.lostMsg = "Accès refusé par la base en ligne. Reconnecte-toi avec le compte du cabinet."; }
+  else if (c === "resource_exhausted"){ S.status = "lost"; S.lostMsg = "Le quota gratuit Firebase du jour est atteint. Les données reviennent demain ; pour lever la limite, passe le projet Firebase en formule Blaze."; }
+  else if (c === "unavailable"){ S.status = "lost"; S.lostMsg = "La connexion aux données est interrompue. Recharge la page."; }
   schedule();
 }
+// Avec le cache hors ligne, Firestore ne prévient du retour du serveur que si on demande les changements de métadonnées
+const watch = (ref, next) => S.mode === "firebase" ? ref.onSnapshot({includeMetadataChanges:true}, next, onDbError) : ref.onSnapshot(next, onDbError);
 function markFresh(fromCache){
   if (!fromCache && (S.status === "loading" || S.status === "slow")){ S.status = "ready"; clearTimeout(S.loadTimer); }
 }
@@ -490,10 +519,10 @@ function ensureMonth(m){
   S.months.set(m, e);
   [["rdv","rdv"],["pay","paiements"],["chg","charges"]].forEach(([k,coll]) => {
     try{
-      e.unsubs.push(S.db.collection(`mois/${m}/${coll}`).onSnapshot(snap => {
+      e.unsubs.push(watch(S.db.collection(`mois/${m}/${coll}`), snap => {
         const map = new Map(); snap.docs.forEach(d => map.set(d.id, d.data()));
         e[k] = map; markFresh(snap.metadata.fromCache); schedule();
-      }, onDbError));
+      }));
     }catch(err){ console.error(err); }
   });
   // garder le nombre d'abonnements sous la limite : on libère les mois les plus éloignés
@@ -507,22 +536,34 @@ function ensureMonth(m){
 function baseWindow(){ const m0 = monthOf(TODAY); const out=[]; for (let i=-5;i<=1;i++) out.push(addMonths(m0,i)); return out; }
 const rdvRef = (m,id) => S.db.collection(`mois/${m}/rdv`).doc(id);
 
-async function write(fn, okMsg){
+// Firestore ne confirme une écriture qu'au retour du serveur. Hors ligne, elle est déjà dans le cache
+// de l'appareil et partira seule au retour de la connexion : on n'attend pas plus de 2,5 s.
+function settle(p){
+  if (S.mode !== "firebase" || !p || typeof p.then !== "function") return p;
+  return Promise.race([p.then(() => "ok"), new Promise(r => setTimeout(() => r("pending"), 2500))]).then(r => {
+    if (r === "pending") p.catch(e => { console.error(e); toast("Une modification n'a pas pu être enregistrée en ligne.", true); });
+    return r;
+  });
+}
+const pendingNote = r => r === "pending" ? " (hors ligne : envoi au retour de la connexion)" : "";
+async function write(fn, okMsg, waitServer){ // waitServer : attendre la confirmation (imports en plusieurs lots)
   if (!S.db){ toast("Les données ne sont pas accessibles dans cette vue.", true); return false; }
   if (S.readonly){ toast("Lecture seule : modification impossible.", true); return false; }
-  try{ await fn(); if (okMsg) toast(okMsg); return true; }
+  const run = () => waitServer ? fn() : settle(fn());
+  try{ const r = await run(); if (okMsg) toast(okMsg + pendingNote(r)); return true; }
   catch(e){
-    if (e && e.code === "unavailable"){
+    if (errCode(e) === "unavailable"){
       await new Promise(r => setTimeout(r, 400 + Math.random()*600));
-      try{ await fn(); if (okMsg) toast(okMsg); return true; }catch(e2){ e = e2; }
+      try{ const r = await run(); if (okMsg) toast(okMsg + pendingNote(r)); return true; }catch(e2){ e = e2; }
     }
     writeError(e); return false;
   }
 }
 function writeError(e){
   console.error(e);
-  const c = e && e.code;
-  if (c === "invalid_argument"){
+  const c = errCode(e);
+  if (c === "permission_denied") toast("Accès refusé : reconnecte-toi avec le compte du cabinet.", true);
+  else if (c === "invalid_argument"){
     if (S.canWrite !== true){ S.readonly = true; schedule(); toast("Ton accès ne permet pas de modifier les données.", true); }
     else toast("Enregistrement refusé : une valeur est invalide.", true);
   } else if (c === "quota_exceeded") toast("La base est pleine. Supprime d'anciennes données (les exemples, par exemple).", true);
@@ -634,7 +675,8 @@ function schedule(){ if (!raf) raf = requestAnimationFrame(() => { raf = 0; rend
 
 function renderNav(){
   const c = cfg();
-  const nk = [S.view, S.mode || "", c.tarifDefaut, c.telFixe, c.telMobile, c.email, c.adresse].join("|");
+  const who = S.fbUser ? S.fbUser.email : "";
+  const nk = [S.view, S.mode || "", who, c.tarifDefaut, c.telFixe, c.telMobile, c.email, c.adresse].join("|");
   if (S.navKey === nk) return; S.navKey = nk;
   const links = ROUTES.map(r => `<a href="#${r}" ${S.view===r?'aria-current="page"':""}>${ic(r)}<span>${TITLES[r]}</span></a>`).join("");
   $("#nav").innerHTML = links; $("#tabbar").innerHTML = links;
@@ -642,7 +684,8 @@ function renderNav(){
   const contact = tel(c.telFixe, "phone") + tel(c.telMobile, "mobile")
     + (c.email ? `<li>${ic("mail")}<a href="mailto:${esc(c.email)}">${esc(c.email)}</a></li>` : "")
     + (c.adresse ? `<li>${ic("home")}<span>${esc(c.adresse)}</span></li>` : "");
-  $("#railFoot").innerHTML = `${contact ? `<ul class="contact">${contact}</ul>` : ""}<div>Tarif séance : ${fmtDH(c.tarifDefaut)}${S.mode === "local" ? "<br>Données : ce navigateur" : ""}</div>`;
+  $("#railFoot").innerHTML = `${contact ? `<ul class="contact">${contact}</ul>` : ""}<div>Tarif séance : ${fmtDH(c.tarifDefaut)}</div>`
+    + (who ? `<div class="who"><span>Données en ligne · ${esc(who)}</span><button type="button" class="linkbtn" data-action="logout">Se déconnecter</button></div>` : "");
 }
 function renderHeader(){
   $("#vTitle").textContent = TITLES[S.view];
@@ -665,11 +708,9 @@ function renderBanners(){
   if (S.status === "slow") b.push(`<div class="banner warn">Les données mettent du temps à arriver. Ce qui s'affiche peut ne pas être à jour.</div>`);
   if (S.status === "lost") b.push(`<div class="banner bad">${esc(S.lostMsg)}</div>`);
   if (S.readonly) b.push(`<div class="banner warn">Lecture seule : ton accès ne permet pas de modifier les données.</div>`);
-  if (S.status === "nostore") b.push(`<div class="banner bad">Ce navigateur bloque le stockage des données (navigation privée ou réglage de confidentialité). Ouvre le fichier dans Chrome, Edge ou Firefox en mode normal.</div>`);
-  if (S.mode === "local" && S.patients.size){
-    const lb = lastBackup(); const days = lb ? Math.floor((Date.now() - Date.parse(lb)) / 86400000) : null;
-    if (days === null || days >= 7) b.push(`<div class="banner warn"><span>${days === null ? "Aucune sauvegarde des données pour l'instant." : `Dernière sauvegarde il y a ${days} jours.`} Les données ne sont que dans ce navigateur.</span><button class="btn sm" data-action="export">Sauvegarder maintenant</button></div>`);
-  }
+  const lg = S.legacy;
+  if (lg) b.push(`<div class="banner warn"><span>${lg.nPat} patient${lg.nPat>1?"s":""} et ${lg.nRdv} rendez-vous saisis avec l'ancienne version sont encore dans ce navigateur, pas dans la base en ligne.</span>
+    <span style="display:flex;gap:6px"><button class="btn sm" data-action="legacy-skip">Ignorer</button><button class="btn sm primary" data-action="legacy-send" data-write>Les envoyer en ligne</button></span></div>`);
   const hasEx = S.config?.exemple || [...S.patients.values()].some(p => p.exemple);
   if (hasEx && S.view !== "reglages") b.push(`<div class="banner info"><span>Données d'exemple affichées : patients fictifs, tarifs et charges indicatifs. Remplace-les par les chiffres réels du cabinet.</span><a class="btn sm" href="#reglages">Réglages</a></div>`);
   $("#banners").innerHTML = b.join("");
@@ -1297,10 +1338,23 @@ async function onAction(btn, e){
     case "export": exportData(); break;
     case "import-cancel": S.pendingImport = null; S.shellKey = ""; schedule(); break;
     case "import-confirm": {
-      const pi = S.pendingImport; if (!pi || !LOCAL) break;
-      try { LOCAL.replace(pi.data); S.pendingImport = null; S.shellKey = ""; toast(`Données restaurées : ${pi.nPat} patients, ${pi.nRdv} rendez-vous`); }
-      catch(e){ writeError(e); }
+      const pi = S.pendingImport; if (!pi) break;
+      btn.disabled = true;
+      const ok = await write(() => importToCloud(pi.data, (k, n) => { btn.textContent = `Import ${k}/${n}…`; }), `Données importées : ${pi.nPat} patients, ${pi.nRdv} rendez-vous`, true);
+      if (ok) S.pendingImport = null;
+      S.shellKey = ""; schedule(); break; }
+    case "legacy-send": {
+      const lg = S.legacy; if (!lg) break;
+      btn.disabled = true;
+      const ok = await write(() => importToCloud(lg.data, (k, n) => { btn.textContent = `Envoi ${k}/${n}…`; }), `${lg.nPat} patients et ${lg.nRdv} rendez-vous envoyés dans la base en ligne`, true);
+      if (ok){ legacyDone("envoye"); S.shellKey = ""; } else btn.disabled = false;
       schedule(); break; }
+    case "legacy-skip": legacyDone("ignore"); schedule(); break;
+    case "logout": await logout(); break;
+    case "gate-step": showGate(ds.step); break;
+    case "gate-verified": await gateVerified(btn); break;
+    case "gate-resend": await gateResend(btn); break;
+    case "reload": location.reload(); break;
   }
 }
 function dirtyNote(){ const s = $("#saveState"); if (s) s.textContent = S.settingsDirty ? "Modifications non enregistrées" : ""; }
@@ -1332,6 +1386,7 @@ document.addEventListener("change", e => {
   if (e.target.closest("#fSettings")){ S.settingsDirty = true; dirtyNote(); }
 });
 document.addEventListener("submit", async e => {
+  if (e.target.id === "fLogin"){ e.preventDefault(); gateSubmit(); return; }
   if (e.target.id !== "fSettings") return; e.preventDefault();
   if (!S.db){ toast("Les données ne sont pas accessibles dans cette vue.", true); return; }
   const doc = readSettings();
@@ -1361,58 +1416,54 @@ window.addEventListener("hashchange", () => {
   readHash(); if (S.view === "resultat" || S.view === "caisse" || S.view === "charges") ensureMonth(S.month); schedule(); window.scrollTo(0,0);
 });
 
-/* ================= Stockage local (index.html autonome) ================= */
-const LS_KEY = "cabinet-sebti-assia:data:v1", LS_BACKUP = "cabinet-sebti-assia:derniere-sauvegarde";
-let LOCAL = null;
-function makeLocalDb(){
-  let store = {};
-  const load = () => { const raw = localStorage.getItem(LS_KEY); store = raw ? (JSON.parse(raw) || {}) : {}; };
-  load(); // lève une erreur si le navigateur bloque le stockage
-  const subs = new Map();
-  const meta = {fromCache:false, hasPendingWrites:false};
-  const clone = o => o === undefined ? undefined : JSON.parse(JSON.stringify(o));
-  const isObj = v => v && typeof v === "object" && !Array.isArray(v);
-  const merge = (a, b) => { const out = Object.assign({}, a); for (const k in b) out[k] = (isObj(b[k]) && isObj(a[k])) ? merge(a[k], b[k]) : b[k]; return out; };
-  const persist = () => { try { localStorage.setItem(LS_KEY, JSON.stringify(store)); } catch(e){ const err = new Error("Stockage du navigateur plein"); err.code = "quota_exceeded"; throw err; } };
-  const emit = k => { const s = subs.get(k); if (s) s.forEach(f => f()); };
-  const emitAll = () => subs.forEach(s => s.forEach(f => f()));
-  const listen = (k, fn) => { if (!subs.has(k)) subs.set(k, new Set()); subs.get(k).add(fn); setTimeout(fn, 0); return () => { const s = subs.get(k); s && s.delete(fn); }; };
-  const commit = (c, id, mutate) => {
-    const prev = JSON.stringify(store[c] === undefined ? null : store[c]);
-    mutate();
-    try { persist(); } catch(e){ const p = JSON.parse(prev); if (p === null) delete store[c]; else store[c] = p; throw e; }
-    emit(c); emit(c + "/" + id);
-  };
-  const docSnap = (c, id) => { const d = store[c] && store[c][id]; return {id, exists:!!d, data:() => clone(d), metadata:meta}; };
-  const collSnap = c => { const m = store[c] || {}; const docs = Object.keys(m).sort().map(id => ({id, exists:true, data:() => clone(m[id]), metadata:meta}));
-    return {docs, size:docs.length, empty:!docs.length, metadata:meta, docChanges:() => []}; };
-  const ref = (c, id) => ({
-    id, path: c + "/" + id,
-    get: async () => docSnap(c, id),
-    set: async data => commit(c, id, () => { (store[c] = store[c] || {})[id] = clone(data); }),
-    update: async data => { if (!store[c] || !store[c][id]){ const e = new Error("Document absent"); e.code = "invalid_argument"; throw e; }
-      commit(c, id, () => { store[c][id] = merge(store[c][id], clone(data)); }); },
-    delete: async () => commit(c, id, () => { if (store[c]) delete store[c][id]; }),
-    onSnapshot: next => listen(c + "/" + id, () => next(docSnap(c, id)))
-  });
-  window.addEventListener("storage", e => { if (e.key === LS_KEY){ try { load(); } catch(err){} emitAll(); } }); // autre onglet
-  return {
-    collection: c => ({ path:c, doc: id => ref(c, id || (uid() + uid())), onSnapshot: next => listen(c, () => next(collSnap(c))) }),
-    doc: p => { const i = p.lastIndexOf("/"); return ref(p.slice(0, i), p.slice(i + 1)); },
-    dump: () => clone(store),
-    replace: data => { const prev = store; store = clone(data); try { persist(); } catch(e){ store = prev; throw e; } emitAll(); },
-    bytes: () => (localStorage.getItem(LS_KEY) || "").length * 2
-  };
+/* ================= Base en ligne (Firebase) ================= */
+// Les données vivent dans Firestore (projet cabinet-sebti-assia, en Europe, protégé contre la suppression).
+// Ces clés identifient le projet et sont publiques par nature : l'accès est contrôlé par firestore.rules.
+const FIREBASE_CONFIG = {
+  apiKey:"AIzaSyC5jTvvTllfAo_K9uaFR_Ckg1OK8DJN9YA", authDomain:"cabinet-sebti-assia.firebaseapp.com", projectId:"cabinet-sebti-assia",
+  storageBucket:"cabinet-sebti-assia.firebasestorage.app", messagingSenderId:"255493261882", appId:"1:255493261882:web:aba15d530ecad769b38303"
+};
+const COMPTES = ["cabinetkinesebti@gmail.com"]; // garder identique à firestore.rules
+const FB_SDK = ["app","auth","firestore"].map(m => `https://www.gstatic.com/firebasejs/10.14.1/firebase-${m}-compat.js`);
+const COLL_OK = c => c === "patients" || c === "config" || /^mois\/\d{4}-\d{2}\/(rdv|paiements|charges)$/.test(c);
+const loadScript = src => new Promise((ok, ko) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = () => ko(new Error("Chargement impossible : " + src)); document.head.appendChild(s); });
+
+async function importToCloud(data, onStep){
+  const ops = [];
+  for (const [c, docs] of Object.entries(data || {})) if (COLL_OK(c) && docs && typeof docs === "object") for (const [id, d] of Object.entries(docs)) ops.push([c, id, d]);
+  for (let i = 0; i < ops.length; i += 400){ // une écriture groupée Firestore accepte 500 opérations au plus
+    const b = S.db.batch();
+    ops.slice(i, i + 400).forEach(([c, id, d]) => b.set(S.db.collection(c).doc(id), d));
+    await b.commit(); onStep && onStep(Math.min(i + 400, ops.length), ops.length);
+  }
 }
-function lastBackup(){ try { return localStorage.getItem(LS_BACKUP); } catch(e){ return null; } }
-function exportData(){
-  if (!LOCAL) return;
-  const payload = {app:"cabinet-sebti-assia", version:1, exportedAt:new Date().toISOString(), data:LOCAL.dump()};
+async function dumpCloud(){
+  const out = {};
+  const put = (c, snap) => { if (!snap.empty){ out[c] = {}; snap.docs.forEach(d => { out[c][d.id] = d.data(); }); } };
+  put("patients", await S.db.collection("patients").get());
+  put("config", await S.db.collection("config").get());
+  // Firestore ne liste pas les mois existants : on parcourt de la plus ancienne date connue à +12 mois
+  let first = addMonths(monthOf(TODAY), -12);
+  const take = s => { const m = monthOf(s); if (/^\d{4}-\d{2}$/.test(m) && m < first) first = m; };
+  Object.values(out.patients || {}).forEach(p => { take(p.createdAt); take(p.dateOrdonnance); });
+  const c = (out.config && out.config.cabinet) || {};
+  (c.chargesFixes || []).forEach(f => take(f.depuis)); (c.materiel || []).forEach(x => take(x.achat));
+  const tasks = [];
+  for (let m = first, end = addMonths(monthOf(TODAY), 12); m <= end; m = addMonths(m, 1))
+    ["rdv","paiements","charges"].forEach(k => { const p = `mois/${m}/${k}`; tasks.push(async () => put(p, await S.db.collection(p).get())); });
+  await pool(tasks, 6);
+  return out;
+}
+async function exportData(){
+  if (!S.db) return;
+  toast("Préparation de la sauvegarde…");
+  let data;
+  try { data = await dumpCloud(); } catch(e){ writeError(e); return; }
+  const payload = {app:"cabinet-sebti-assia", version:1, exportedAt:new Date().toISOString(), data};
   const blob = new Blob([JSON.stringify(payload, null, 1)], {type:"application/json"});
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `sauvegarde-cabinet-sebti-assia-${TODAY}.json`;
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
-  try { localStorage.setItem(LS_BACKUP, new Date().toISOString()); } catch(e){}
-  toast("Sauvegarde téléchargée. Range-la hors de l'ordinateur (clé USB, Drive)."); if (!S.settingsDirty) S.shellKey = ""; schedule();
+  toast("Sauvegarde téléchargée. Range-la hors de l'ordinateur (clé USB, Drive).");
 }
 function readImportFile(file){
   const fr = new FileReader();
@@ -1431,48 +1482,182 @@ function readImportFile(file){
   fr.readAsText(file);
 }
 function backupSection(){
-  if (S.mode !== "local") return "";
-  const lb = lastBackup(); const ko = LOCAL ? Math.round(LOCAL.bytes() / 1024) : 0;
+  if (S.mode !== "firebase") return "";
   const pi = S.pendingImport;
-  return `<section class="box" style="margin-top:14px"><h3>Sauvegarde des données</h3>
-    <p class="hint">Les données sont enregistrées dans ce navigateur, sur cet ordinateur uniquement. Effacer les données de navigation ou changer de navigateur les fait disparaître : télécharge une sauvegarde chaque semaine et range-la ailleurs.</p>
-    <p class="hint" style="margin-top:6px">Dernière sauvegarde : <b>${lb ? esc(new Date(lb).toLocaleString("fr-FR",{dateStyle:"long",timeStyle:"short"})) : "jamais"}</b> · Espace utilisé : ${ko} Ko.</p>
+  return `<section class="box" style="margin-top:14px"><h3>Données et compte</h3>
+    <p class="hint">Les données sont enregistrées en ligne, dans la base Firebase du cabinet (en Europe, protégée contre la suppression). Elles sont disponibles sur tout appareil connecté avec ${esc(COMPTES.join(" ou "))}.</p>
+    <p class="hint" style="margin-top:6px">Connecté : <b>${esc(S.fbUser ? S.fbUser.email : "")}</b>. Télécharger une copie de temps en temps (clé USB, Drive) reste une bonne précaution.</p>
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">
-      <button type="button" class="btn primary" data-action="export">Télécharger une sauvegarde</button>
-      <label class="btn" for="importFile">Restaurer une sauvegarde…</label><input type="file" id="importFile" accept=".json,application/json" hidden>
+      <button type="button" class="btn" data-action="export">Télécharger une sauvegarde</button>
+      <label class="btn" for="importFile" data-write>Importer une sauvegarde…</label><input type="file" id="importFile" accept=".json,application/json" hidden>
+      <button type="button" class="btn ghost" data-action="logout">Se déconnecter</button>
     </div>
-    ${pi ? `<div class="banner warn" style="margin:12px 0 0"><span>« ${esc(pi.name)} » : ${pi.nPat} patients, ${pi.nRdv} rendez-vous${pi.date ? ", sauvegardé le " + esc(new Date(pi.date).toLocaleDateString("fr-FR")) : ""}. La restauration remplace toutes les données actuelles.</span>
-      <span style="display:flex;gap:6px"><button type="button" class="btn sm" data-action="import-cancel">Annuler</button><button type="button" class="btn sm danger" data-action="import-confirm" data-confirm>Remplacer les données</button></span></div>` : ""}
+    ${pi ? `<div class="banner warn" style="margin:12px 0 0"><span>« ${esc(pi.name)} » : ${pi.nPat} patients, ${pi.nRdv} rendez-vous${pi.date ? ", sauvegardé le " + esc(new Date(pi.date).toLocaleDateString("fr-FR")) : ""}. L'import ajoute ces éléments à la base en ligne ; ceux qui y sont déjà sont remplacés par la version de la sauvegarde.</span>
+      <span style="display:flex;gap:6px"><button type="button" class="btn sm" data-action="import-cancel">Annuler</button><button type="button" class="btn sm primary" data-action="import-confirm" data-confirm data-write>Importer</button></span></div>` : ""}
   </section>`;
+}
+
+/* ================= Ancienne version (données du navigateur) ================= */
+// Avant Firebase, les données restaient dans le navigateur. On propose une fois de les envoyer en ligne ;
+// elles ne sont jamais effacées du navigateur.
+const LS_KEY = "cabinet-sebti-assia:data:v1", LS_LEGACY = "cabinet-sebti-assia:ancienne-version";
+function readLegacy(){
+  try {
+    if (localStorage.getItem(LS_LEGACY)) return null;
+    const data = JSON.parse(localStorage.getItem(LS_KEY) || "null");
+    if (!data || typeof data !== "object") return null;
+    const nPat = Object.keys(data.patients || {}).length;
+    const nRdv = Object.keys(data).filter(k => /^mois\/\d{4}-\d{2}\/rdv$/.test(k)).reduce((s, k) => s + Object.keys(data[k] || {}).length, 0);
+    return nPat || nRdv ? {data, nPat, nRdv} : null;
+  } catch(e){ return null; }
+}
+function legacyDone(how){ S.legacy = null; try { localStorage.setItem(LS_LEGACY, how + " " + new Date().toISOString()); } catch(e){} }
+
+/* ================= Connexion ================= */
+const AUTH_OFF = "La connexion par e-mail n'est pas encore activée dans la console Firebase (Authentication › Sign-in method › E-mail/Mot de passe).";
+const AUTH_ERR = {
+  "auth/invalid-credential":"E-mail ou mot de passe incorrect.", "auth/wrong-password":"E-mail ou mot de passe incorrect.",
+  "auth/user-not-found":"Aucun compte avec cet e-mail : utilise « Première fois : créer le compte ».",
+  "auth/invalid-email":"Adresse e-mail invalide.", "auth/missing-password":"Saisis le mot de passe.",
+  "auth/too-many-requests":"Trop d'essais. Attends quelques minutes ou réinitialise le mot de passe.",
+  "auth/network-request-failed":"Pas de connexion internet. Vérifie le réseau puis réessaie.",
+  "auth/email-already-in-use":"Ce compte existe déjà : connecte-toi avec son mot de passe.",
+  "auth/weak-password":"Mot de passe trop court : 8 caractères minimum.",
+  "auth/operation-not-allowed":AUTH_OFF, "auth/configuration-not-found":AUTH_OFF
+};
+const authMsg = e => AUTH_ERR[e && e.code] || `Connexion impossible (${(e && e.code) || "erreur inconnue"}).`;
+
+function showGate(step, err){
+  S.gate = step;
+  const g = $("#gate"), body = $("#gateBody");
+  if (!step){ g.hidden = true; return; }
+  g.hidden = false;
+  const u = S.fbAuth && S.fbAuth.currentUser;
+  const mail = `<label class="f">E-mail<input id="gMail" type="email" autocomplete="username" value="${esc(u ? u.email : COMPTES[0])}"></label>`;
+  const errHtml = err ? `<p class="err" role="alert">${esc(err)}</p>` : "";
+  const H = {
+    loading: `<p class="hint">Connexion à la base du cabinet…</p>`,
+    offline: `<h2>Base en ligne injoignable</h2><p class="hint">Vérifie la connexion internet puis recharge la page.</p>
+      <button type="button" class="btn primary" data-action="reload">Recharger</button>`,
+    login: `<h2>Connexion</h2>${mail}
+      <label class="f">Mot de passe<input id="gPass" type="password" autocomplete="current-password"></label>${errHtml}
+      <button type="submit" class="btn primary">Se connecter</button>
+      <div class="gate-links"><button type="button" class="linkbtn" data-action="gate-step" data-step="reset">Mot de passe oublié ?</button>
+      <button type="button" class="linkbtn" data-action="gate-step" data-step="create">Première fois : créer le compte</button></div>`,
+    create: `<h2>Créer le compte du cabinet</h2>${mail}
+      <label class="f">Mot de passe (8 caractères minimum)<input id="gPass" type="password" autocomplete="new-password"></label>
+      <label class="f">Confirmer le mot de passe<input id="gPass2" type="password" autocomplete="new-password"></label>${errHtml}
+      <button type="submit" class="btn primary">Créer le compte</button>
+      <div class="gate-links"><button type="button" class="linkbtn" data-action="gate-step" data-step="login">J'ai déjà un compte</button></div>`,
+    reset: `<h2>Mot de passe oublié</h2><p class="hint">Un lien pour choisir un nouveau mot de passe sera envoyé à cette adresse.</p>${mail}${errHtml}
+      <button type="submit" class="btn primary">Envoyer le lien</button>
+      <div class="gate-links"><button type="button" class="linkbtn" data-action="gate-step" data-step="login">Retour à la connexion</button></div>`,
+    verify: `<h2>Confirme l'adresse e-mail</h2><p class="hint">Un lien de confirmation a été envoyé à <b>${esc(u ? u.email : "")}</b>. Ouvre la boîte mail (regarde aussi dans les spams), clique sur le lien, puis reviens ici.</p>${errHtml}
+      <button type="button" class="btn primary" data-action="gate-verified">J'ai cliqué sur le lien</button>
+      <div class="gate-links"><button type="button" class="linkbtn" data-action="gate-resend">Renvoyer l'e-mail</button>
+      <button type="button" class="linkbtn" data-action="logout">Se déconnecter</button></div>`,
+    denied: `<h2>Accès non autorisé</h2><p class="hint">Le compte <b>${esc(u ? u.email : "")}</b> n'a pas accès aux données du cabinet. Connecte-toi avec ${esc(COMPTES.join(" ou "))}.</p>
+      <button type="button" class="btn primary" data-action="logout">Changer de compte</button>`
+  };
+  body.innerHTML = H[step] || "";
+  const f = $("#gPass", body) || $("#gMail", body); if (f) f.focus();
+}
+async function gateSubmit(){
+  const step = S.gate, a = S.fbAuth; if (!a || !["login","create","reset"].includes(step)) return;
+  const mail = ($("#gMail") ? $("#gMail").value : "").trim().toLowerCase(), pass = $("#gPass") ? $("#gPass").value : "";
+  const fail = msg => { showGate(step, msg); $("#gMail").value = mail; };
+  if (!mail) return fail("Saisis l'adresse e-mail.");
+  if (step !== "reset" && !COMPTES.includes(mail)) return fail(`Seul ${COMPTES.join(" ou ")} a accès aux données du cabinet.`);
+  if (step === "create"){
+    if (pass.length < 8) return fail("Mot de passe trop court : 8 caractères minimum.");
+    if (pass !== $("#gPass2").value) return fail("Les deux mots de passe ne sont pas identiques.");
+  }
+  $("#fLogin button[type=submit]").disabled = true;
+  try {
+    if (step === "login") await a.signInWithEmailAndPassword(mail, pass);
+    else if (step === "create") await a.createUserWithEmailAndPassword(mail, pass); // l'e-mail de confirmation part depuis onAuth
+    else { await a.sendPasswordResetEmail(mail); showGate("login"); toast(`Lien envoyé à ${mail}. Regarde aussi dans les spams.`); }
+  } catch(e){ console.error(e); fail(authMsg(e)); }
+}
+async function gateVerified(btn){
+  const a = S.fbAuth; if (!a.currentUser) return showGate("login");
+  btn.disabled = true;
+  try { await a.currentUser.reload(); } catch(e){ return showGate("verify", authMsg(e)); }
+  const u = a.currentUser;
+  if (!u.emailVerified) return showGate("verify", "L'adresse n'est pas encore confirmée. Clique sur le lien reçu par e-mail, puis réessaie.");
+  await onAuth(u);
+}
+async function gateResend(btn){
+  const u = S.fbAuth.currentUser; if (!u) return;
+  btn.disabled = true;
+  try { await u.sendEmailVerification(); toast(`E-mail renvoyé à ${u.email}.`); btn.disabled = false; }
+  catch(e){ showGate("verify", authMsg(e)); }
+}
+async function onAuth(u){
+  S.fbUser = null;
+  if (!u){ if (S.started) location.reload(); else showGate("login"); return; }
+  if (!COMPTES.includes(String(u.email || "").toLowerCase())) return showGate("denied");
+  if (!u.emailVerified){
+    if (!S.verifySent){ S.verifySent = true; u.sendEmailVerification().catch(e => console.error(e)); }
+    return showGate("verify");
+  }
+  // les règles de la base lisent email_verified dans le jeton : on le renouvelle s'il date d'avant la confirmation
+  try { const t = await u.getIdTokenResult(); if (!t.claims.email_verified) await u.getIdToken(true); } catch(e){ console.warn(e); }
+  S.fbUser = u; S.navKey = ""; showGate(null);
+  if (!S.started) start(S.fdb);
+  schedule();
+}
+async function logout(){
+  if (S.db && S.db.waitForPendingWrites){
+    const r = await Promise.race([S.db.waitForPendingWrites().then(() => "ok"), new Promise(r => setTimeout(() => r("pending"), 4000))]);
+    if (r === "pending"){ toast("Des modifications attendent encore la connexion internet : déconnexion annulée pour ne pas les perdre.", true); return; }
+    // le cache hors ligne contient des dossiers patients : on le vide en quittant
+    S.leaving = true;
+    try { await S.db.terminate(); await S.db.clearPersistence(); } catch(e){ console.warn(e); }
+  }
+  try { await S.fbAuth.signOut(); } catch(e){ console.error(e); }
+  location.reload();
 }
 
 /* ================= Démarrage ================= */
 (async function init(){
   readHash(); render();
   const cl = window.claude;
-  let db = null, user = null;
   if (cl && typeof cl.use === "function"){
+    let db = null, user = null;
     try { [db, user] = await Promise.all([cl.use("db"), cl.use("user")]); } catch(e){ console.error(e); }
     S.user = user;
     if (user){ try { S.canWrite = await user.can("data.write"); } catch(e){} if (S.canWrite === false) S.readonly = true; }
     if (!db){ S.status = "nodb"; render(); return; }
-  } else {
-    // Fichier index.html autonome : données dans le navigateur de ce poste
-    try { LOCAL = makeLocalDb(); db = LOCAL; S.mode = "local"; S.canWrite = true; }
-    catch(e){ console.error(e); S.status = "nostore"; render(); return; }
+    start(db); return;
   }
-  S.db = db;
+  // Site du cabinet : base Firebase, après connexion du compte autorisé
+  S.mode = "firebase"; S.canWrite = true;
+  showGate("loading");
+  try { for (const src of FB_SDK) await loadScript(src); }
+  catch(e){ console.error(e); showGate("offline"); return; }
+  firebase.initializeApp(FIREBASE_CONFIG);
+  S.fdb = firebase.firestore();
+  S.fdb.settings({ignoreUndefinedProperties:true});
+  try { await S.fdb.enablePersistence({synchronizeTabs:true}); } // cache hors ligne : l'agenda reste lisible sans internet
+  catch(e){ console.warn("Cache hors ligne indisponible :", e.code || e); }
+  S.legacy = readLegacy();
+  S.fbAuth = firebase.auth();
+  S.fbAuth.onAuthStateChanged(u => { onAuth(u).catch(e => { console.error(e); showGate("login", authMsg(e)); }); });
+})();
+function start(db){
+  S.db = db; S.started = true;
   S.loadTimer = setTimeout(() => { if (S.status === "loading"){ S.status = "slow"; S.patientsReady = true; schedule(); } }, 10000);
   try{
-    db.collection("patients").onSnapshot(snap => {
+    watch(db.collection("patients"), snap => {
       const map = new Map(); snap.docs.forEach(d => map.set(d.id, d.data())); S.patients = map;
       if (!snap.metadata.fromCache) S.patientsReady = true;
       markFresh(snap.metadata.fromCache); schedule();
-    }, onDbError);
-    db.doc("config/cabinet").onSnapshot(snap => { S.config = snap.exists ? snap.data() : null; schedule(); }, onDbError);
+    });
+    watch(db.doc("config/cabinet"), snap => { S.config = snap.exists ? snap.data() : null; schedule(); });
   }catch(e){ console.error(e); }
   baseWindow().forEach(ensureMonth);
-})();
+}
 </script>
 </body>
 </html>
