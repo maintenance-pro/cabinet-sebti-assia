@@ -18,5 +18,5 @@ Tout tient dans `index.html`. Les données sont dans **Firestore** (projet Fireb
 ```sh
 npm install -g firebase-tools
 firebase login
-firebase deploy --only hosting,firestore:rules
+firebase deploy --only hosting,firestore:rules,auth
 ```
