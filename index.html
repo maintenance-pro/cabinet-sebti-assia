@@ -1,0 +1,1478 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cabinet Sebti Assia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Kufi+Arabic:wght@600;700&family=Public+Sans:wght@400;500;600;700&family=Roboto+Condensed:wght@500;700&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath d='M17 42.5C7.5 39.5 2.6 30.5 5 21.5 7.6 11.6 18 5.2 29 5.6c6.8.3 12.3 3.3 14.6 8.4' fill='none' stroke='%23A8368B' stroke-width='3.4' stroke-linecap='round'/%3E%3Ccircle cx='32.5' cy='11.5' r='4.2' fill='%232F4F91'/%3E%3Cpath d='M29 18.5L21.5 28.5' stroke='%2313826D' stroke-width='5.6' stroke-linecap='round'/%3E%3Cpath d='M28 19.5L33.5 24.5 39 21.5M28 19.5L21.5 17.5 17.5 21.5M21.5 28.5L15.5 35.5 9.5 34.5' stroke='%232F4F91' stroke-width='3.8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M21.5 28.5L30 32.5 30.5 41' stroke='%2313826D' stroke-width='4.4' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+<style>
+/* Layout : rail de navigation à gauche + plan de travail ; barre d'onglets en bas sur téléphone.
+   Identité reprise de la carte de visite : vert d'eau pour l'action, magenta « Sebti Assia » réservé au repère
+   « aujourd'hui / hors ordonnance », bleu marine pour le texte ; titres en capitales condensées comme sur la carte. */
+:root{
+  --bg:#F4F6F9; --surface:#FFFFFF; --sunken:#EDF1F5; --ink:#1B2F4E; --ink-2:#3B4F6E; --muted:#5F6E85;
+  --line:#DAE1E9; --line-strong:#B9C4D2; --grid:#E5EAF0;
+  --accent:#13826D; --accent-ink:#0D6858; --accent-soft:#DCF1EA; --on-accent:#FFFFFF;
+  --tape:#A8368B; --tape-soft:#F8E4F2; --logo-blue:#2F4F91;
+  --good:#2E7A2C; --good-soft:#E3F1DF; --warn:#935D00; --warn-soft:#FAEED3; --bad:#B3352E; --bad-soft:#F8E1DF;
+  --chart-a:#1A9580; --chart-b:#3E5C9A;
+  --scrim:rgba(10,20,38,.45); --shadow:0 1px 2px rgba(27,47,78,.06),0 12px 32px rgba(27,47,78,.14);
+  --f-display:"Roboto Condensed","Arial Narrow","Segoe UI",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --f-ar:"Noto Kufi Arabic","Segoe UI",Tahoma,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C1522; --surface:#132033; --sunken:#0F1A2A; --ink:#E3E9F2; --ink-2:#B3BFD1; --muted:#8492A8;
+  --line:#22314A; --line-strong:#33445F; --grid:#1B283B;
+  --accent:#45C2A8; --accent-ink:#7DD6C3; --accent-soft:#103A36; --on-accent:#03241E;
+  --tape:#E57CC8; --tape-soft:#3A1733; --logo-blue:#7F9BDB;
+  --good:#74C66A; --good-soft:#16301A; --warn:#E5AE45; --warn-soft:#33270E; --bad:#F07D74; --bad-soft:#3C1A17;
+  --chart-a:#2FAF95; --chart-b:#6F8DD0;
+  --scrim:rgba(0,0,0,.6); --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.45);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0C1522; --surface:#132033; --sunken:#0F1A2A; --ink:#E3E9F2; --ink-2:#B3BFD1; --muted:#8492A8;
+  --line:#22314A; --line-strong:#33445F; --grid:#1B283B;
+  --accent:#45C2A8; --accent-ink:#7DD6C3; --accent-soft:#103A36; --on-accent:#03241E;
+  --tape:#E57CC8; --tape-soft:#3A1733; --logo-blue:#7F9BDB;
+  --good:#74C66A; --good-soft:#16301A; --warn:#E5AE45; --warn-soft:#33270E; --bad:#F07D74; --bad-soft:#3C1A17;
+  --chart-a:#2FAF95; --chart-b:#6F8DD0;
+  --scrim:rgba(0,0,0,.6); --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.45);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+[hidden]{display:none!important}
+img{max-width:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{text-wrap:balance}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono,.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.num{text-align:right;white-space:nowrap}
+.muted{color:var(--muted)}
+.ro [data-write]{display:none!important}
+
+.app{display:grid;grid-template-columns:212px minmax(0,1fr);gap:32px;max-width:1440px;margin:0 auto;min-height:100vh;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+.rail{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:26px;padding-block:26px}
+.brand{display:flex;flex-direction:column;gap:8px}
+.brand-row{display:flex;gap:9px;align-items:center}
+.brand svg{width:44px;height:44px;flex:none}
+.brand small{display:block;font-family:var(--f-display);font-weight:700;font-size:10.5px;line-height:1.2;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-ink)}
+.brand b{display:block;font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1.05;letter-spacing:.01em;text-transform:uppercase;color:var(--tape);margin-top:2px}
+.ar{font-family:var(--f-ar);font-weight:700}
+.brand .ar{font-size:11.5px;line-height:1.6;color:var(--accent-ink);padding-top:7px;border-top:1px solid var(--tape)}
+.brand .ar b{display:inline;font:inherit;text-transform:none;letter-spacing:0;color:var(--tape);margin:0}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav a{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:8px;color:var(--ink-2);text-decoration:none;font-weight:500}
+.nav a:hover{background:var(--sunken)}
+.nav a[aria-current="page"]{background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.nav svg{width:18px;height:18px;flex:none}
+.rail-foot{margin-top:auto;color:var(--muted);font-size:12px;line-height:1.5;display:flex;flex-direction:column;gap:10px}
+.contact{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;color:var(--ink-2)}
+.contact li{display:flex;gap:8px;align-items:flex-start;min-width:0}
+.contact svg{width:16px;height:16px;flex:none;color:var(--accent);margin-top:1px}
+.contact a{color:inherit;text-decoration:none;overflow-wrap:anywhere}
+.contact a:hover{color:var(--accent-ink);text-decoration:underline}
+.contact .tel{font-family:var(--f-display);font-weight:700;font-size:14px;letter-spacing:.03em;line-height:1.3}
+.main{min-width:0;padding-block:26px 56px}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 20px;margin-bottom:18px}
+.top h1{font-family:var(--f-display);font-weight:700;font-size:32px;line-height:1.1;margin:0}
+.top p{margin:4px 0 0;color:var(--muted)}
+.mbrand{display:none}
+.tabbar{display:none}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);padding:7px 12px;border-radius:8px;font-weight:600;font-size:13.5px;cursor:pointer;min-height:36px;white-space:nowrap;text-decoration:none}
+.btn:hover{border-color:var(--ink-2)}
+.btn svg{width:16px;height:16px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.ghost:hover{background:var(--sunken)}
+.btn.sm{padding:4px 9px;min-height:30px;font-size:12.5px}
+.btn.ok{border-color:var(--good);color:var(--good)}
+.btn.danger{border-color:var(--bad);color:var(--bad)}
+.btn.armed{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn:disabled{opacity:.5;cursor:default}
+.icon-btn{width:36px;padding:0}
+
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--sunken);color:var(--ink-2);white-space:nowrap;line-height:1.5}
+.chip svg{width:12px;height:12px}
+.chip.good{background:var(--good-soft);color:var(--good)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.chip.accent{background:var(--accent-soft);color:var(--accent-ink)}
+.chip.tape{background:var(--tape-soft);color:var(--tape)}
+.chip.ex{background:transparent;border:1px dashed var(--line-strong);color:var(--muted);font-weight:500}
+
+.banner{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:10px;margin-bottom:12px;font-size:13.5px;border:1px solid var(--line)}
+.banner.info{background:var(--accent-soft);border-color:transparent;color:var(--accent-ink)}
+.banner.warn{background:var(--warn-soft);border-color:transparent;color:var(--warn)}
+.banner.bad{background:var(--bad-soft);border-color:transparent;color:var(--bad)}
+
+.box{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-width:0}
+.box h3,.lbl{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
+.box h3{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.hint{color:var(--muted);font-size:12.5px;margin:0}
+.empty{padding:22px 16px;text-align:center;color:var(--muted)}
+.empty b{display:block;color:var(--ink);font-size:15px;margin-bottom:4px}
+
+/* ---------- Agenda ---------- */
+.daybar{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin-bottom:12px}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;flex:1 1 420px;min-width:0}
+.wd{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:6px 2px 5px;text-align:center;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:0;min-width:0}
+.wd .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.wd .n{font-family:var(--f-display);font-weight:700;font-size:19px;line-height:1.15}
+.wd .c{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.wd:hover{border-color:var(--line-strong)}
+.wd[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.wd[aria-pressed="true"] .c{color:var(--accent-ink)}
+.wd.today .n{color:var(--tape)}
+.wd.closed{opacity:.55}
+.navpair{display:flex;gap:4px;align-items:stretch}
+.stats{display:flex;flex-wrap:wrap;gap:6px 22px;padding:10px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:14px}
+.stats div{display:flex;flex-direction:column}
+.stats span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.stats b{font-family:var(--f-mono);font-size:16px;font-weight:500;font-variant-numeric:tabular-nums}
+.ag{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+.tl{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.tl-head{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.slot{display:grid;grid-template-columns:62px minmax(0,1fr);border-top:1px solid var(--grid)}
+.tl-head + .slot{border-top:0}
+.slot>time{font-family:var(--f-mono);font-size:12.5px;color:var(--muted);padding:12px 0 0 14px}
+.slot.now>time{color:var(--tape);font-weight:500}
+.slot.now{box-shadow:inset 3px 0 0 var(--tape)}
+.cards{display:grid;grid-template-columns:repeat(var(--postes,3),minmax(0,1fr));gap:6px;padding:6px 8px 6px 0;min-width:0}
+.add{border:1px dashed var(--line-strong);border-radius:8px;background:transparent;color:var(--muted);min-height:40px;cursor:pointer;font-size:12.5px}
+.add:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
+.rdv{border:1px solid var(--line);border-radius:9px;padding:7px 9px 8px;background:var(--surface);display:flex;flex-direction:column;gap:3px;min-width:0}
+.rdv.s-effectue{background:var(--sunken)}
+.rdv.s-annule{opacity:.55}
+.rdv.s-annule .nm{text-decoration:line-through}
+.rdv.hors{border:1.5px dashed var(--tape)}
+.rh{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.rh .t{font-family:var(--f-mono);font-size:12px;color:var(--ink-2)}
+.sn{font-family:var(--f-mono);font-size:11px;padding:0 5px;border:1px solid var(--line-strong);border-radius:4px;color:var(--ink-2)}
+.rh .chip.st{margin-left:auto}
+.nm{all:unset;cursor:pointer;font-weight:600;font-size:14px;overflow-wrap:anywhere}
+.nm:hover{color:var(--accent-ink);text-decoration:underline}
+.nm:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+.mt{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.hw{font-size:11.5px;font-weight:600;color:var(--tape)}
+.ra{display:flex;flex-wrap:wrap;gap:5px;margin-top:3px}
+.alist{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.alist li{display:flex;flex-direction:column;gap:3px;padding-bottom:8px;border-bottom:1px solid var(--grid)}
+.alist li:last-child{border-bottom:0;padding-bottom:0}
+.alist .r1{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.alist .r2{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;color:var(--muted)}
+.linkish{all:unset;cursor:pointer;font-weight:600}
+.linkish:hover{text-decoration:underline;color:var(--accent-ink)}
+.linkish:focus-visible{outline:2px solid var(--accent);border-radius:3px}
+
+/* ---------- Patients ---------- */
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.search{flex:1 1 240px;min-width:0;position:relative}
+.search input{width:100%;padding-left:34px}
+.search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;background:var(--surface);padding:7px 11px;cursor:pointer;font-weight:500;font-size:13px;color:var(--ink-2)}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.plist{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.phead,.prow{display:grid;grid-template-columns:minmax(0,2.1fr) minmax(0,1.3fr) minmax(0,1fr) minmax(0,1.2fr);gap:14px;align-items:center;padding:11px 16px}
+.phead{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--line);font-weight:600}
+.prow{width:100%;border:0;border-top:1px solid var(--grid);background:transparent;text-align:left;cursor:pointer}
+.prow:first-of-type{border-top:0}
+.prow:hover{background:var(--sunken)}
+.pn{display:flex;flex-direction:column;gap:2px;min-width:0}
+.pn b{font-size:14.5px;overflow-wrap:anywhere}
+.pn small{color:var(--muted);font-size:12.5px;overflow-wrap:anywhere}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.prog{display:flex;flex-direction:column;gap:4px;min-width:0}
+.bar{height:7px;border-radius:4px;background:var(--grid);display:flex;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.bar i.plan{background:var(--accent);opacity:.35}
+.bar i.over{background:var(--tape)}
+.prog span{font-size:12px;color:var(--muted)}
+.solde{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.solde b{font-family:var(--f-mono);font-weight:500;font-variant-numeric:tabular-nums}
+
+/* ---------- Tables / argent ---------- */
+.mnav{display:inline-flex;align-items:center;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:3px}
+.mnav strong{min-width:150px;text-align:center;font-weight:600;text-transform:capitalize}
+.mnav .btn{min-height:30px;width:32px;padding:0;border-color:transparent}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--grid);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+th.num{text-align:right}
+.grid2{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi span{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.kpi b{font-family:var(--f-display);font-weight:700;font-size:24px;line-height:1.2;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.kpi small{font-size:12px;color:var(--muted)}
+.kpi.hero{grid-column:span 2;background:var(--accent-soft);border-color:transparent}
+.kpi.hero b{font-size:34px}
+.kpi.hero.neg{background:var(--bad-soft)}
+.kpi.hero.neg b{color:var(--bad)}
+.kpi.hero.pos b{color:var(--accent-ink)}
+.kpis.k6{grid-template-columns:repeat(6,minmax(0,1fr))}
+.modes-bars{display:flex;flex-direction:column;gap:8px}
+.mb{display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:10px;align-items:center;font-size:13px}
+.mb .bar{height:10px}
+.pl td:first-child{padding-left:4px}
+.pl tr.sec td{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;padding-top:14px;border-bottom:1px solid var(--line)}
+.pl tr.tot td{font-weight:700;border-top:1px solid var(--line-strong)}
+.pl tr.res td{font-family:var(--f-display);font-weight:700;font-size:17px;border-top:2px solid var(--ink)}
+.pl td.ind{padding-left:18px}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto}
+.chart .gl{stroke:var(--grid);stroke-width:1}
+.chart .base{stroke:var(--line-strong);stroke-width:1}
+.chart .ax{fill:var(--muted);font-family:var(--f-mono);font-size:11px}
+.chart .ml{fill:var(--ink-2);font-size:12px;font-family:var(--f-body);font-weight:600}
+.chart .rl{fill:var(--ink);font-family:var(--f-mono);font-size:11.5px}
+.chart .bar-a{fill:var(--chart-a)}
+.chart .bar-b{fill:var(--chart-b)}
+.chart .hit{fill:transparent;cursor:default}
+.chart .hit:hover,.chart .hit:focus{fill:var(--accent);fill-opacity:.07;outline:none}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--ink-2);margin-bottom:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:7px 9px;border-radius:7px;line-height:1.45;white-space:nowrap;z-index:5;font-variant-numeric:tabular-nums}
+details.tblv summary{cursor:pointer;color:var(--accent-ink);font-size:13px;font-weight:600;margin-top:8px}
+.ind-list{display:flex;flex-direction:column;gap:10px;margin:0}
+.ind-list div{display:flex;justify-content:space-between;gap:10px;align-items:baseline;border-bottom:1px solid var(--grid);padding-bottom:8px}
+.ind-list div:last-child{border-bottom:0}
+.ind-list dt{color:var(--ink-2)}
+.ind-list dd{margin:0;font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+.note{font-size:12.5px;color:var(--muted);border-left:2px solid var(--line-strong);padding-left:10px;margin:12px 0 0}
+
+/* ---------- Formulaires / tiroir ---------- */
+input,select,textarea{border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:8px 10px;font-size:14px;color:var(--ink);min-width:0;width:100%;min-height:38px}
+textarea{min-height:70px;resize:vertical}
+input[type="checkbox"],input[type="radio"]{width:auto;min-height:0;accent-color:var(--accent)}
+.f{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:600;color:var(--ink-2);min-width:0}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.form{display:flex;flex-direction:column;gap:12px}
+.checks{display:flex;flex-wrap:wrap;gap:6px}
+.checks label{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:7px;padding:5px 9px;font-weight:500;font-size:13px;cursor:pointer}
+.radios{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.radios label{display:flex;align-items:center;justify-content:center;gap:5px;border:1px solid var(--line-strong);border-radius:8px;padding:7px 6px;font-weight:500;font-size:13px;cursor:pointer;text-align:center}
+.radios input{position:absolute;opacity:0;pointer-events:none}
+.radios label:has(input:checked){background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.radios label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+fieldset{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:0;min-width:0}
+legend{font-size:12.5px;font-weight:600;color:var(--ink-2);padding:0 4px}
+.drawer{position:fixed;inset:0;z-index:50}
+.scrim{position:absolute;inset:0;background:var(--scrim)}
+.sheet{position:absolute;top:0;right:0;bottom:0;width:min(540px,100%);background:var(--surface);overflow-y:auto;box-shadow:var(--shadow);
+  padding:calc(18px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) 22px}
+.dh{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.dh h2{font-family:var(--f-display);font-weight:700;font-size:22px;margin:0;line-height:1.15}
+.dh p{margin:3px 0 0;color:var(--muted);font-size:13px}
+.dfoot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding-top:6px}
+.dfoot .r{display:flex;gap:8px;margin-left:auto}
+.paymodes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.paymodes .btn{min-height:52px;font-size:14.5px}
+.livebox{border-top:1px solid var(--line);margin-top:18px;padding-top:16px;display:flex;flex-direction:column;gap:14px}
+.hist{max-height:300px;overflow-y:auto;border:1px solid var(--line);border-radius:10px}
+.hist table{font-size:13px}
+.spark svg{display:block;width:100%;height:auto}
+.spark .ln{fill:none;stroke:var(--chart-a);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.spark .pt{fill:var(--chart-a);stroke:var(--surface);stroke-width:2}
+.spark .gl{stroke:var(--grid)}
+.spark .ax{fill:var(--muted);font-family:var(--f-mono);font-size:10px}
+.frows{display:flex;flex-direction:column;gap:6px}
+.frow{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1.4fr) minmax(0,.9fr) minmax(0,1fr) minmax(0,1fr) 36px;gap:6px;align-items:center}
+.frow.mat{grid-template-columns:minmax(0,2.2fr) minmax(0,1fr) minmax(0,1fr) minmax(0,.8fr) minmax(0,1fr) 36px}
+.frow.hd{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+.frow .dot{font-family:var(--f-mono);font-size:12.5px;color:var(--ink-2);text-align:right}
+.settings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+.settings .wide{grid-column:1/-1}
+.savebar{position:sticky;bottom:12px;display:flex;justify-content:flex-end;gap:10px;align-items:center;margin-top:14px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:80;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:9px;font-weight:500;font-size:13.5px;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
+.toast.bad{background:var(--bad);color:#fff}
+.loading{padding:40px 10px;text-align:center;color:var(--muted)}
+
+@media (max-width:1180px){
+  .ag{grid-template-columns:minmax(0,1fr)}
+  .side{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+  .kpis.k6{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .grid2{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:860px){
+  .app{grid-template-columns:minmax(0,1fr);gap:0}
+  .rail{display:none}
+  .main{padding-block:14px calc(92px + env(safe-area-inset-bottom,0px))}
+  .mbrand{display:flex;align-items:center;gap:9px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+  .mbrand svg{width:36px;height:36px;flex:none}
+  .mbrand small{display:block;font-family:var(--f-display);font-weight:700;font-size:10px;line-height:1.2;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-ink)}
+  .mbrand b{display:block;font-family:var(--f-display);font-weight:700;font-size:19px;line-height:1.1;letter-spacing:.01em;text-transform:uppercase;color:var(--tape)}
+  .mbrand .ar{margin-left:auto;font-size:13px;color:var(--tape);white-space:nowrap}
+  .top h1{font-size:27px}
+  .tabbar{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);
+    padding:6px max(16px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+  .tabbar a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0;color:var(--muted);text-decoration:none;font-size:10.5px;font-weight:600;border-radius:8px;min-width:0}
+  .tabbar a svg{width:20px;height:20px}
+  .tabbar a[aria-current="page"]{color:var(--accent-ink);background:var(--accent-soft)}
+  .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  .phead{display:none}
+  .prow{grid-template-columns:minmax(0,1fr) auto;gap:8px 12px}
+  .prow .prog{grid-column:1/-1;order:3}
+  .prow .pmot{display:none}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kpis.k6{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .settings{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:640px){
+  .cards{grid-template-columns:minmax(0,1fr);padding-right:8px}
+  .slot{grid-template-columns:52px minmax(0,1fr)}
+  .slot>time{padding-left:10px}
+  .g3{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .radios{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .frow,.frow.mat{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .frow>:first-child{grid-column:1/-1}
+  .frow.hd{display:none}
+  .frow{border-bottom:1px solid var(--grid);padding-bottom:8px}
+  .mb{grid-template-columns:90px minmax(0,1fr) auto}
+  .sheet{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .wd .l{font-size:9.5px;letter-spacing:.03em}
+  .wd .n{font-size:16px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .btn,.wd,.prow,.add{transition:background-color .15s,border-color .15s,color .15s}
+  .sheet{animation:slidein .2s ease-out}
+  @keyframes slidein{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}
+}
+</style>
+</head>
+<body>
+<!-- Logo de la carte de visite : sportif dans un arc vert d'eau → magenta -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="logoArc" x1="0" y1="1" x2="1" y2="0"><stop offset=".15" style="stop-color:var(--accent)"/><stop offset=".6" style="stop-color:var(--tape)"/></linearGradient>
+  <symbol id="logo" viewBox="0 0 48 48">
+    <path d="M17 42.5C7.5 39.5 2.6 30.5 5 21.5 7.6 11.6 18 5.2 29 5.6c6.8.3 12.3 3.3 14.6 8.4" fill="none" stroke="url(#logoArc)" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="32.5" cy="11.5" r="3.9" fill="var(--logo-blue)"/>
+    <path d="M29 18.5L21.5 28.5" stroke="var(--accent)" stroke-width="5.2" stroke-linecap="round" fill="none"/>
+    <path d="M28 19.5L33.5 24.5 39 21.5M28 19.5L21.5 17.5 17.5 21.5" stroke="var(--logo-blue)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M21.5 28.5L30 32.5 30.5 41" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M21.5 28.5L15.5 35.5 9.5 34.5" stroke="var(--logo-blue)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </symbol>
+</defs></svg>
+<div class="app" id="app">
+  <aside class="rail" aria-label="Navigation">
+    <div class="brand">
+      <div class="brand-row"><svg aria-hidden="true"><use href="#logo"/></svg><div><small>Cabinet de kinésithérapie</small><b>Sebti Assia</b></div></div>
+      <div class="ar" lang="ar" dir="rtl">عيادة الترويض الطبي <b>السبتي أسية</b></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="rail-foot" id="railFoot"></div>
+  </aside>
+  <div class="main">
+    <div class="mbrand"><svg aria-hidden="true"><use href="#logo"/></svg><div><small>Cabinet de kinésithérapie</small><b>Sebti Assia</b></div><span class="ar" lang="ar" dir="rtl">السبتي أسية</span></div>
+    <header class="top">
+      <div><h1 id="vTitle">Agenda</h1><p id="vSub"></p></div>
+      <div id="topActions"></div>
+    </header>
+    <div id="banners"></div>
+    <main id="view"><div class="loading">Chargement des données du cabinet…</div></main>
+  </div>
+</div>
+<nav class="tabbar" id="tabbar" aria-label="Navigation"></nav>
+<div class="drawer" id="drawer" hidden><div class="scrim" data-action="close"></div><section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="dTitle"></section></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+"use strict";
+/* ================= Constantes métier ================= */
+const COUVERTURES = ["AMO CNSS","AMO CNOPS","Mutuelle / assurance privée","Sans couverture"];
+const COUV_SHORT = {"AMO CNSS":"CNSS","AMO CNOPS":"CNOPS","Mutuelle / assurance privée":"Mutuelle","Sans couverture":"Sans couverture"};
+const MODES = {especes:"Espèces", carte:"Carte bancaire", virement:"Virement", cheque:"Chèque"};
+const TYPES = ["Séance","Bilan initial","Bilan de fin"];
+const STATUTS = {prevu:"Prévue", effectue:"Effectuée", absent:"Absent", annule:"Annulée"};
+const ST_CLASS = {prevu:"", effectue:"good", absent:"bad", annule:""};
+const CATEGORIES = ["Consommables","Matériel & entretien","Loyer","Salaires","Charges sociales (CNSS)","Électricité & eau","Téléphone & internet","Assurances","Honoraires (comptable…)","Impôts & taxes","Formation","Divers"];
+const MOTIFS = ["Lombalgie commune","Lombosciatalgie","Cervicalgie","Entorse de cheville","Rééducation post-opératoire LCA (genou)","Prothèse totale de genou","Prothèse totale de hanche","Gonarthrose","Tendinopathie de la coiffe des rotateurs","Capsulite rétractile de l'épaule","Rééducation post-fracture","Rééducation post-AVC","Paralysie faciale","Rééducation périnéale post-partum","Kinésithérapie respiratoire","Scoliose","Torticolis","Épicondylite","Fasciite plantaire"];
+const JOURS = [[1,"Lun"],[2,"Mar"],[3,"Mer"],[4,"Jeu"],[5,"Ven"],[6,"Sam"],[0,"Dim"]];
+const DEFAULTS = {
+  nom:"Cabinet de kinésithérapie Sebti Assia", praticien:"Sebti Assia",
+  telFixe:"05 21 33 31 30", telMobile:"06 01 97 68 67", email:"cabinetkinesebti@gmail.com",
+  adresse:"Bd Med V, Résidence Aymen, N° 16/17, 1er étage, Lot Berkoure (en face Clinique Ibn Zohr), Berrechid",
+  tarifDefaut:150, dureeDefaut:30, coutVariableSeance:6,
+  ouverture:"08:30", fermeture:"19:00", samediFermeture:"13:00", pas:30, postes:3, joursOuvres:[1,2,3,4,5,6],
+  tauxImpot:0, chargesFixes:[], materiel:[],
+  messageRappel:"Bonjour {patient}, nous vous rappelons votre séance de kinésithérapie {jour} à {heure} au cabinet Sebti Assia. Merci de nous prévenir en cas d'empêchement."
+};
+const ROUTES = ["agenda","patients","caisse","charges","resultat","reglages"];
+const TITLES = {agenda:"Agenda", patients:"Patients", caisse:"Caisse", charges:"Charges", resultat:"Résultat", reglages:"Réglages"};
+
+/* ================= Utilitaires ================= */
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad = n => String(n).padStart(2,"0");
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parseYmd = s => { const [y,m,d] = String(s).split("-").map(Number); return new Date(y, (m||1)-1, d||1); };
+const addDays = (s,n) => { const d = parseYmd(s); d.setDate(d.getDate()+n); return ymd(d); };
+const monthOf = s => String(s||"").slice(0,7);
+const addMonths = (m,n) => { let y=+m.slice(0,4), mo=+m.slice(5,7)+n; while(mo>12){mo-=12;y++} while(mo<1){mo+=12;y--} return `${y}-${pad(mo)}`; };
+const monthDiff = (a,b) => (+b.slice(0,4)-+a.slice(0,4))*12 + (+b.slice(5,7)-+a.slice(5,7));
+const cap = s => s ? s.charAt(0).toUpperCase()+s.slice(1) : s;
+const monthLabel = m => new Date(+m.slice(0,4), +m.slice(5,7)-1, 1).toLocaleDateString("fr-FR",{month:"long",year:"numeric"});
+const monthShort = m => new Date(+m.slice(0,4), +m.slice(5,7)-1, 1).toLocaleDateString("fr-FR",{month:"short"});
+const dayLabel = s => cap(parseYmd(s).toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"}));
+const dayShort = s => parseYmd(s).toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit"});
+const toMin = t => { const [h,m] = String(t||"0:0").split(":").map(Number); return (h||0)*60+(m||0); };
+const fromMin = n => `${pad(Math.floor(n/60))}:${pad(n%60)}`;
+const nf = new Intl.NumberFormat("fr-FR",{maximumFractionDigits:0});
+const fmt = n => nf.format(Math.round(+n||0));
+const fmtDH = n => fmt(n) + " DH";
+const fmtSigned = n => (n<0?"−":"+") + fmt(Math.abs(n)) + " DH";
+const pct = (a,b) => b ? Math.round(a/b*100) : 0;
+const sum = (arr, f) => arr.reduce((s,x) => s + (+f(x)||0), 0);
+const push = (map,k,v) => { const a = map.get(k); if (a) a.push(v); else map.set(k,[v]); };
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+const TODAY = ymd(new Date());
+
+const ICONS = {
+  agenda:'<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  patients:'<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c.6-3.8 3.8-5.8 7.5-5.8s6.9 2 7.5 5.8"/>',
+  caisse:'<rect x="3" y="6" width="18" height="12.5" rx="2"/><circle cx="12" cy="12.25" r="2.6"/><path d="M6.5 9.5v.01M17.5 15v.01"/>',
+  charges:'<path d="M6 3h12v18l-3-1.8L12 21l-3-1.8L6 21z"/><path d="M9 8h6M9 12h6"/>',
+  resultat:'<path d="M4 20V11M10 20V5M16 20v-6M3 20.5h18"/>',
+  reglages:'<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>', check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  left:'<path d="M14.5 6l-6 6 6 6"/>', right:'<path d="M9.5 6l6 6-6 6"/>', close:'<path d="M6 6l12 12M18 6L6 18"/>',
+  search:'<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/>', chat:'<path d="M4 19.5l1.4-4A7.8 7.8 0 1 1 8.6 19z"/>',
+  phone:'<circle cx="12" cy="12" r="9.5"/><path d="M9.2 7.5l1.3 2.6-1 1a6.5 6.5 0 0 0 3.4 3.4l1-1 2.6 1.3-.5 1.6c-4 .5-8.4-3.9-7.9-7.9z"/>',
+  mobile:'<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>',
+  mail:'<circle cx="12" cy="12" r="9.5"/><rect x="7" y="8.5" width="10" height="7" rx="1"/><path d="M7.3 9l4.7 3.6L16.7 9"/>',
+  home:'<circle cx="12" cy="12" r="9.5"/><path d="M7.5 12L12 7.8l4.5 4.2M9 11v5h6v-5"/>'
+};
+const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]||""}</svg>`;
+
+/* ================= État ================= */
+const S = {
+  db:null, user:null, canWrite:null, readonly:false,
+  status:"loading", loadTimer:null, lostMsg:"",
+  config:null, patients:new Map(), patientsReady:false,
+  months:new Map(),
+  view:"agenda", day:TODAY, month:monthOf(TODAY),
+  search:"", pfilter:"tous", shellKey:"", settingsDirty:false,
+  drawer:null, D:null
+};
+const cfg = () => Object.assign({}, DEFAULTS, S.config || {});
+
+/* ================= Base de données ================= */
+function onDbError(e){
+  console.error(e);
+  if (!e) return;
+  if (e.code === "revoked"){ S.status = "lost"; S.lostMsg = "L'accès aux données a été retiré pour cette vue."; }
+  else if (e.code === "unavailable"){ S.status = "lost"; S.lostMsg = "La connexion aux données est interrompue. Recharge la page."; }
+  schedule();
+}
+function markFresh(fromCache){
+  if (!fromCache && (S.status === "loading" || S.status === "slow")){ S.status = "ready"; clearTimeout(S.loadTimer); }
+}
+function ensureMonth(m){
+  if (!S.db || S.months.has(m)) return;
+  const e = {rdv:new Map(), pay:new Map(), chg:new Map(), unsubs:[]};
+  S.months.set(m, e);
+  [["rdv","rdv"],["pay","paiements"],["chg","charges"]].forEach(([k,coll]) => {
+    try{
+      e.unsubs.push(S.db.collection(`mois/${m}/${coll}`).onSnapshot(snap => {
+        const map = new Map(); snap.docs.forEach(d => map.set(d.id, d.data()));
+        e[k] = map; markFresh(snap.metadata.fromCache); schedule();
+      }, onDbError));
+    }catch(err){ console.error(err); }
+  });
+  // garder le nombre d'abonnements sous la limite : on libère les mois les plus éloignés
+  const keep = new Set(baseWindow());
+  for (let i=0;i<6;i++) keep.add(addMonths(S.month,-i));
+  if (S.months.size > 16){
+    const far = [...S.months.keys()].filter(k => !keep.has(k)).sort((a,b) => Math.abs(monthDiff(b,S.month)) - Math.abs(monthDiff(a,S.month)));
+    while (S.months.size > 16 && far.length){ const k = far.shift(); S.months.get(k).unsubs.forEach(u => u()); S.months.delete(k); }
+  }
+}
+function baseWindow(){ const m0 = monthOf(TODAY); const out=[]; for (let i=-5;i<=1;i++) out.push(addMonths(m0,i)); return out; }
+const rdvRef = (m,id) => S.db.collection(`mois/${m}/rdv`).doc(id);
+
+async function write(fn, okMsg){
+  if (!S.db){ toast("Les données ne sont pas accessibles dans cette vue.", true); return false; }
+  if (S.readonly){ toast("Lecture seule : modification impossible.", true); return false; }
+  try{ await fn(); if (okMsg) toast(okMsg); return true; }
+  catch(e){
+    if (e && e.code === "unavailable"){
+      await new Promise(r => setTimeout(r, 400 + Math.random()*600));
+      try{ await fn(); if (okMsg) toast(okMsg); return true; }catch(e2){ e = e2; }
+    }
+    writeError(e); return false;
+  }
+}
+function writeError(e){
+  console.error(e);
+  const c = e && e.code;
+  if (c === "invalid_argument"){
+    if (S.canWrite !== true){ S.readonly = true; schedule(); toast("Ton accès ne permet pas de modifier les données.", true); }
+    else toast("Enregistrement refusé : une valeur est invalide.", true);
+  } else if (c === "quota_exceeded") toast("La base est pleine. Supprime d'anciennes données (les exemples, par exemple).", true);
+  else if (c === "resource_exhausted") toast("Trop de modifications d'un coup. Réessaie dans quelques secondes.", true);
+  else toast("Échec de l'enregistrement. Vérifie la connexion puis réessaie.", true);
+}
+async function pool(tasks, n, onStep){
+  let i = 0, done = 0;
+  const worker = async () => { while (i < tasks.length){ const t = tasks[i++]; await t(); done++; onStep && onStep(done); } };
+  await Promise.all(Array.from({length:Math.min(n, tasks.length)}, worker));
+}
+
+/* ================= Dérivés ================= */
+function derive(){
+  const rdv=[], pays=[], chg=[];
+  for (const [m,e] of S.months){
+    for (const [id,r] of e.rdv) rdv.push(Object.assign({}, r, {id, m}));
+    for (const [id,p] of e.pay) pays.push(Object.assign({}, p, {id, m}));
+    for (const [id,c] of e.chg) chg.push(Object.assign({}, c, {id, m}));
+  }
+  rdv.sort((a,b) => (a.date+(a.heure||"")).localeCompare(b.date+(b.heure||"")));
+  const byDay = new Map(), byPat = new Map(), payByPat = new Map();
+  rdv.forEach(r => { push(byDay, r.date, r); push(byPat, r.patientId, r); });
+  pays.forEach(p => push(payByPat, p.patientId, p));
+  const pstats = new Map();
+  for (const [pid,p] of S.patients){
+    const list = byPat.get(pid) || [];
+    const start = p.dateOrdonnance || "0000-00-00";
+    let n=0, eff=0, plan=0, abs=0; const num = new Map();
+    list.forEach(r => {
+      if (r.date < start) return;
+      if (r.statut === "effectue" || r.statut === "prevu"){ n++; num.set(r.id, n); r.statut === "effectue" ? eff++ : plan++; }
+      else if (r.statut === "absent") abs++;
+    });
+    const du = sum(list.filter(r => r.statut === "effectue"), r => r.montant);
+    const regl = sum(list, r => r.reglement ? r.reglement.montant : 0) + sum(payByPat.get(pid)||[], x => x.montant);
+    const evas = list.filter(r => r.statut === "effectue" && r.eva !== null && r.eva !== undefined && r.eva !== "").map(r => ({date:r.date, eva:+r.eva}));
+    const next = list.find(r => r.statut === "prevu" && r.date >= TODAY);
+    const pres = +p.seancesPrescrites || 0;
+    const alerts = [];
+    if (pres){
+      const over = n - pres;
+      if (over > 0 && list.some(r => r.statut === "prevu" && num.get(r.id) > pres)) alerts.push({c:"tape", t:`${over} séance${over>1?"s":""} hors ordonnance`});
+      if (eff >= pres){
+        if (p.couverture && p.couverture !== "Sans couverture" && !p.feuilleSoins) alerts.push({c:"warn", t:"Feuille de soins à remettre"});
+      } else if (eff >= pres - 2) alerts.push({c:"warn", t:`Plus que ${pres - eff} séance${pres-eff>1?"s":""} : renouvellement ?`});
+    }
+    const done = pres > 0 && eff >= pres && plan === 0;
+    pstats.set(pid, {list, num, eff, plan, abs, n, du, regl, solde: du - regl, evas, next, pres, alerts, done,
+      active: list.some(r => r.date >= start && (r.statut === "prevu" || r.statut === "effectue")) && (plan > 0 || !pres || eff < pres)});
+  }
+  return {rdv, pays, chg, byDay, byPat, payByPat, pstats};
+}
+
+function finance(m, D){
+  const c = cfg();
+  const rdvM = D.rdv.filter(r => monthOf(r.date) === m);
+  const eff = rdvM.filter(r => r.statut === "effectue");
+  const ca = sum(eff, r => r.montant);
+  const nEff = eff.length, nAbs = rdvM.filter(r => r.statut === "absent").length, nAnn = rdvM.filter(r => r.statut === "annule").length;
+  const encR = D.rdv.filter(r => r.reglement && monthOf(r.reglement.date || r.date) === m);
+  const encP = D.pays.filter(p => monthOf(p.date) === m);
+  const byMode = {especes:0, carte:0, virement:0, cheque:0};
+  encR.forEach(r => { byMode[r.reglement.mode] = (byMode[r.reglement.mode]||0) + (+r.reglement.montant||0); });
+  encP.forEach(p => { byMode[p.mode] = (byMode[p.mode]||0) + (+p.montant||0); });
+  const enc = sum(encR, r => r.reglement.montant) + sum(encP, p => p.montant);
+  const fixes = (c.chargesFixes||[]).filter(f => f.depuis && f.depuis <= m && (!f.fin || m <= f.fin));
+  const totFixes = sum(fixes, f => f.montant);
+  const ponct = D.chg.filter(x => monthOf(x.date) === m);
+  const totPonct = sum(ponct, x => x.montant);
+  const amorts = (c.materiel||[]).map(x => {
+    const dur = (+x.dureeAns||0) * 12; if (!x.achat || !dur) return null;
+    const k = monthDiff(x.achat, m); if (k < 0 || k >= dur) return null;
+    return Object.assign({}, x, {dot:(+x.valeur||0)/dur});
+  }).filter(Boolean);
+  const totAmort = sum(amorts, a => a.dot);
+  const charges = totFixes + totPonct + totAmort;
+  const resultat = ca - charges;
+  const taux = +c.tauxImpot || 0;
+  const impot = resultat > 0 ? resultat * taux / 100 : 0;
+  const prixMoyen = nEff ? ca / nEff : (+c.tarifDefaut||0);
+  // consommables saisis = coût variable réel ; sinon estimation des réglages
+  const conso = sum(ponct.filter(x => x.categorie === "Consommables"), x => x.montant);
+  const consoReel = !!(nEff && conso);
+  const vu = consoReel ? conso / nEff : (+c.coutVariableSeance||0);
+  const margeU = prixMoyen - vu;
+  const structure = totFixes + totAmort + totPonct - (consoReel ? conso : 0);
+  const seuil = margeU > 0 ? Math.ceil(structure / margeU) : null;
+  const byCat = new Map();
+  fixes.forEach(f => byCat.set(f.categorie||"Divers", (byCat.get(f.categorie||"Divers")||0) + (+f.montant||0)));
+  ponct.forEach(x => byCat.set(x.categorie||"Divers", (byCat.get(x.categorie||"Divers")||0) + (+x.montant||0)));
+  return {m, rdvM, nEff, nAbs, nAnn, ca, enc, encR, encP, byMode, fixes, totFixes, ponct, totPonct, amorts, totAmort, charges,
+    resultat, taux, impot, net: resultat - impot, prixMoyen, seuil, byCat, vu, consoReel, structure,
+    tauxAbs: (nEff+nAbs) ? nAbs/(nEff+nAbs) : 0, coutSeance: nEff ? charges/nEff : null,
+    tresorerie: enc - totFixes - totPonct};
+}
+function firstActivityMonth(D){
+  const c = cfg(); let first = null;
+  const take = m => { if (m && (!first || m < first)) first = m; };
+  (c.chargesFixes||[]).forEach(f => take(f.depuis)); (c.materiel||[]).forEach(x => take(x.achat));
+  if (D.rdv.length) take(monthOf(D.rdv[0].date));
+  D.pays.forEach(p => take(monthOf(p.date))); D.chg.forEach(x => take(monthOf(x.date)));
+  return first;
+}
+
+/* ================= Rendu principal ================= */
+let raf = 0;
+function schedule(){ if (!raf) raf = requestAnimationFrame(() => { raf = 0; render(); }); }
+
+function renderNav(){
+  const c = cfg();
+  const nk = [S.view, S.mode || "", c.tarifDefaut, c.telFixe, c.telMobile, c.email, c.adresse].join("|");
+  if (S.navKey === nk) return; S.navKey = nk;
+  const links = ROUTES.map(r => `<a href="#${r}" ${S.view===r?'aria-current="page"':""}>${ic(r)}<span>${TITLES[r]}</span></a>`).join("");
+  $("#nav").innerHTML = links; $("#tabbar").innerHTML = links;
+  const tel = (n, icon) => n ? `<li>${ic(icon)}<a class="tel" href="tel:${esc(n.replace(/[^\d+]/g,""))}">${esc(n)}</a></li>` : "";
+  const contact = tel(c.telFixe, "phone") + tel(c.telMobile, "mobile")
+    + (c.email ? `<li>${ic("mail")}<a href="mailto:${esc(c.email)}">${esc(c.email)}</a></li>` : "")
+    + (c.adresse ? `<li>${ic("home")}<span>${esc(c.adresse)}</span></li>` : "");
+  $("#railFoot").innerHTML = `${contact ? `<ul class="contact">${contact}</ul>` : ""}<div>Tarif séance : ${fmtDH(c.tarifDefaut)}${S.mode === "local" ? "<br>Données : ce navigateur" : ""}</div>`;
+}
+function renderHeader(){
+  $("#vTitle").textContent = TITLES[S.view];
+  let sub = "";
+  if (S.view === "agenda") sub = dayLabel(S.day);
+  else if (S.view === "patients") sub = `${S.patients.size} patient${S.patients.size>1?"s":""} enregistré${S.patients.size>1?"s":""}`;
+  else if (S.view === "reglages") sub = "Tarifs, horaires, charges fixes et matériel amorti";
+  else sub = cap(monthLabel(S.month));
+  $("#vSub").textContent = sub;
+  let act = "";
+  if (S.view === "agenda" || S.view === "patients") act = `<button class="btn primary" data-action="new-rdv" data-write>${ic("plus")}Rendez-vous</button>`;
+  if (S.view === "patients") act = `<button class="btn" data-action="new-patient" data-write>${ic("plus")}Patient</button> ` + act;
+  if (S.view === "caisse") act = `<button class="btn primary" data-action="new-payment" data-write>${ic("plus")}Encaissement</button>`;
+  if (S.view === "charges") act = `<button class="btn primary" data-action="new-charge" data-write>${ic("plus")}Charge</button>`;
+  $("#topActions").innerHTML = act;
+}
+function renderBanners(){
+  const b = [];
+  if (S.status === "nodb") b.push(`<div class="banner bad">Les données du cabinet ne sont pas accessibles dans cette vue. Ouvre la page depuis claude.ai en étant connecté.</div>`);
+  if (S.status === "slow") b.push(`<div class="banner warn">Les données mettent du temps à arriver. Ce qui s'affiche peut ne pas être à jour.</div>`);
+  if (S.status === "lost") b.push(`<div class="banner bad">${esc(S.lostMsg)}</div>`);
+  if (S.readonly) b.push(`<div class="banner warn">Lecture seule : ton accès ne permet pas de modifier les données.</div>`);
+  if (S.status === "nostore") b.push(`<div class="banner bad">Ce navigateur bloque le stockage des données (navigation privée ou réglage de confidentialité). Ouvre le fichier dans Chrome, Edge ou Firefox en mode normal.</div>`);
+  if (S.mode === "local" && S.patients.size){
+    const lb = lastBackup(); const days = lb ? Math.floor((Date.now() - Date.parse(lb)) / 86400000) : null;
+    if (days === null || days >= 7) b.push(`<div class="banner warn"><span>${days === null ? "Aucune sauvegarde des données pour l'instant." : `Dernière sauvegarde il y a ${days} jours.`} Les données ne sont que dans ce navigateur.</span><button class="btn sm" data-action="export">Sauvegarder maintenant</button></div>`);
+  }
+  const hasEx = S.config?.exemple || [...S.patients.values()].some(p => p.exemple);
+  if (hasEx && S.view !== "reglages") b.push(`<div class="banner info"><span>Données d'exemple affichées : patients fictifs, tarifs et charges indicatifs. Remplace-les par les chiffres réels du cabinet.</span><a class="btn sm" href="#reglages">Réglages</a></div>`);
+  $("#banners").innerHTML = b.join("");
+}
+function render(){
+  const D = derive(); S.D = D;
+  document.body.classList.toggle("ro", !!S.readonly);
+  renderNav(); renderHeader(); renderBanners();
+  const v = $("#view");
+  const key = S.view + "|" + (S.view === "agenda" ? S.day : S.month);
+  if (S.status === "loading" && !S.patientsReady){ v.innerHTML = `<div class="loading">Chargement des données du cabinet…</div>`; S.shellKey = ""; }
+  else if (S.view === "patients"){
+    if (S.shellKey !== key){ v.innerHTML = patientsShell(); S.shellKey = key; }
+    $("#plistWrap").innerHTML = patientsList(D);
+  } else if (S.view === "reglages"){
+    const fs = $("#fSettings"); const editing = fs && fs.contains(document.activeElement);
+    if (S.shellKey !== key || (!S.settingsDirty && !editing)){ v.innerHTML = settingsView(D); S.shellKey = key; S.settingsDirty = false; }
+  } else {
+    v.innerHTML = ({agenda:viewAgenda, caisse:viewCaisse, charges:viewCharges, resultat:viewResultat})[S.view](D);
+    S.shellKey = key;
+  }
+  if (S.drawer && S.drawer.type === "patient" && S.drawer.id) { const lb = $("#pLive"); if (lb) lb.innerHTML = patientLive(S.drawer.id, D); }
+}
+
+/* ================= Agenda ================= */
+function slotsFor(day){
+  const c = cfg(); const dow = parseYmd(day).getDay();
+  const open = (c.joursOuvres||[]).map(Number).includes(dow);
+  const end = (dow === 6 && c.samediFermeture) ? c.samediFermeture : c.fermeture;
+  const step = Math.max(10, +c.pas || 30); const out = [];
+  for (let t = toMin(c.ouverture); t < toMin(end); t += step) out.push(fromMin(t));
+  return {open, slots:out, step};
+}
+const active = r => r.statut === "prevu" || r.statut === "effectue";
+function viewAgenda(D){
+  const c = cfg(); const day = S.day;
+  const {open, slots, step} = slotsFor(day);
+  const list = D.byDay.get(day) || [];
+  const dIdx = (parseYmd(day).getDay() + 6) % 7; const monday = addDays(day, -dIdx);
+  let week = "";
+  for (let i=0;i<7;i++){
+    const d = addDays(monday, i); const dd = parseYmd(d);
+    const n = (D.byDay.get(d)||[]).filter(active).length;
+    const isOpen = (c.joursOuvres||[]).map(Number).includes(dd.getDay());
+    week += `<button class="wd ${d===TODAY?"today":""} ${isOpen?"":"closed"}" aria-pressed="${d===day}" data-action="day" data-day="${d}">
+      <span class="l">${esc(dd.toLocaleDateString("fr-FR",{weekday:"short"}).replace(".",""))}</span><span class="n">${dd.getDate()}</span><span class="c">${n ? n+" rdv" : "—"}</span></button>`;
+  }
+  const prev = list.filter(r => r.statut === "prevu").length, eff = list.filter(r => r.statut === "effectue"), abs = list.filter(r => r.statut === "absent").length;
+  const encDay = sum(D.rdv.filter(r => r.reglement && r.reglement.date === day), r => r.reglement.montant) + sum(D.pays.filter(p => p.date === day), p => p.montant);
+  const stats = `<div class="stats">
+    <div><span>Prévus</span><b>${prev}</b></div><div><span>Effectués</span><b>${eff.length}</b></div><div><span>Absents</span><b>${abs}</b></div>
+    <div><span>Réalisé</span><b>${fmtDH(sum(eff, r => r.montant))}</b></div><div><span>Encaissé</span><b>${fmtDH(encDay)}</b></div></div>`;
+  const bySlot = new Map(slots.map(s => [s, []])); const outside = [];
+  list.forEach(r => {
+    const t = toMin(r.heure); let s = null;
+    for (const x of slots){ if (toMin(x) <= t) s = x; else break; }
+    if (s && t < toMin(slots[slots.length-1]) + step) bySlot.get(s).push(r); else outside.push(r);
+  });
+  const postes = Math.max(1, +c.postes || 1);
+  const nowMin = new Date().getHours()*60 + new Date().getMinutes();
+  let rows = "";
+  if (outside.length) rows += `<div class="slot"><time>Hors<br>horaire</time><div class="cards" style="--postes:${postes}">${outside.map(r => rdvCard(r, D)).join("")}</div></div>`;
+  slots.forEach(s => {
+    const rs = bySlot.get(s); const used = rs.filter(active).length;
+    const isNow = day === TODAY && nowMin >= toMin(s) && nowMin < toMin(s) + step;
+    const addBtn = used < postes ? `<button class="add" data-action="new-rdv" data-date="${day}" data-time="${s}" data-write aria-label="Ajouter un rendez-vous à ${s}">+ ${s}</button>` : "";
+    rows += `<div class="slot ${isNow?"now":""}"><time>${s}</time><div class="cards" style="--postes:${postes}">${rs.map(r => rdvCard(r, D)).join("")}${addBtn}</div></div>`;
+  });
+  const tl = `<section class="tl" aria-label="Rendez-vous du jour">
+    <div class="tl-head"><span>${open ? `${slots[0]||""} – ${fromMin(toMin(slots[slots.length-1]||"0:0")+step)} · ${postes} patient${postes>1?"s":""} en parallèle` : "Cabinet fermé ce jour"}</span><span>${list.filter(active).length} rendez-vous</span></div>
+    ${(open || list.length) ? rows : `<div class="empty"><b>Jour de fermeture</b>Choisis un autre jour dans la semaine.</div>`}</section>`;
+  return `<div class="daybar">
+      <div class="navpair"><button class="btn icon-btn" data-action="day-shift" data-n="-7" aria-label="Semaine précédente">${ic("left")}</button></div>
+      <div class="week">${week}</div>
+      <div class="navpair"><button class="btn icon-btn" data-action="day-shift" data-n="7" aria-label="Semaine suivante">${ic("right")}</button>
+      <button class="btn" data-action="day" data-day="${TODAY}">Aujourd'hui</button></div>
+    </div>${stats}
+    <div class="ag">${tl}<aside class="side stack">${remindersBox(D)}${followBox(D)}</aside></div>`;
+}
+function rdvCard(r, D){
+  const p = S.patients.get(r.patientId); const st = D.pstats.get(r.patientId);
+  const n = st && st.num.get(r.id); const pres = st ? st.pres : 0;
+  const hors = n && pres && n > pres;
+  let acts = "";
+  if (r.statut === "prevu") acts = `<button class="btn sm ok" data-action="rdv-status" data-s="effectue" data-id="${r.id}" data-m="${r.m}" data-write>${ic("check")}Faite</button><button class="btn sm" data-action="rdv-status" data-s="absent" data-id="${r.id}" data-m="${r.m}" data-write>Absent</button>`;
+  else if (r.statut === "effectue"){
+    if (r.reglement) acts = `<span class="chip good">${ic("check")}Réglée · ${esc(MODES[r.reglement.mode]||"")}</span>`;
+    else if (st && st.solde <= 0) acts = `<span class="chip good">Couverte par avance</span>`;
+    else acts = `<button class="btn sm" data-action="rdv-pay" data-id="${r.id}" data-m="${r.m}" data-write>Encaisser ${fmtDH(r.montant)}</button>`;
+  }
+  return `<article class="rdv s-${r.statut} ${hors?"hors":""}">
+    <div class="rh"><span class="t">${esc(r.heure)}</span>${n ? `<span class="sn" title="Séance ${n}${pres?" sur "+pres+" prescrites":""}">S${n}${pres?"/"+pres:""}</span>` : ""}${r.type && r.type !== "Séance" ? `<span class="chip accent">${esc(r.type)}</span>` : ""}<span class="chip st ${ST_CLASS[r.statut]}">${STATUTS[r.statut]||""}</span></div>
+    <button class="nm" data-action="open-rdv" data-id="${r.id}" data-m="${r.m}">${esc(p ? p.nom : "Patient supprimé")}</button>
+    <div class="mt">${esc([p && p.motif, p && COUV_SHORT[p.couverture]].filter(Boolean).join(" · "))}</div>
+    ${hors ? `<div class="hw">Hors ordonnance : non remboursable</div>` : ""}
+    ${acts ? `<div class="ra">${acts}</div>` : ""}</article>`;
+}
+function waNumber(tel){
+  let d = String(tel||"").replace(/\D/g,"");
+  if (d.startsWith("00")) d = d.slice(2);
+  if (d.length === 10 && d.startsWith("0")) d = "212" + d.slice(1);
+  return d.length >= 11 ? d : "";
+}
+function reminderText(r, p, when){
+  const c = cfg();
+  return String(c.messageRappel||DEFAULTS.messageRappel).replace(/\{patient\}/g, p ? p.nom : "").replace(/\{jour\}/g, when).replace(/\{heure\}/g, r.heure.replace(":","h"));
+}
+function remindersBox(D){
+  let target = null;
+  for (let i=1;i<=7;i++){ const d = addDays(TODAY, i); if ((D.byDay.get(d)||[]).some(r => r.statut === "prevu")){ target = d; break; } }
+  if (!target) return `<section class="box"><h3>Rappels</h3><p class="hint">Aucun rendez-vous prévu dans les 7 prochains jours.</p></section>`;
+  const when = target === addDays(TODAY,1) ? "demain" : "le " + parseYmd(target).toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+  const rs = (D.byDay.get(target)||[]).filter(r => r.statut === "prevu");
+  const items = rs.map(r => {
+    const p = S.patients.get(r.patientId); const num = waNumber(p && p.tel);
+    const link = num ? `<a class="btn sm" href="https://wa.me/${num}?text=${encodeURIComponent(reminderText(r,p,when))}" target="_blank" rel="noopener">${ic("chat")}WhatsApp</a>` : `<span class="chip warn">Pas de numéro</span>`;
+    return `<li><div class="r1"><button class="linkish" data-action="open-patient" data-id="${esc(r.patientId)}">${esc(p ? p.nom : "Patient supprimé")}</button><span class="mono">${esc(r.heure)}</span></div>
+      <div class="r2"><span class="mono">${esc(p && p.tel || "")}</span>${link}</div></li>`;
+  }).join("");
+  return `<section class="box"><h3>Rappels · ${esc(cap(when))}<span class="chip">${rs.length}</span></h3><ul class="alist">${items}</ul>
+    <p class="hint" style="margin-top:10px">Le lien ouvre WhatsApp avec le message prêt. Vérifie qu'il est bien parti.</p></section>`;
+}
+function followBox(D){
+  const rows = [];
+  for (const [pid,st] of D.pstats){ if (st.alerts.length) rows.push([pid, st]); }
+  rows.sort((a,b) => (b[1].alerts.some(x=>x.c==="tape")?1:0) - (a[1].alerts.some(x=>x.c==="tape")?1:0));
+  const items = rows.slice(0,8).map(([pid,st]) => { const p = S.patients.get(pid);
+    return `<li><div class="r1"><button class="linkish" data-action="open-patient" data-id="${esc(pid)}">${esc(p.nom)}</button><span class="mono">${st.eff}/${st.pres}</span></div>
+      <div class="r2">${st.alerts.map(a => `<span class="chip ${a.c}">${esc(a.t)}</span>`).join("")}</div></li>`; }).join("");
+  if (!S.patients.size) return `<section class="box"><h3>Premiers pas</h3><p class="hint">Ajoute un patient avec son ordonnance (nombre de séances prescrites), puis planifie sa série de séances depuis un créneau.</p></section>`;
+  return `<section class="box"><h3>Suivi des ordonnances${rows.length?`<span class="chip">${rows.length}</span>`:""}</h3>${items ? `<ul class="alist">${items}</ul>` : `<p class="hint">Aucune ordonnance à renouveler ni feuille de soins en attente.</p>`}</section>`;
+}
+
+/* ================= Patients ================= */
+function patientsShell(){
+  const f = [["tous","Tous"],["encours","En cours"],["alertes","À traiter"],["impayes","Impayés"]];
+  return `<div class="toolbar"><label class="search">${ic("search")}<input id="pSearch" type="search" placeholder="Rechercher un nom, un téléphone, un motif…" value="${esc(S.search)}" aria-label="Rechercher un patient"></label>
+    <div class="seg" role="group" aria-label="Filtrer">${f.map(([k,l]) => `<button data-action="pfilter" data-f="${k}" aria-pressed="${S.pfilter===k}">${l}</button>`).join("")}</div></div>
+    <div id="plistWrap"></div>`;
+}
+function patientsList(D){
+  const q = S.search.trim().toLowerCase();
+  let ps = [...S.patients.entries()].map(([id,p]) => ({id, p, st:D.pstats.get(id)}));
+  if (q) ps = ps.filter(x => [x.p.nom, x.p.tel, x.p.motif, x.p.prescripteur].join(" ").toLowerCase().includes(q));
+  if (S.pfilter === "encours") ps = ps.filter(x => x.st.active);
+  if (S.pfilter === "alertes") ps = ps.filter(x => x.st.alerts.length);
+  if (S.pfilter === "impayes") ps = ps.filter(x => x.st.solde > 0.5);
+  ps.sort((a,b) => (b.st.active - a.st.active) || String(a.p.nom).localeCompare(String(b.p.nom), "fr"));
+  if (!ps.length) return `<div class="plist"><div class="empty"><b>${S.patients.size ? "Aucun patient ne correspond" : "Aucun patient pour l'instant"}</b>${S.patients.size ? "Change la recherche ou le filtre." : "Ajoute le premier patient avec le bouton « Patient »."}</div></div>`;
+  return `<div class="plist"><div class="phead"><span>Patient</span><span class="pmot">Ordonnance</span><span>Séances</span><span style="text-align:right">Solde</span></div>` +
+    ps.map(({id,p,st}) => {
+      const pres = st.pres; const w1 = pres ? Math.min(100, st.eff/pres*100) : 0; const w2 = pres ? Math.max(0, Math.min(100 - w1, st.plan/pres*100)) : 0;
+      const over = pres && st.eff + st.plan > pres;
+      const solde = st.solde > 0.5 ? `<b style="color:var(--bad)">${fmtDH(st.solde)}</b><small class="muted">à encaisser</small>` : st.solde < -0.5 ? `<b>${fmtDH(-st.solde)}</b><small class="muted">d'avance</small>` : `<b class="muted">0 DH</b>`;
+      return `<button class="prow" data-action="open-patient" data-id="${esc(id)}">
+        <span class="pn"><b>${esc(p.nom)}</b><span class="tags">${p.couverture?`<span class="chip">${esc(COUV_SHORT[p.couverture]||p.couverture)}</span>`:""}${st.done?`<span class="chip good">Traitement terminé</span>`:""}${st.alerts.map(a => `<span class="chip ${a.c}">${esc(a.t)}</span>`).join("")}${p.exemple?`<span class="chip ex">Exemple</span>`:""}</span></span>
+        <span class="pn pmot"><small>${esc(p.motif||"Motif non renseigné")}</small><small>${p.dateOrdonnance?"Ordonnance du "+esc(dayShort(p.dateOrdonnance)):""}${p.prescripteur?" · "+esc(p.prescripteur):""}</small></span>
+        <span class="prog"><span class="bar" aria-hidden="true"><i style="width:${w1}%"></i><i class="plan ${over?"over":""}" style="width:${w2}%"></i></span>
+          <span>${st.eff} faite${st.eff>1?"s":""}${st.plan?` + ${st.plan} prévue${st.plan>1?"s":""}`:""}${pres?` / ${pres}`:""}${st.next?` · prochaine ${esc(dayShort(st.next.date))}`:""}</span></span>
+        <span class="solde">${solde}</span></button>`;
+    }).join("") + `</div>`;
+}
+
+/* ================= Caisse ================= */
+function monthNav(){ return `<div class="mnav"><button class="btn" data-action="m-shift" data-n="-1" aria-label="Mois précédent">${ic("left")}</button><strong>${esc(monthLabel(S.month))}</strong><button class="btn" data-action="m-shift" data-n="1" aria-label="Mois suivant">${ic("right")}</button></div>`; }
+function viewCaisse(D){
+  const F = finance(S.month, D);
+  const maxMode = Math.max(1, ...Object.values(F.byMode));
+  const modes = Object.entries(MODES).map(([k,l]) => `<div class="mb"><span>${l}</span><span class="bar"><i style="width:${(F.byMode[k]||0)/maxMode*100}%"></i></span><span class="num">${fmtDH(F.byMode[k]||0)}</span></div>`).join("");
+  const lines = [
+    ...F.encR.map(r => ({date:r.reglement.date || r.date, pid:r.patientId, orig:`Séance du ${dayShort(r.date)}`, mode:r.reglement.mode, montant:+r.reglement.montant||0, kind:"r", id:r.id, m:r.m})),
+    ...F.encP.map(p => ({date:p.date, pid:p.patientId, orig:p.note || "Paiement / avance", mode:p.mode, montant:+p.montant||0, kind:"p", id:p.id, m:p.m}))
+  ].sort((a,b) => b.date.localeCompare(a.date));
+  const rows = lines.map(x => { const p = S.patients.get(x.pid);
+    const del = x.kind === "p" ? `<button class="btn sm ghost" data-action="del-payment" data-id="${x.id}" data-m="${x.m}" data-confirm data-write>Supprimer</button>`
+      : `<button class="btn sm ghost" data-action="open-rdv" data-id="${x.id}" data-m="${x.m}">Voir</button>`;
+    return `<tr><td class="mono">${esc(dayShort(x.date))}</td><td>${esc(p ? p.nom : "—")}</td><td class="muted">${esc(x.orig)}</td><td>${esc(MODES[x.mode]||x.mode||"")}</td><td class="num">${fmtDH(x.montant)}</td><td style="text-align:right">${del}</td></tr>`; }).join("");
+  const dues = [...D.pstats.entries()].filter(([,s]) => s.solde > 0.5).sort((a,b) => b[1].solde - a[1].solde);
+  const totDue = sum(dues, ([,s]) => s.solde);
+  const dueRows = dues.map(([pid,s]) => `<li><div class="r1"><button class="linkish" data-action="open-patient" data-id="${esc(pid)}">${esc(S.patients.get(pid).nom)}</button><span class="num" style="color:var(--bad)">${fmtDH(s.solde)}</span></div>
+    <div class="r2">${s.eff} séance${s.eff>1?"s":""} faite${s.eff>1?"s":""} · ${fmtDH(s.regl)} réglés <button class="btn sm" data-action="new-payment" data-patient="${esc(pid)}" data-amount="${Math.round(s.solde)}" data-write>Encaisser</button></div></li>`).join("");
+  return `<div class="toolbar">${monthNav()}</div>
+    <div class="kpis">
+      <div class="kpi"><span>Encaissé</span><b>${fmtDH(F.enc)}</b><small>${lines.length} opération${lines.length>1?"s":""}</small></div>
+      <div class="kpi"><span>Réalisé</span><b>${fmtDH(F.ca)}</b><small>${F.nEff} séance${F.nEff>1?"s":""} effectuée${F.nEff>1?"s":""}</small></div>
+      <div class="kpi"><span>Écart du mois</span><b>${fmtSigned(F.enc - F.ca)}</b><small>encaissé − réalisé</small></div>
+      <div class="kpi"><span>Reste à encaisser</span><b style="color:${totDue?"var(--bad)":"inherit"}">${fmtDH(totDue)}</b><small>tous patients, tous mois chargés</small></div>
+    </div>
+    <div class="grid2"><section class="box"><h3>Encaissements du mois</h3>${rows ? `<div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Patient</th><th>Origine</th><th>Mode</th><th class="num">Montant</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>` : `<div class="empty"><b>Aucun encaissement ce mois-ci</b>Encaisse une séance depuis l'agenda ou enregistre une avance.</div>`}</section>
+      <div class="stack"><section class="box"><h3>Par mode de paiement</h3><div class="modes-bars">${modes}</div></section>
+      <section class="box"><h3>Impayés<span class="chip ${dues.length?"bad":""}">${dues.length}</span></h3>${dueRows ? `<ul class="alist">${dueRows}</ul>` : `<p class="hint">Aucun patient ne doit d'argent au cabinet.</p>`}</section></div></div>`;
+}
+
+/* ================= Charges ================= */
+function viewCharges(D){
+  const F = finance(S.month, D);
+  const rows = [
+    ...F.fixes.map(f => `<tr><td><span class="chip accent">Fixe</span></td><td>${esc(f.libelle)}</td><td class="muted">${esc(f.categorie||"")}</td><td class="num">${fmtDH(f.montant)}</td><td style="text-align:right"><a class="btn sm ghost" href="#reglages">Modifier</a></td></tr>`),
+    ...F.ponct.sort((a,b) => a.date.localeCompare(b.date)).map(x => `<tr><td class="mono">${esc(dayShort(x.date))}</td><td>${esc(x.libelle)}${x.exemple?' <span class="chip ex">Exemple</span>':""}</td><td class="muted">${esc(x.categorie||"")}</td><td class="num">${fmtDH(x.montant)}</td><td style="text-align:right"><button class="btn sm ghost" data-action="del-charge" data-id="${x.id}" data-m="${x.m}" data-confirm data-write>Supprimer</button></td></tr>`),
+    ...F.amorts.map(a => `<tr><td><span class="chip">Amort.</span></td><td>${esc(a.libelle)}</td><td class="muted">${fmt(a.valeur)} DH sur ${esc(a.dureeAns)} an${+a.dureeAns>1?"s":""}</td><td class="num">${fmtDH(a.dot)}</td><td style="text-align:right"><a class="btn sm ghost" href="#reglages">Modifier</a></td></tr>`)
+  ].join("");
+  return `<div class="toolbar">${monthNav()}</div>
+    <div class="kpis">
+      <div class="kpi"><span>Charges fixes</span><b>${fmtDH(F.totFixes)}</b><small>${F.fixes.length} ligne${F.fixes.length>1?"s":""} mensuelles</small></div>
+      <div class="kpi"><span>Dépenses du mois</span><b>${fmtDH(F.totPonct)}</b><small>achats et factures saisis</small></div>
+      <div class="kpi"><span>Amortissements</span><b>${fmtDH(F.totAmort)}</b><small>matériel, non décaissé</small></div>
+      <div class="kpi"><span>Total charges</span><b>${fmtDH(F.charges)}</b><small>${F.nEff ? fmtDH(F.charges/F.nEff)+" par séance effectuée" : "aucune séance effectuée"}</small></div>
+    </div>
+    <section class="box"><h3>Détail des charges de ${esc(monthLabel(S.month))}</h3>${rows ? `<div class="tbl-wrap"><table><thead><tr><th>Date / type</th><th>Libellé</th><th>Catégorie</th><th class="num">Montant</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>` : `<div class="empty"><b>Aucune charge pour ce mois</b>Ajoute le loyer et les salaires dans Réglages (charges fixes), et les achats ici.</div>`}
+    <p class="note">Les charges fixes (loyer, salaires, CNSS employeur…) s'appliquent automatiquement chaque mois depuis Réglages. Ici, saisis les dépenses ponctuelles : consommables, réparations, factures.</p></section>`;
+}
+
+/* ================= Résultat ================= */
+function niceStep(v){ const p = Math.pow(10, Math.floor(Math.log10(v))); const n = v/p; return (n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*p; }
+const fmtAxis = v => v >= 1000 ? (v/1000).toLocaleString("fr-FR",{maximumFractionDigits:1}) + " k" : String(Math.round(v));
+function chartSvg(series){
+  const W = 640, H = 250, L = 52, R = 10, T = 12, B = 54;
+  const peak = Math.max(1, ...series.flatMap(s => [s.ca, s.charges]));
+  const step = niceStep(peak/4); const max = step*4;
+  const y = v => T + (H-T-B) * (1 - v/max);
+  const gw = (W-L-R)/series.length; const bw = Math.max(8, Math.min(30, (gw-22)/2));
+  let g = "";
+  for (let i=1;i<=4;i++){ const yy = y(step*i).toFixed(1); g += `<line class="gl" x1="${L}" x2="${W-R}" y1="${yy}" y2="${yy}"/><text class="ax" x="${L-8}" y="${(+yy+4).toFixed(1)}" text-anchor="end">${fmtAxis(step*i)}</text>`; }
+  g += `<text class="ax" x="${L-8}" y="${(y(0)+4).toFixed(1)}" text-anchor="end">0</text>`;
+  const bar = (x, v, cls) => { const yt = y(v), yb = y(0), h = yb - yt; if (h < .5) return ""; const r = Math.min(4, h, bw/2);
+    return `<path class="${cls}" d="M${x.toFixed(1)},${yb.toFixed(1)}V${(yt+r).toFixed(1)}Q${x.toFixed(1)},${yt.toFixed(1)} ${(x+r).toFixed(1)},${yt.toFixed(1)}H${(x+bw-r).toFixed(1)}Q${(x+bw).toFixed(1)},${yt.toFixed(1)} ${(x+bw).toFixed(1)},${(yt+r).toFixed(1)}V${yb.toFixed(1)}Z"/>`; };
+  series.forEach((s,i) => {
+    const cx = L + gw*i + gw/2;
+    g += bar(cx - bw - 1, s.ca, "bar-a") + bar(cx + 1, s.charges, "bar-b");
+    g += `<text class="ml" x="${cx.toFixed(1)}" y="${H-B+18}" text-anchor="middle">${esc(cap(monthShort(s.m).replace(".","")))}</text>`;
+    g += `<text class="rl" x="${cx.toFixed(1)}" y="${H-B+36}" text-anchor="middle">${s.res<0?"−":"+"}${fmt(Math.abs(s.res))}</text>`;
+    const tip = `${cap(monthLabel(s.m))}<br>Honoraires : ${fmtDH(s.ca)}<br>Charges : ${fmtDH(s.charges)}<br>Résultat : ${fmtSigned(s.res)}`;
+    g += `<rect class="hit" x="${(L+gw*i+2).toFixed(1)}" y="${T}" width="${(gw-4).toFixed(1)}" height="${H-T-B+40}" rx="6" tabindex="0" data-tip="${esc(tip)}" aria-label="${esc(tip.replace(/<br>/g,", "))}"/>`;
+  });
+  g += `<line class="base" x1="${L}" x2="${W-R}" y1="${y(0).toFixed(1)}" y2="${y(0).toFixed(1)}"/>`;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Honoraires et charges par mois">${g}</svg>`;
+}
+function viewResultat(D){
+  const F = finance(S.month, D);
+  const first = firstActivityMonth(D);
+  const months = []; for (let i=5;i>=0;i--){ const m = addMonths(S.month,-i); ensureMonth(m); if (!first || m >= first) months.push(m); }
+  const series = months.map(m => { const f = finance(m, D); return {m, ca:f.ca, charges:f.charges, res:f.resultat}; });
+  const neg = F.resultat < 0;
+  const dues = sum([...D.pstats.values()].filter(s => s.solde > 0), s => s.solde);
+  const cats = [...F.byCat.entries()].sort((a,b) => b[1]-a[1]).map(([k,v]) => `<tr><td class="ind">${esc(k)}</td><td class="num">${fmtDH(v)}</td></tr>`).join("");
+  const seuilTxt = F.seuil === null ? "Non calculable" : `${F.seuil} séances / mois`;
+  const seuilPct = F.seuil ? Math.min(100, F.nEff / F.seuil * 100) : 0;
+  return `<div class="toolbar">${monthNav()}</div>
+    <div class="kpis k6">
+      <div class="kpi hero ${neg?"neg":"pos"}"><span>Résultat avant impôt</span><b>${fmtSigned(F.resultat)}</b><small>${F.ca ? "Marge : " + pct(F.resultat, F.ca) + " % des honoraires" : "Aucune séance effectuée ce mois"}</small></div>
+      <div class="kpi"><span>Honoraires</span><b>${fmtDH(F.ca)}</b><small>${F.nEff} séances</small></div>
+      <div class="kpi"><span>Charges</span><b>${fmtDH(F.charges)}</b><small>dont ${fmtDH(F.totAmort)} amort.</small></div>
+      <div class="kpi"><span>Encaissé</span><b>${fmtDH(F.enc)}</b><small>trésorerie ${fmtSigned(F.tresorerie)}</small></div>
+      <div class="kpi"><span>À encaisser</span><b>${fmtDH(dues)}</b><small>créances patients</small></div>
+    </div>
+    <div class="grid2">
+      <div class="stack">
+        <section class="box"><h3>Évolution sur ${series.length} mois</h3>
+          ${series.length && series.some(s => s.ca || s.charges) ? `<div class="legend"><span><i style="background:var(--chart-a)"></i>Honoraires réalisés</span><span><i style="background:var(--chart-b)"></i>Charges (amortissements inclus)</span><span class="muted">Sous chaque mois : résultat</span></div>
+          <div class="chart" id="chart">${chartSvg(series)}<div class="tip" id="tip" hidden></div></div>
+          <details class="tblv"><summary>Voir les chiffres</summary><div class="tbl-wrap"><table><thead><tr><th>Mois</th><th class="num">Honoraires</th><th class="num">Charges</th><th class="num">Résultat</th></tr></thead><tbody>${series.map(s => `<tr><td>${esc(cap(monthLabel(s.m)))}</td><td class="num">${fmtDH(s.ca)}</td><td class="num">${fmtDH(s.charges)}</td><td class="num">${fmtSigned(s.res)}</td></tr>`).join("")}</tbody></table></div></details>`
+          : `<div class="empty"><b>Pas encore de données</b>Les mois apparaissent dès les premières séances ou charges.</div>`}
+        </section>
+        <section class="box"><h3>Indicateurs de pilotage</h3><dl class="ind-list">
+          <div><dt>Prix moyen d'une séance</dt><dd>${fmtDH(F.prixMoyen)}</dd></div>
+          <div><dt>Coût de revient d'une séance</dt><dd>${F.coutSeance === null ? "—" : fmtDH(F.coutSeance)}</dd></div>
+          <div><dt>Consommables par séance</dt><dd>${F.vu.toLocaleString("fr-FR",{maximumFractionDigits:1})} DH${F.consoReel ? "" : " (estimé)"}</dd></div>
+          <div><dt>Taux d'absence</dt><dd>${Math.round(F.tauxAbs*100)} % (${F.nAbs} absent${F.nAbs>1?"s":""})</dd></div>
+          <div><dt>Seuil de rentabilité</dt><dd>${seuilTxt}</dd></div>
+        </dl>
+        ${F.seuil ? `<div style="margin-top:12px"><div class="bar" style="height:10px"><i style="width:${seuilPct}%;background:${F.nEff>=F.seuil?"var(--good)":"var(--warn)"}"></i></div><p class="hint" style="margin-top:6px">${F.nEff >= F.seuil ? `Seuil atteint : ${F.nEff - F.seuil} séance${F.nEff-F.seuil>1?"s":""} au-delà.` : `Il manque ${F.seuil - F.nEff} séance${F.seuil-F.nEff>1?"s":""} pour couvrir les charges fixes et l'amortissement.`}</p></div>` : ""}
+        <p class="note">Seuil = charges de structure (${fmtDH(F.structure)} : fixes, amortissements, dépenses hors consommables) ÷ marge par séance (prix moyen − consommables par séance). Chaque absence non remplacée est une séance perdue au prix moyen.</p></section>
+      </div>
+      <section class="box"><h3>Compte de résultat simplifié</h3><div class="tbl-wrap"><table class="pl"><tbody>
+        <tr class="sec"><td colspan="2">Produits</td></tr>
+        <tr><td class="ind">Honoraires des séances effectuées (${F.nEff})</td><td class="num">${fmtDH(F.ca)}</td></tr>
+        <tr class="sec"><td colspan="2">Charges d'exploitation</td></tr>
+        ${cats || `<tr><td class="ind muted">Aucune charge saisie</td><td class="num">0 DH</td></tr>`}
+        <tr><td class="ind">Dotations aux amortissements</td><td class="num">${fmtDH(F.totAmort)}</td></tr>
+        <tr class="tot"><td>Total des charges</td><td class="num">${fmtDH(F.charges)}</td></tr>
+        <tr class="res"><td>Résultat avant impôt</td><td class="num">${fmtSigned(F.resultat)}</td></tr>
+        <tr><td class="ind">${F.taux ? `Provision impôt (${F.taux} %)` : "Provision impôt : taux non renseigné"}</td><td class="num">${F.taux ? "−" + fmtDH(F.impot) : "—"}</td></tr>
+        ${F.taux ? `<tr class="tot"><td>Résultat net estimé</td><td class="num">${fmtSigned(F.net)}</td></tr>` : ""}
+        <tr class="sec"><td colspan="2">Trésorerie du mois</td></tr>
+        <tr><td class="ind">Encaissements</td><td class="num">${fmtDH(F.enc)}</td></tr>
+        <tr><td class="ind">Charges payées (hors amortissements)</td><td class="num">−${fmtDH(F.totFixes + F.totPonct)}</td></tr>
+        <tr class="tot"><td>Variation de trésorerie</td><td class="num">${fmtSigned(F.tresorerie)}</td></tr>
+      </tbody></table></div>
+      <p class="note">Les honoraires sont comptés à la date de la séance effectuée ; la trésorerie, à la date d'encaissement. La base imposable retenue et le taux d'impôt dépendent du régime fiscal du cabinet : à valider avec le comptable avant toute déclaration.</p></section>
+    </div>`;
+}
+
+/* ================= Réglages ================= */
+function fixeRow(f){ f = f || {};
+  return `<div class="frow" data-row="fixe"><input data-k="libelle" value="${esc(f.libelle)}" placeholder="Libellé (ex. Loyer)" aria-label="Libellé">
+    <select data-k="categorie" aria-label="Catégorie">${CATEGORIES.map(c => `<option ${c===(f.categorie||"Loyer")?"selected":""}>${esc(c)}</option>`).join("")}</select>
+    <input data-k="montant" type="number" min="0" step="1" value="${esc(f.montant)}" placeholder="DH / mois" aria-label="Montant mensuel en DH">
+    <input data-k="depuis" type="month" value="${esc(f.depuis || monthOf(TODAY))}" aria-label="Depuis le mois">
+    <input data-k="fin" type="month" value="${esc(f.fin)}" aria-label="Jusqu'au mois (optionnel)">
+    <button type="button" class="btn icon-btn ghost" data-action="row-del" aria-label="Supprimer la ligne">${ic("close")}</button></div>`; }
+function matRow(x){ x = x || {}; const dot = (+x.valeur && +x.dureeAns) ? fmtDH(x.valeur/(x.dureeAns*12)) + "/mois" : "—";
+  return `<div class="frow mat" data-row="mat"><input data-k="libelle" value="${esc(x.libelle)}" placeholder="Équipement (ex. table électrique)" aria-label="Équipement">
+    <input data-k="valeur" type="number" min="0" step="1" value="${esc(x.valeur)}" placeholder="Valeur DH" aria-label="Valeur d'achat en DH">
+    <input data-k="achat" type="month" value="${esc(x.achat || monthOf(TODAY))}" aria-label="Mois d'achat">
+    <input data-k="dureeAns" type="number" min="1" max="20" step="1" value="${esc(x.dureeAns || 5)}" aria-label="Durée en années">
+    <span class="dot">${dot}</span>
+    <button type="button" class="btn icon-btn ghost" data-action="row-del" aria-label="Supprimer la ligne">${ic("close")}</button></div>`; }
+function settingsView(D){
+  const c = cfg();
+  const exCount = [...S.patients.values()].filter(p => p.exemple).length + D.rdv.filter(r => r.exemple).length + D.pays.filter(p => p.exemple).length + D.chg.filter(x => x.exemple).length;
+  return `<form id="fSettings" class="form" autocomplete="off">
+  ${c.exemple ? `<div class="banner info">Ces réglages sont des exemples (loyer, salaires, matériel). Remplace-les par les montants réels puis enregistre.</div>` : ""}
+  <div class="settings">
+    <section class="box"><h3>Cabinet</h3><div class="form">
+      <label class="f">Nom du cabinet<input id="sNom" value="${esc(c.nom)}"></label>
+      <label class="f">Praticien(ne)<input id="sPrat" value="${esc(c.praticien)}"></label>
+      <div class="g2"><label class="f">Téléphone fixe<input id="sTel" type="tel" value="${esc(c.telFixe)}"></label>
+      <label class="f">Mobile<input id="sMob" type="tel" value="${esc(c.telMobile)}"></label></div>
+      <label class="f">E-mail<input id="sMail" type="email" value="${esc(c.email)}"></label>
+      <label class="f">Adresse<textarea id="sAdr" rows="2">${esc(c.adresse)}</textarea></label>
+      <div class="g3"><label class="f">Tarif séance (DH)<input id="sTarif" type="number" min="0" step="1" value="${esc(c.tarifDefaut)}"></label>
+      <label class="f">Durée (min)<input id="sDuree" type="number" min="10" step="5" value="${esc(c.dureeDefaut)}"></label>
+      <label class="f">Coût variable / séance<input id="sCV" type="number" min="0" step="0.5" value="${esc(c.coutVariableSeance)}"></label></div>
+      <p class="hint">Coût variable : consommables par séance (gel, électrodes, drap d'examen). Utilisé pour le seuil de rentabilité tant qu'aucun achat « Consommables » n'est saisi dans le mois.</p></div></section>
+    <section class="box"><h3>Horaires et capacité</h3><div class="form">
+      <div class="g3"><label class="f">Ouverture<input id="sOuv" type="time" value="${esc(c.ouverture)}"></label>
+      <label class="f">Fermeture<input id="sFerm" type="time" value="${esc(c.fermeture)}"></label>
+      <label class="f">Samedi jusqu'à<input id="sSam" type="time" value="${esc(c.samediFermeture)}"></label></div>
+      <div class="g2"><label class="f">Pas des créneaux (min)<select id="sPas">${[15,20,30,45,60].map(v => `<option ${+c.pas===v?"selected":""}>${v}</option>`).join("")}</select></label>
+      <label class="f">Patients en parallèle<input id="sPostes" type="number" min="1" max="8" step="1" value="${esc(c.postes)}"></label></div>
+      <div class="f">Jours d'ouverture<div class="checks">${JOURS.map(([d,l]) => `<label><input type="checkbox" data-jour="${d}" ${(c.joursOuvres||[]).map(Number).includes(d)?"checked":""}>${l}</label>`).join("")}</div></div></div></section>
+    <section class="box wide"><h3>Charges fixes mensuelles<button type="button" class="btn sm" data-action="row-add" data-kind="fixe">${ic("plus")}Ajouter</button></h3>
+      <div class="frows" id="rowsFixe"><div class="frow hd"><span>Libellé</span><span>Catégorie</span><span>DH / mois</span><span>Depuis</span><span>Jusqu'à</span><span></span></div>${(c.chargesFixes||[]).map(fixeRow).join("")}</div>
+      <p class="hint" style="margin-top:8px">Pour une augmentation de loyer : mets une date de fin à l'ancienne ligne et ajoute la nouvelle à partir du mois suivant. Les mois passés gardent ainsi leur vrai montant.</p></section>
+    <section class="box wide"><h3>Matériel amorti<button type="button" class="btn sm" data-action="row-add" data-kind="mat">${ic("plus")}Ajouter</button></h3>
+      <div class="frows" id="rowsMat"><div class="frow mat hd"><span>Équipement</span><span>Valeur DH</span><span>Achat</span><span>Durée (ans)</span><span style="text-align:right">Dotation</span><span></span></div>${(c.materiel||[]).map(matRow).join("")}</div>
+      <p class="hint" style="margin-top:8px">Amortissement linéaire : la valeur est répartie sur la durée, mois par mois. Les durées usuelles sont à confirmer avec le comptable.</p></section>
+    <section class="box"><h3>Fiscalité</h3><div class="form">
+      <label class="f">Taux de provision pour impôt (%)<input id="sTaux" type="number" min="0" max="60" step="0.5" value="${esc(c.tauxImpot)}"></label>
+      <p class="hint">Laisse 0 tant que le comptable ne t'a pas donné un taux adapté au régime du cabinet. Ce taux sert seulement à mettre de côté une estimation.</p></div></section>
+    <section class="box"><h3>Message de rappel WhatsApp</h3><div class="form">
+      <label class="f">Texte<textarea id="sMsg" rows="4">${esc(c.messageRappel)}</textarea></label>
+      <p class="hint">Variables : {patient}, {jour}, {heure}.</p></div></section>
+    <section class="box wide"><h3>Données d'exemple</h3>
+      ${exCount ? `<p class="hint" style="margin-bottom:10px">${exCount} éléments d'exemple (patients fictifs, rendez-vous, encaissements, dépenses). Les supprimer ne touche pas aux données que tu as saisies.</p>
+      <button type="button" class="btn danger" data-action="clear-examples" data-confirm data-write>Effacer les exemples</button>` : `<p class="hint">Aucune donnée d'exemple.</p>`}</section>
+  </div>
+  <div class="savebar" data-write><span class="hint" id="saveState">${S.settingsDirty ? "Modifications non enregistrées" : ""}</span><button type="submit" class="btn primary">Enregistrer les réglages</button></div>
+  </form>${backupSection()}`;
+}
+function readSettings(){
+  const f = $("#fSettings"); const v = id => $("#"+id, f).value;
+  const rows = (sel, keys) => $$(sel, f).map(r => { const o = {id: r.dataset.rid || uid()}; keys.forEach(k => { const el = $(`[data-k="${k}"]`, r); o[k] = el ? el.value.trim() : ""; }); return o; });
+  const fixes = rows('[data-row="fixe"]', ["libelle","categorie","montant","depuis","fin"]).filter(x => x.libelle || x.montant).map(x => Object.assign(x, {montant:+x.montant||0}));
+  const mat = rows('[data-row="mat"]', ["libelle","valeur","achat","dureeAns"]).filter(x => x.libelle || x.valeur).map(x => Object.assign(x, {valeur:+x.valeur||0, dureeAns:+x.dureeAns||1}));
+  return {
+    nom:v("sNom").trim() || DEFAULTS.nom, praticien:v("sPrat").trim(),
+    telFixe:v("sTel").trim(), telMobile:v("sMob").trim(), email:v("sMail").trim(), adresse:v("sAdr").trim(),
+    tarifDefaut:+v("sTarif")||0, dureeDefaut:+v("sDuree")||30, coutVariableSeance:+v("sCV")||0,
+    ouverture:v("sOuv")||"08:30", fermeture:v("sFerm")||"19:00", samediFermeture:v("sSam")||"", pas:+v("sPas")||30, postes:Math.max(1, +v("sPostes")||1),
+    joursOuvres:$$("[data-jour]", f).filter(x => x.checked).map(x => +x.dataset.jour),
+    chargesFixes:fixes, materiel:mat, tauxImpot:+v("sTaux")||0, messageRappel:v("sMsg"), exemple:false, majLe:new Date().toISOString()
+  };
+}
+
+/* ================= Tiroir (formulaires) ================= */
+function openDrawer(type, html, data){
+  S.drawer = Object.assign({type}, data||{});
+  $("#sheet").innerHTML = html; $("#drawer").hidden = false;
+  document.body.style.overflow = "hidden";
+  setTimeout(() => { const el = $("#sheet input:not([type=hidden]):not([type=checkbox]), #sheet select, #sheet textarea"); el && el.focus(); }, 30);
+}
+function closeDrawer(){ $("#drawer").hidden = true; $("#sheet").innerHTML = ""; S.drawer = null; document.body.style.overflow = ""; }
+const dHead = (t, sub) => `<div class="dh"><div><h2 id="dTitle">${t}</h2>${sub?`<p>${sub}</p>`:""}</div><button class="btn icon-btn ghost" data-action="close" aria-label="Fermer">${ic("close")}</button></div>`;
+const patientOptions = sel => [...S.patients.entries()].sort((a,b) => String(a[1].nom).localeCompare(String(b[1].nom),"fr")).map(([id,p]) => `<option value="${esc(id)}" ${id===sel?"selected":""}>${esc(p.nom)}${p.tel?" — "+esc(p.tel):""}</option>`).join("");
+const motifList = `<datalist id="motifs">${MOTIFS.map(m => `<option value="${esc(m)}">`).join("")}</datalist>`;
+
+function rdvDrawer(opts){
+  const c = cfg(); const edit = !!opts.id;
+  const r = edit ? Object.assign({}, S.months.get(opts.m)?.rdv.get(opts.id) || {}) : {};
+  if (edit && !r.date){ toast("Ce rendez-vous n'existe plus.", true); return; }
+  const pid = r.patientId || opts.patient || "";
+  const p = S.patients.get(pid);
+  const montant = edit ? r.montant : (p ? (p.tarif || c.tarifDefaut) : c.tarifDefaut);
+  const date = r.date || opts.date || S.day; const heure = r.heure || opts.time || c.ouverture;
+  const st = edit ? S.D.pstats.get(pid) : null; const n = st && st.num.get(opts.id);
+  const sub = edit ? `${esc(dayLabel(r.date))} · ${esc(r.heure)}${n?` · séance ${n}${st.pres?"/"+st.pres:""}`:""}` : "";
+  const reg = r.reglement ? `<div class="banner info" style="margin:0"><span>Réglée le ${esc(dayShort(r.reglement.date))} · ${esc(MODES[r.reglement.mode]||"")} · ${fmtDH(r.reglement.montant)}</span><button type="button" class="btn sm" data-action="undo-pay" data-write>Annuler le règlement</button></div>` : "";
+  const html = dHead(edit ? "Rendez-vous" : "Nouveau rendez-vous", sub) + `<form id="fRdv" class="form" autocomplete="off">
+    <label class="f">Patient<select id="rPat" required><option value="">Choisir un patient…</option>${patientOptions(pid)}<option value="__new">+ Nouveau patient…</option></select></label>
+    <fieldset id="rNew" hidden><legend>Nouveau patient</legend><div class="form">
+      <div class="g2"><label class="f">Nom complet<input id="nNom"></label><label class="f">Téléphone<input id="nTel" type="tel" placeholder="06 12 34 56 78"></label></div>
+      <label class="f">Motif / pathologie<input id="nMotif" list="motifs"></label>
+      <div class="g2"><label class="f">Couverture<select id="nCouv">${COUVERTURES.map(x => `<option>${esc(x)}</option>`).join("")}</select></label><label class="f">Séances prescrites<input id="nPres" type="number" min="0" step="1" value="10"></label></div></div></fieldset>
+    <div class="g2"><label class="f">Date<input id="rDate" type="date" value="${esc(date)}" required></label><label class="f">Heure<input id="rHeure" type="time" step="300" value="${esc(heure)}" required></label></div>
+    <div class="g3"><label class="f">Durée (min)<input id="rDuree" type="number" min="5" step="5" value="${esc(r.duree || c.dureeDefaut)}"></label>
+      <label class="f">Type<select id="rType">${TYPES.map(t => `<option ${t===(r.type||"Séance")?"selected":""}>${t}</option>`).join("")}</select></label>
+      <label class="f">Montant (DH)<input id="rMontant" type="number" min="0" step="1" value="${esc(montant)}"></label></div>
+    <p class="hint" id="rCap"></p>
+    ${edit ? `<div class="f">Statut<div class="radios">${Object.entries(STATUTS).map(([k,l]) => `<label><input type="radio" name="rSt" value="${k}" ${r.statut===k?"checked":""}>${l}</label>`).join("")}</div></div>
+      <label class="f">Douleur ressentie (EVA)<select id="rEva"><option value="">Non évaluée</option>${Array.from({length:11},(_,i) => `<option value="${i}" ${r.eva!==undefined&&r.eva!==null&&r.eva!==""&&+r.eva===i?"selected":""}>${i}${i===0?" — aucune douleur":i===10?" — douleur maximale":""}</option>`).join("")}</select></label>${reg}` : ""}
+    <label class="f">Note de séance<textarea id="rNote" rows="2" placeholder="Exercices, technique, observation…">${esc(r.note)}</textarea></label>
+    ${edit ? "" : `<fieldset><legend><label style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="rRep">Planifier une série de séances</label></legend>
+      <div id="rRepBox" class="form" hidden><div class="checks">${JOURS.slice(0,6).map(([d,l]) => `<label><input type="checkbox" data-rep="${d}" ${[1,3,5].includes(d)?"checked":""}>${l}</label>`).join("")}</div>
+      <label class="f">Nombre de séances à créer<input id="rRepN" type="number" min="1" max="60" step="1" value="10"></label><p class="hint" id="rRepHint"></p></div></fieldset>`}
+    <div class="dfoot">${edit ? `<button type="button" class="btn danger" data-action="del-rdv" data-confirm data-write>Supprimer</button>` : "<span></span>"}
+      <div class="r"><button type="button" class="btn" data-action="close">Fermer</button><button type="submit" class="btn primary" data-write>${edit?"Enregistrer":"Créer"}</button></div></div>
+  </form>${motifList}`;
+  openDrawer("rdv", html, {id:opts.id, m:opts.m, orig:r});
+  const f = $("#fRdv");
+  const sync = () => {
+    const ps = $("#rPat").value; $("#rNew").hidden = ps !== "__new";
+    const pp = S.patients.get(ps); if (!edit && pp && !f.dataset.touchedMontant) $("#rMontant").value = pp.tarif || c.tarifDefaut;
+    const d = $("#rDate").value, h = $("#rHeure").value;
+    const {slots, step, open} = slotsFor(d||S.day); const postes = Math.max(1, +c.postes||1);
+    let s = null; for (const x of slots){ if (toMin(x) <= toMin(h)) s = x; else break; }
+    const used = s ? (S.D.byDay.get(d)||[]).filter(x => active(x) && x.id !== opts.id && toMin(x.heure) >= toMin(s) && toMin(x.heure) < toMin(s)+step).length : 0;
+    const msgs = [];
+    if (!open) msgs.push("Le cabinet est fermé ce jour-là.");
+    else if (!s || toMin(h) >= toMin(slots[slots.length-1]||"0:0") + step) msgs.push("Heure en dehors des horaires d'ouverture.");
+    if (used >= postes) msgs.push(`Créneau complet : ${used} patient${used>1?"s":""} déjà prévu${used>1?"s":""} pour ${postes} poste${postes>1?"s":""}.`);
+    else if (s) msgs.push(`Créneau ${s} : ${used}/${postes} occupé${used>1?"s":""}.`);
+    $("#rCap").textContent = msgs.join(" ");
+    $("#rCap").style.color = (used >= postes || !open) ? "var(--bad)" : "";
+    if (!edit){
+      $("#rRepBox").hidden = !$("#rRep").checked;
+      if ($("#rRep").checked){
+        const dates = repDates(); const st2 = pp ? S.D.pstats.get(ps) : null;
+        let t = dates.length ? `${dates.length} rendez-vous du ${dayShort(dates[0])} au ${dayShort(dates[dates.length-1])} à ${h}.` : "Choisis au moins un jour.";
+        if (st2 && st2.pres){ const rest = st2.pres - st2.eff - st2.plan; t += rest >= 0 ? ` Il reste ${rest} séance${rest>1?"s":""} sur l'ordonnance.` : ""; if (dates.length > rest && rest >= 0) t += " Attention : la série dépasse l'ordonnance."; }
+        $("#rRepHint").textContent = t;
+      }
+    }
+  };
+  f.addEventListener("input", e => { if (e.target.id === "rMontant") f.dataset.touchedMontant = "1"; sync(); });
+  f.addEventListener("change", sync);
+  if (!edit){ const pp = S.patients.get(pid); if (pp && pp.dateOrdonnance){ const st2 = S.D.pstats.get(pid); const rest = st2.pres ? st2.pres - st2.eff - st2.plan : 10; $("#rRepN").value = Math.max(1, Math.min(30, rest || 10)); } }
+  sync();
+  f.addEventListener("submit", async e => { e.preventDefault(); await saveRdv(edit); });
+}
+function repDates(){
+  const days = $$("[data-rep]").filter(x => x.checked).map(x => +x.dataset.rep);
+  const n = Math.max(1, Math.min(60, +$("#rRepN").value || 1)); const out = [];
+  if (!days.length) return out;
+  let d = $("#rDate").value; let guard = 0;
+  while (out.length < n && guard++ < 200){ if (days.includes(parseYmd(d).getDay())) out.push(d); d = addDays(d, 1); }
+  return out;
+}
+async function saveRdv(edit){
+  const c = cfg(); const o = S.drawer;
+  let pid = $("#rPat").value;
+  const date = $("#rDate").value, heure = $("#rHeure").value;
+  if (!date || !heure){ toast("Indique la date et l'heure.", true); return; }
+  if (pid === "__new"){
+    const nom = $("#nNom").value.trim(); if (!nom){ toast("Indique le nom du nouveau patient.", true); return; }
+    const ref = S.db ? S.db.collection("patients").doc() : null;
+    const ok = await write(() => ref.set({nom, tel:$("#nTel").value.trim(), motif:$("#nMotif").value.trim(), couverture:$("#nCouv").value,
+      seancesPrescrites:+$("#nPres").value||0, dateOrdonnance:date, tarif:+$("#rMontant").value||c.tarifDefaut, prescripteur:"", feuilleSoins:false, notes:"", createdAt:new Date().toISOString()}));
+    if (!ok) return; pid = ref.id;
+  }
+  if (!pid){ toast("Choisis un patient.", true); return; }
+  const base = {patientId:pid, heure, duree:+$("#rDuree").value||c.dureeDefaut, type:$("#rType").value, montant:+$("#rMontant").value||0, note:$("#rNote").value.trim()};
+  if (edit){
+    const orig = o.orig; const st = ($("input[name=rSt]:checked")||{}).value || orig.statut;
+    const evaV = $("#rEva").value;
+    const doc = Object.assign({}, orig, base, {date, statut:st, eva: evaV === "" ? null : +evaV});
+    delete doc.id; delete doc.m;
+    const nm = monthOf(date);
+    const ok = await write(async () => {
+      if (nm === o.m) await rdvRef(o.m, o.id).set(doc);
+      else { await rdvRef(nm, o.id).set(doc); await rdvRef(o.m, o.id).delete(); }
+    }, "Rendez-vous enregistré");
+    if (ok){ ensureMonth(nm); closeDrawer(); }
+  } else {
+    const dates = $("#rRep").checked ? repDates() : [date];
+    if (!dates.length){ toast("Choisis au moins un jour pour la série.", true); return; }
+    const btn = $('#fRdv [type=submit]'); btn.disabled = true;
+    const now = new Date().toISOString();
+    const tasks = dates.map(d => () => { const m = monthOf(d); ensureMonth(m); return S.db.collection(`mois/${m}/rdv`).doc().set(Object.assign({}, base, {date:d, statut:"prevu", createdAt:now})); });
+    const ok = await write(() => pool(tasks, 3, k => { if (dates.length > 1) btn.textContent = `Création ${k}/${dates.length}…`; }),
+      dates.length > 1 ? `${dates.length} rendez-vous créés` : "Rendez-vous créé");
+    if (ok){ closeDrawer(); S.day = dates[0]; if (S.view === "agenda") schedule(); } else btn.disabled = false;
+  }
+}
+
+function payDrawer(m, id){
+  const r = S.months.get(m)?.rdv.get(id); if (!r) return;
+  const p = S.patients.get(r.patientId);
+  const html = dHead("Encaisser la séance", `${esc(p ? p.nom : "")} · ${esc(dayShort(r.date))} à ${esc(r.heure)}`) + `<div class="form">
+    <div class="g2"><label class="f">Montant (DH)<input id="pyM" type="number" min="0" step="1" value="${esc(r.montant)}"></label><label class="f">Date d'encaissement<input id="pyD" type="date" value="${TODAY}"></label></div>
+    <div class="f">Mode de paiement<div class="paymodes">${Object.entries(MODES).map(([k,l]) => `<button type="button" class="btn" data-action="pay-mode" data-mode="${k}">${l}</button>`).join("")}</div></div>
+    <p class="hint">Un toucher sur le mode enregistre l'encaissement.</p></div>`;
+  openDrawer("pay", html, {id, m});
+}
+function paymentDrawer(opts){
+  const html = dHead("Nouvel encaissement", "Avance, forfait ou règlement de plusieurs séances") + `<form id="fPay" class="form" autocomplete="off">
+    <label class="f">Patient<select id="bPat" required><option value="">Choisir…</option>${patientOptions(opts.patient)}</select></label>
+    <div class="g2"><label class="f">Montant (DH)<input id="bM" type="number" min="1" step="1" value="${esc(opts.amount||"")}" required></label><label class="f">Date<input id="bD" type="date" value="${TODAY}" required></label></div>
+    <label class="f">Mode<select id="bMode">${Object.entries(MODES).map(([k,l]) => `<option value="${k}">${l}</option>`).join("")}</select></label>
+    <label class="f">Libellé<input id="bNote" placeholder="Ex. Forfait 10 séances, règlement solde…"></label>
+    <div class="dfoot"><span></span><div class="r"><button type="button" class="btn" data-action="close">Fermer</button><button class="btn primary" type="submit">Enregistrer</button></div></div></form>`;
+  openDrawer("payment", html);
+  $("#fPay").addEventListener("submit", async e => { e.preventDefault();
+    const pid = $("#bPat").value, mt = +$("#bM").value, d = $("#bD").value;
+    if (!pid || !mt || !d){ toast("Patient, montant et date sont nécessaires.", true); return; }
+    const m = monthOf(d); ensureMonth(m);
+    const ok = await write(() => S.db.collection(`mois/${m}/paiements`).doc().set({patientId:pid, montant:mt, date:d, mode:$("#bMode").value, note:$("#bNote").value.trim(), createdAt:new Date().toISOString()}), "Encaissement enregistré");
+    if (ok) closeDrawer(); });
+}
+function chargeDrawer(){
+  const d0 = monthOf(TODAY) === S.month ? TODAY : S.month + "-01";
+  const html = dHead("Nouvelle dépense", "Achat, facture ou réparation du mois") + `<form id="fChg" class="form" autocomplete="off">
+    <div class="g2"><label class="f">Date<input id="cD" type="date" value="${d0}" required></label><label class="f">Montant (DH)<input id="cM" type="number" min="0" step="0.01" required></label></div>
+    <label class="f">Catégorie<select id="cCat">${CATEGORIES.map(x => `<option>${esc(x)}</option>`).join("")}</select></label>
+    <label class="f">Libellé<input id="cL" placeholder="Ex. Électrodes TENS, gel, réparation table…" required></label>
+    <div class="dfoot"><span></span><div class="r"><button type="button" class="btn" data-action="close">Fermer</button><button class="btn primary" type="submit">Enregistrer</button></div></div></form>`;
+  openDrawer("charge", html);
+  $("#fChg").addEventListener("submit", async e => { e.preventDefault();
+    const d = $("#cD").value, mt = +$("#cM").value, l = $("#cL").value.trim();
+    if (!d || !mt || !l){ toast("Date, montant et libellé sont nécessaires.", true); return; }
+    const m = monthOf(d); ensureMonth(m);
+    const ok = await write(() => S.db.collection(`mois/${m}/charges`).doc().set({date:d, montant:mt, categorie:$("#cCat").value, libelle:l, createdAt:new Date().toISOString()}), "Dépense enregistrée");
+    if (ok) closeDrawer(); });
+}
+
+function patientDrawer(id){
+  const c = cfg(); const p = id ? S.patients.get(id) : null;
+  if (id && !p){ toast("Ce patient n'existe plus.", true); return; }
+  const v = p || {couverture:"AMO CNSS", seancesPrescrites:10, tarif:c.tarifDefaut, dateOrdonnance:TODAY};
+  const html = dHead(p ? esc(p.nom) : "Nouveau patient", p ? esc([p.motif, COUV_SHORT[p.couverture]].filter(Boolean).join(" · ")) : "Fiche et ordonnance en cours") + `<form id="fPat" class="form" autocomplete="off">
+    <div class="g2"><label class="f">Nom complet<input id="pNom" value="${esc(v.nom)}" required></label><label class="f">Téléphone<input id="pTel" type="tel" value="${esc(v.tel)}" placeholder="06 12 34 56 78"></label></div>
+    <div class="g2"><label class="f">Motif / pathologie<input id="pMotif" list="motifs" value="${esc(v.motif)}"></label><label class="f">Médecin prescripteur<input id="pPresc" value="${esc(v.prescripteur)}" placeholder="Dr …"></label></div>
+    <div class="g3"><label class="f">Date de l'ordonnance<input id="pDO" type="date" value="${esc(v.dateOrdonnance)}"></label><label class="f">Séances prescrites<input id="pPres" type="number" min="0" step="1" value="${esc(v.seancesPrescrites)}"></label><label class="f">Tarif séance (DH)<input id="pTarif" type="number" min="0" step="1" value="${esc(v.tarif)}"></label></div>
+    <div class="g2"><label class="f">Couverture<select id="pCouv">${COUVERTURES.map(x => `<option ${x===v.couverture?"selected":""}>${esc(x)}</option>`).join("")}</select></label>
+      <label class="f" style="justify-content:flex-end"><span style="display:inline-flex;gap:8px;align-items:center;min-height:38px"><input type="checkbox" id="pFS" ${v.feuilleSoins?"checked":""}>Feuille de soins remise</span></label></div>
+    <label class="f">Notes cliniques<textarea id="pNotes" rows="3" placeholder="Antécédents, contre-indications, objectifs…">${esc(v.notes)}</textarea></label>
+    <div class="dfoot">${p ? `<button type="button" class="btn danger" data-action="del-patient" data-confirm data-write>Supprimer</button>` : "<span></span>"}
+      <div class="r">${p ? `<button type="button" class="btn" data-action="new-ordo" data-write>Nouvelle ordonnance</button>` : ""}<button class="btn primary" type="submit" data-write>${p?"Enregistrer":"Créer le patient"}</button></div></div>
+  </form>${motifList}${p ? `<div class="livebox" id="pLive">${patientLive(id, S.D)}</div>` : ""}`;
+  openDrawer("patient", html, {id});
+  $("#fPat").addEventListener("submit", async e => { e.preventDefault();
+    const nom = $("#pNom").value.trim(); if (!nom){ toast("Le nom est nécessaire.", true); return; }
+    const doc = Object.assign({}, p || {createdAt:new Date().toISOString()}, {nom, tel:$("#pTel").value.trim(), motif:$("#pMotif").value.trim(), prescripteur:$("#pPresc").value.trim(),
+      dateOrdonnance:$("#pDO").value, seancesPrescrites:+$("#pPres").value||0, tarif:+$("#pTarif").value||c.tarifDefaut, couverture:$("#pCouv").value, feuilleSoins:$("#pFS").checked, notes:$("#pNotes").value.trim()});
+    const ref = id ? S.db && S.db.collection("patients").doc(id) : S.db && S.db.collection("patients").doc();
+    const ok = await write(() => ref.set(doc), id ? "Fiche enregistrée" : "Patient créé");
+    if (ok){ if (id) closeDrawer(); else patientDrawer(ref.id); } });
+}
+function evaSpark(evas){
+  if (evas.length < 2) return evas.length ? `<p class="hint">EVA relevée une fois : ${evas[0].eva}/10.</p>` : `<p class="hint">Aucune EVA relevée. Renseigne-la dans le rendez-vous après la séance.</p>`;
+  const W = 300, H = 92, L = 22, R = 8, T = 8, B = 16; const n = evas.length;
+  const x = i => L + (W-L-R) * (n === 1 ? .5 : i/(n-1)); const y = v => T + (H-T-B) * (1 - v/10);
+  let g = [0,5,10].map(v => `<line class="gl" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${L-5}" y="${y(v)+3}" text-anchor="end">${v}</text>`).join("");
+  g += `<polyline class="ln" points="${evas.map((e,i) => `${x(i).toFixed(1)},${y(e.eva).toFixed(1)}`).join(" ")}"/>`;
+  g += evas.map((e,i) => `<circle class="pt" cx="${x(i).toFixed(1)}" cy="${y(e.eva).toFixed(1)}" r="${i===n-1?4.5:3}"><title>${esc(dayShort(e.date))} : ${e.eva}/10</title></circle>`).join("");
+  g += `<text class="ax" x="${L}" y="${H-2}">${esc(dayShort(evas[0].date))}</text><text class="ax" x="${W-R}" y="${H-2}" text-anchor="end">${esc(dayShort(evas[n-1].date))}</text>`;
+  const d = evas[n-1].eva - evas[0].eva;
+  return `<div class="spark"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Évolution de la douleur EVA">${g}</svg></div><p class="hint">De ${evas[0].eva} à ${evas[n-1].eva}/10 sur ${n} séances (${d<=0?"−":"+"}${Math.abs(d)} point${Math.abs(d)>1?"s":""}).</p>`;
+}
+function patientLive(id, D){
+  const p = S.patients.get(id); const st = D && D.pstats.get(id); if (!p || !st) return "";
+  const pres = st.pres;
+  const hist = st.list.slice().reverse().slice(0, 40).map(r => `<tr><td class="mono">${esc(dayShort(r.date))}</td><td class="mono">${esc(r.heure)}</td><td>${st.num.get(r.id) ? "S"+st.num.get(r.id) : ""}</td><td><span class="chip ${ST_CLASS[r.statut]}">${STATUTS[r.statut]}</span></td><td class="num">${r.statut==="effectue"?fmtDH(r.montant):""}</td><td>${r.reglement?`<span class="chip good">Réglée</span>`:""}</td><td><button class="btn sm ghost" data-action="open-rdv" data-id="${r.id}" data-m="${r.m}">Ouvrir</button></td></tr>`).join("");
+  const solde = st.solde > 0.5 ? `<b style="color:var(--bad)">${fmtDH(st.solde)} à encaisser</b>` : st.solde < -0.5 ? `<b>${fmtDH(-st.solde)} d'avance</b>` : `<b>À jour</b>`;
+  return `<div class="kpis" style="margin:0"><div class="kpi"><span>Faites</span><b>${st.eff}${pres?"/"+pres:""}</b><small>${st.plan} prévue${st.plan>1?"s":""}</small></div>
+      <div class="kpi"><span>Absences</span><b>${st.abs}</b><small>depuis l'ordonnance</small></div>
+      <div class="kpi" style="grid-column:span 2"><span>Compte</span><b style="font-size:19px">${solde}</b><small>${fmtDH(st.du)} réalisés · ${fmtDH(st.regl)} réglés</small></div></div>
+    ${st.alerts.length ? `<div class="tags">${st.alerts.map(a => `<span class="chip ${a.c}">${esc(a.t)}</span>`).join("")}</div>` : ""}
+    <div style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn primary" data-action="new-rdv" data-patient="${esc(id)}" data-write>${ic("plus")}Rendez-vous</button>
+      <button class="btn" data-action="new-payment" data-patient="${esc(id)}" data-amount="${st.solde>0?Math.round(st.solde):""}" data-write>Encaisser</button>
+      ${p.tel ? `<span class="chip mono" style="align-self:center">${esc(p.tel)}</span>` : ""}</div>
+    <div><p class="lbl">Douleur (EVA 0–10)</p>${evaSpark(st.evas)}</div>
+    <div><p class="lbl">Historique des séances</p>${hist ? `<div class="hist tbl-wrap"><table><tbody>${hist}</tbody></table></div>` : `<p class="hint">Aucune séance enregistrée.</p>`}</div>`;
+}
+
+/* ================= Toast ================= */
+let toastT = 0;
+function toast(msg, bad){ const t = $("#toast"); t.textContent = msg; t.className = "toast" + (bad ? " bad" : ""); t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, bad ? 5000 : 2600); }
+
+/* ================= Actions ================= */
+function armed(btn){
+  if (btn.dataset.armedOn) return true;
+  btn.dataset.armedOn = "1"; btn.dataset.label = btn.innerHTML; btn.classList.add("armed"); btn.textContent = "Confirmer ?";
+  setTimeout(() => { if (btn.isConnected){ btn.classList.remove("armed"); btn.innerHTML = btn.dataset.label; delete btn.dataset.armedOn; } }, 4000);
+  return false;
+}
+async function onAction(btn, e){
+  const a = btn.dataset.action, ds = btn.dataset;
+  if (ds.confirm !== undefined && !armed(btn)) return;
+  switch (a){
+    case "close": closeDrawer(); break;
+    case "day": S.day = ds.day; ensureMonth(monthOf(S.day)); schedule(); break;
+    case "day-shift": S.day = addDays(S.day, +ds.n); ensureMonth(monthOf(S.day)); schedule(); break;
+    case "m-shift": S.month = addMonths(S.month, +ds.n); ensureMonth(S.month); schedule(); break;
+    case "pfilter": S.pfilter = ds.f; $$('[data-action="pfilter"]').forEach(b => b.setAttribute("aria-pressed", b.dataset.f === S.pfilter)); schedule(); break;
+    case "new-rdv":
+      if (!S.patients.size && !ds.patient){ /* premier usage : patient créé dans le même formulaire */ }
+      rdvDrawer({date:ds.date, time:ds.time, patient:ds.patient}); break;
+    case "open-rdv": rdvDrawer({id:ds.id, m:ds.m}); break;
+    case "open-patient": patientDrawer(ds.id); break;
+    case "new-patient": patientDrawer(null); break;
+    case "new-payment": paymentDrawer({patient:ds.patient, amount:ds.amount}); break;
+    case "new-charge": chargeDrawer(); break;
+    case "rdv-status": await write(() => rdvRef(ds.m, ds.id).update({statut:ds.s}), ds.s === "effectue" ? "Séance effectuée" : "Absence notée"); break;
+    case "rdv-pay": payDrawer(ds.m, ds.id); break;
+    case "pay-mode": {
+      const o = S.drawer; const mt = +$("#pyM").value || 0; const d = $("#pyD").value || TODAY;
+      $$(".paymodes .btn").forEach(b => b.disabled = true);
+      const ok = await write(() => rdvRef(o.m, o.id).update({reglement:{date:d, mode:ds.mode, montant:mt}}), `${fmtDH(mt)} encaissés (${MODES[ds.mode]})`);
+      if (ok) closeDrawer(); else $$(".paymodes .btn").forEach(b => b.disabled = false);
+      break; }
+    case "undo-pay": {
+      const o = S.drawer; const cur = Object.assign({}, S.months.get(o.m)?.rdv.get(o.id) || {}); delete cur.reglement;
+      const ok = await write(() => rdvRef(o.m, o.id).set(cur), "Règlement annulé");
+      if (ok){ o.orig = cur; btn.closest(".banner").remove(); }
+      break; }
+    case "del-rdv": { const o = S.drawer; const ok = await write(() => rdvRef(o.m, o.id).delete(), "Rendez-vous supprimé"); if (ok) closeDrawer(); break; }
+    case "del-payment": await write(() => S.db.collection(`mois/${ds.m}/paiements`).doc(ds.id).delete(), "Encaissement supprimé"); break;
+    case "del-charge": await write(() => S.db.collection(`mois/${ds.m}/charges`).doc(ds.id).delete(), "Dépense supprimée"); break;
+    case "del-patient": { const id = S.drawer.id; const ok = await write(() => S.db.collection("patients").doc(id).delete(), "Patient supprimé (ses rendez-vous restent dans l'agenda)"); if (ok) closeDrawer(); break; }
+    case "new-ordo": { $("#pDO").value = TODAY; $("#pFS").checked = false; $("#pPres").focus(); $("#pPres").select(); toast("Indique le nombre de séances de la nouvelle ordonnance puis enregistre."); break; }
+    case "row-add": { const box = ds.kind === "fixe" ? $("#rowsFixe") : $("#rowsMat"); box.insertAdjacentHTML("beforeend", ds.kind === "fixe" ? fixeRow() : matRow()); S.settingsDirty = true; dirtyNote(); $("input", box.lastElementChild).focus(); break; }
+    case "row-del": btn.closest(".frow").remove(); S.settingsDirty = true; dirtyNote(); break;
+    case "clear-examples": await clearExamples(btn); break;
+    case "export": exportData(); break;
+    case "import-cancel": S.pendingImport = null; S.shellKey = ""; schedule(); break;
+    case "import-confirm": {
+      const pi = S.pendingImport; if (!pi || !LOCAL) break;
+      try { LOCAL.replace(pi.data); S.pendingImport = null; S.shellKey = ""; toast(`Données restaurées : ${pi.nPat} patients, ${pi.nRdv} rendez-vous`); }
+      catch(e){ writeError(e); }
+      schedule(); break; }
+  }
+}
+function dirtyNote(){ const s = $("#saveState"); if (s) s.textContent = S.settingsDirty ? "Modifications non enregistrées" : ""; }
+async function clearExamples(btn){
+  const D = S.D; const tasks = [];
+  for (const [id,p] of S.patients) if (p.exemple) tasks.push(() => S.db.collection("patients").doc(id).delete());
+  D.rdv.filter(r => r.exemple).forEach(r => tasks.push(() => rdvRef(r.m, r.id).delete()));
+  D.pays.filter(p => p.exemple).forEach(p => tasks.push(() => S.db.collection(`mois/${p.m}/paiements`).doc(p.id).delete()));
+  D.chg.filter(x => x.exemple).forEach(x => tasks.push(() => S.db.collection(`mois/${x.m}/charges`).doc(x.id).delete()));
+  if (!tasks.length) return;
+  btn.disabled = true;
+  await write(() => pool(tasks, 4, k => { btn.textContent = `Suppression ${k}/${tasks.length}…`; }), `${tasks.length} éléments d'exemple supprimés`);
+  S.settingsDirty = false; schedule();
+}
+
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-action]"); if (!t) return;
+  if (t.tagName === "A") return;
+  e.preventDefault(); onAction(t, e);
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#drawer").hidden) closeDrawer(); });
+document.addEventListener("input", e => {
+  if (e.target.id === "pSearch"){ S.search = e.target.value; $("#plistWrap").innerHTML = patientsList(S.D); }
+  if (e.target.closest("#fSettings")){ S.settingsDirty = true; dirtyNote();
+    const row = e.target.closest('[data-row="mat"]'); if (row){ const v = +$('[data-k="valeur"]',row).value, d = +$('[data-k="dureeAns"]',row).value; $(".dot",row).textContent = v && d ? fmtDH(v/(d*12)) + "/mois" : "—"; } }
+});
+document.addEventListener("change", e => {
+  if (e.target.id === "importFile"){ const f = e.target.files && e.target.files[0]; if (f) readImportFile(f); e.target.value = ""; return; }
+  if (e.target.closest("#fSettings")){ S.settingsDirty = true; dirtyNote(); }
+});
+document.addEventListener("submit", async e => {
+  if (e.target.id !== "fSettings") return; e.preventDefault();
+  if (!S.db){ toast("Les données ne sont pas accessibles dans cette vue.", true); return; }
+  const doc = readSettings();
+  const ok = await write(() => S.db.doc("config/cabinet").set(doc), "Réglages enregistrés");
+  if (ok){ S.settingsDirty = false; S.shellKey = ""; schedule(); }
+});
+function tipMove(e){
+  const h = e.target.closest && e.target.closest(".hit"); const tip = $("#tip"); const ch = $("#chart");
+  if (!tip || !ch) return;
+  if (!h){ tip.hidden = true; return; }
+  tip.innerHTML = h.dataset.tip; tip.hidden = false;
+  const cr = ch.getBoundingClientRect(); const hr = h.getBoundingClientRect();
+  let x = hr.left - cr.left + hr.width/2 - tip.offsetWidth/2; x = Math.max(0, Math.min(cr.width - tip.offsetWidth, x));
+  tip.style.left = x + "px"; tip.style.top = "4px";
+}
+document.addEventListener("pointerover", tipMove);
+document.addEventListener("focusin", tipMove);
+document.addEventListener("pointerleave", () => { const t = $("#tip"); if (t) t.hidden = true; });
+
+function readHash(){
+  const h = (location.hash || "").replace("#","");
+  S.view = ROUTES.includes(h) ? h : "agenda";
+  if (S.view !== "reglages") S.settingsDirty = false;
+}
+window.addEventListener("hashchange", () => {
+  if (S.view === "reglages" && S.settingsDirty && location.hash !== "#reglages"){ /* on quitte : modifications abandonnées */ S.settingsDirty = false; }
+  readHash(); if (S.view === "resultat" || S.view === "caisse" || S.view === "charges") ensureMonth(S.month); schedule(); window.scrollTo(0,0);
+});
+
+/* ================= Stockage local (index.html autonome) ================= */
+const LS_KEY = "cabinet-sebti-assia:data:v1", LS_BACKUP = "cabinet-sebti-assia:derniere-sauvegarde";
+let LOCAL = null;
+function makeLocalDb(){
+  let store = {};
+  const load = () => { const raw = localStorage.getItem(LS_KEY); store = raw ? (JSON.parse(raw) || {}) : {}; };
+  load(); // lève une erreur si le navigateur bloque le stockage
+  const subs = new Map();
+  const meta = {fromCache:false, hasPendingWrites:false};
+  const clone = o => o === undefined ? undefined : JSON.parse(JSON.stringify(o));
+  const isObj = v => v && typeof v === "object" && !Array.isArray(v);
+  const merge = (a, b) => { const out = Object.assign({}, a); for (const k in b) out[k] = (isObj(b[k]) && isObj(a[k])) ? merge(a[k], b[k]) : b[k]; return out; };
+  const persist = () => { try { localStorage.setItem(LS_KEY, JSON.stringify(store)); } catch(e){ const err = new Error("Stockage du navigateur plein"); err.code = "quota_exceeded"; throw err; } };
+  const emit = k => { const s = subs.get(k); if (s) s.forEach(f => f()); };
+  const emitAll = () => subs.forEach(s => s.forEach(f => f()));
+  const listen = (k, fn) => { if (!subs.has(k)) subs.set(k, new Set()); subs.get(k).add(fn); setTimeout(fn, 0); return () => { const s = subs.get(k); s && s.delete(fn); }; };
+  const commit = (c, id, mutate) => {
+    const prev = JSON.stringify(store[c] === undefined ? null : store[c]);
+    mutate();
+    try { persist(); } catch(e){ const p = JSON.parse(prev); if (p === null) delete store[c]; else store[c] = p; throw e; }
+    emit(c); emit(c + "/" + id);
+  };
+  const docSnap = (c, id) => { const d = store[c] && store[c][id]; return {id, exists:!!d, data:() => clone(d), metadata:meta}; };
+  const collSnap = c => { const m = store[c] || {}; const docs = Object.keys(m).sort().map(id => ({id, exists:true, data:() => clone(m[id]), metadata:meta}));
+    return {docs, size:docs.length, empty:!docs.length, metadata:meta, docChanges:() => []}; };
+  const ref = (c, id) => ({
+    id, path: c + "/" + id,
+    get: async () => docSnap(c, id),
+    set: async data => commit(c, id, () => { (store[c] = store[c] || {})[id] = clone(data); }),
+    update: async data => { if (!store[c] || !store[c][id]){ const e = new Error("Document absent"); e.code = "invalid_argument"; throw e; }
+      commit(c, id, () => { store[c][id] = merge(store[c][id], clone(data)); }); },
+    delete: async () => commit(c, id, () => { if (store[c]) delete store[c][id]; }),
+    onSnapshot: next => listen(c + "/" + id, () => next(docSnap(c, id)))
+  });
+  window.addEventListener("storage", e => { if (e.key === LS_KEY){ try { load(); } catch(err){} emitAll(); } }); // autre onglet
+  return {
+    collection: c => ({ path:c, doc: id => ref(c, id || (uid() + uid())), onSnapshot: next => listen(c, () => next(collSnap(c))) }),
+    doc: p => { const i = p.lastIndexOf("/"); return ref(p.slice(0, i), p.slice(i + 1)); },
+    dump: () => clone(store),
+    replace: data => { const prev = store; store = clone(data); try { persist(); } catch(e){ store = prev; throw e; } emitAll(); },
+    bytes: () => (localStorage.getItem(LS_KEY) || "").length * 2
+  };
+}
+function lastBackup(){ try { return localStorage.getItem(LS_BACKUP); } catch(e){ return null; } }
+function exportData(){
+  if (!LOCAL) return;
+  const payload = {app:"cabinet-sebti-assia", version:1, exportedAt:new Date().toISOString(), data:LOCAL.dump()};
+  const blob = new Blob([JSON.stringify(payload, null, 1)], {type:"application/json"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `sauvegarde-cabinet-sebti-assia-${TODAY}.json`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  try { localStorage.setItem(LS_BACKUP, new Date().toISOString()); } catch(e){}
+  toast("Sauvegarde téléchargée. Range-la hors de l'ordinateur (clé USB, Drive)."); if (!S.settingsDirty) S.shellKey = ""; schedule();
+}
+function readImportFile(file){
+  const fr = new FileReader();
+  fr.onload = () => {
+    try {
+      const p = JSON.parse(fr.result);
+      if (!p || p.app !== "cabinet-sebti-assia" || !p.data || typeof p.data !== "object") throw new Error("format");
+      const keys = Object.keys(p.data);
+      const nPat = Object.keys(p.data.patients || {}).length;
+      const nRdv = keys.filter(k => /^mois\/\d{4}-\d{2}\/rdv$/.test(k)).reduce((s, k) => s + Object.keys(p.data[k]).length, 0);
+      S.pendingImport = {data:p.data, name:file.name, nPat, nRdv, date:p.exportedAt};
+    } catch(e){ S.pendingImport = null; toast("Ce fichier n'est pas une sauvegarde du cabinet.", true); }
+    S.shellKey = ""; schedule();
+  };
+  fr.onerror = () => toast("Lecture du fichier impossible.", true);
+  fr.readAsText(file);
+}
+function backupSection(){
+  if (S.mode !== "local") return "";
+  const lb = lastBackup(); const ko = LOCAL ? Math.round(LOCAL.bytes() / 1024) : 0;
+  const pi = S.pendingImport;
+  return `<section class="box" style="margin-top:14px"><h3>Sauvegarde des données</h3>
+    <p class="hint">Les données sont enregistrées dans ce navigateur, sur cet ordinateur uniquement. Effacer les données de navigation ou changer de navigateur les fait disparaître : télécharge une sauvegarde chaque semaine et range-la ailleurs.</p>
+    <p class="hint" style="margin-top:6px">Dernière sauvegarde : <b>${lb ? esc(new Date(lb).toLocaleString("fr-FR",{dateStyle:"long",timeStyle:"short"})) : "jamais"}</b> · Espace utilisé : ${ko} Ko.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">
+      <button type="button" class="btn primary" data-action="export">Télécharger une sauvegarde</button>
+      <label class="btn" for="importFile">Restaurer une sauvegarde…</label><input type="file" id="importFile" accept=".json,application/json" hidden>
+    </div>
+    ${pi ? `<div class="banner warn" style="margin:12px 0 0"><span>« ${esc(pi.name)} » : ${pi.nPat} patients, ${pi.nRdv} rendez-vous${pi.date ? ", sauvegardé le " + esc(new Date(pi.date).toLocaleDateString("fr-FR")) : ""}. La restauration remplace toutes les données actuelles.</span>
+      <span style="display:flex;gap:6px"><button type="button" class="btn sm" data-action="import-cancel">Annuler</button><button type="button" class="btn sm danger" data-action="import-confirm" data-confirm>Remplacer les données</button></span></div>` : ""}
+  </section>`;
+}
+
+/* ================= Démarrage ================= */
+(async function init(){
+  readHash(); render();
+  const cl = window.claude;
+  let db = null, user = null;
+  if (cl && typeof cl.use === "function"){
+    try { [db, user] = await Promise.all([cl.use("db"), cl.use("user")]); } catch(e){ console.error(e); }
+    S.user = user;
+    if (user){ try { S.canWrite = await user.can("data.write"); } catch(e){} if (S.canWrite === false) S.readonly = true; }
+    if (!db){ S.status = "nodb"; render(); return; }
+  } else {
+    // Fichier index.html autonome : données dans le navigateur de ce poste
+    try { LOCAL = makeLocalDb(); db = LOCAL; S.mode = "local"; S.canWrite = true; }
+    catch(e){ console.error(e); S.status = "nostore"; render(); return; }
+  }
+  S.db = db;
+  S.loadTimer = setTimeout(() => { if (S.status === "loading"){ S.status = "slow"; S.patientsReady = true; schedule(); } }, 10000);
+  try{
+    db.collection("patients").onSnapshot(snap => {
+      const map = new Map(); snap.docs.forEach(d => map.set(d.id, d.data())); S.patients = map;
+      if (!snap.metadata.fromCache) S.patientsReady = true;
+      markFresh(snap.metadata.fromCache); schedule();
+    }, onDbError);
+    db.doc("config/cabinet").onSnapshot(snap => { S.config = snap.exists ? snap.data() : null; schedule(); }, onDbError);
+  }catch(e){ console.error(e); }
+  baseWindow().forEach(ensureMonth);
+})();
+</script>
+</body>
+</html>
