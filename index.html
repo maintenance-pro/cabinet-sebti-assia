@@ -740,7 +740,7 @@ const JOURS = [[1,"Lun"],[2,"Mar"],[3,"Mer"],[4,"Jeu"],[5,"Ven"],[6,"Sam"],[0,"D
 const DEFAULTS = {
   nom:"Cabinet de kinésithérapie Sebti Assia", praticien:"Sebti Assia",
   telFixe:"05 21 33 31 30", telMobile:"06 01 97 68 67", email:"cabinetkinesebti@gmail.com",
-  adresse:"Bd Med V, Résidence Aymen, N° 16/17, 1er étage, Lot Berkoure (en face Clinique Ibn Zohr), Berrechid",
+  adresse:"Bd Med V, Résidence Aymen, N° 16/17, 1er étage, Lot Berkoure (en face Clinique Ibn Zohr), Berrechid", mapsLien:"",
   tarifDefaut:150, dureeDefaut:30, coutVariableSeance:6,
   ouverture:"08:30", fermeture:"19:00", samediFermeture:"13:00", pas:30, postes:3, joursOuvres:[1,2,3,4,5,6],
   resaActive:true, resaHorizon:21, resaDelai:2,
@@ -1003,7 +1003,7 @@ function renderNav(){
   const tel = (n, icon) => n ? `<li>${ic(icon)}<a class="tel" href="tel:${esc(n.replace(/[^\d+]/g,""))}">${esc(n)}</a></li>` : "";
   const contact = tel(c.telFixe, "phone") + tel(c.telMobile, "mobile")
     + (c.email ? `<li>${ic("mail")}<a href="mailto:${esc(c.email)}">${esc(c.email)}</a></li>` : "")
-    + (c.adresse ? `<li>${ic("home")}<span>${esc(c.adresse)}</span></li>` : "");
+    + (c.adresse ? `<li>${ic("home")}<a href="${esc(mapsUrl(c))}" target="_blank" rel="noopener" title="Itinéraire vers le cabinet">${esc(c.adresse)}</a></li>` : "");
   $("#railFoot").innerHTML = `${contact ? `<ul class="contact">${contact}</ul>` : ""}<div>Tarif séance : ${fmtDH(c.tarifDefaut)}</div>`
     + (inst ? `<button type="button" class="btn install-btn" data-action="install">${ic("download")}Installer l'application</button>` : "")
     + (who ? `<div class="who"><span>Données en ligne · ${esc(who)}</span><button type="button" class="linkbtn" data-action="logout">Se déconnecter</button></div>` : "");
@@ -1229,6 +1229,12 @@ function rdvCard(r, D){
     ${hors ? `<div class="hw">Hors ordonnance : non remboursable</div>` : ""}
     ${acts ? `<div class="ra">${acts}</div>` : ""}</article>`;
 }
+// Itinéraire vers le cabinet : le lien Google Maps collé dans les Réglages, sinon l'adresse (ouvre l'appli Maps sur téléphone)
+function mapsUrl(c){
+  const lien = String(c.mapsLien || "").trim();
+  if (/^https:\/\/(maps\.app\.goo\.gl|goo\.gl\/maps|(www\.)?google\.[a-z.]+\/maps)/i.test(lien)) return lien;
+  return c.adresse ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(c.adresse + ", Maroc")}` : "";
+}
 function waNumber(tel){
   let d = String(tel||"").replace(/\D/g,"");
   if (d.startsWith("00")) d = d.slice(2);
@@ -1452,6 +1458,8 @@ function settingsView(D){
       <label class="f">Mobile<input id="sMob" type="tel" value="${esc(c.telMobile)}"></label></div>
       <label class="f">E-mail<input id="sMail" type="email" value="${esc(c.email)}"></label>
       <label class="f">Adresse<textarea id="sAdr" rows="2">${esc(c.adresse)}</textarea></label>
+      <label class="f">Lien Google Maps du cabinet (facultatif)<input id="sMaps" type="url" inputmode="url" placeholder="https://maps.app.goo.gl/…" value="${esc(c.mapsLien)}"></label>
+      <p class="hint">Dans Google Maps, ouvre la fiche du cabinet › Partager › Copier le lien, puis colle-le ici : l'itinéraire des patients mènera exactement à la porte. Sans lien, l'adresse ci-dessus est utilisée.</p>
       <div class="g3"><label class="f">Tarif séance (DH)<input id="sTarif" type="number" min="0" step="1" value="${esc(c.tarifDefaut)}"></label>
       <label class="f">Durée (min)<input id="sDuree" type="number" min="10" step="5" value="${esc(c.dureeDefaut)}"></label>
       <label class="f">Coût variable / séance<input id="sCV" type="number" min="0" step="0.5" value="${esc(c.coutVariableSeance)}"></label></div>
@@ -1504,7 +1512,7 @@ function readSettings(){
   const mat = rows('[data-row="mat"]', ["libelle","valeur","achat","dureeAns"]).filter(x => x.libelle || x.valeur).map(x => Object.assign(x, {valeur:+x.valeur||0, dureeAns:+x.dureeAns||1}));
   return {
     nom:v("sNom").trim() || DEFAULTS.nom, praticien:v("sPrat").trim(),
-    telFixe:v("sTel").trim(), telMobile:v("sMob").trim(), email:v("sMail").trim(), adresse:v("sAdr").trim(),
+    telFixe:v("sTel").trim(), telMobile:v("sMob").trim(), email:v("sMail").trim(), adresse:v("sAdr").trim(), mapsLien:v("sMaps").trim(),
     tarifDefaut:+v("sTarif")||0, dureeDefaut:+v("sDuree")||30, coutVariableSeance:+v("sCV")||0,
     ouverture:v("sOuv")||"08:30", fermeture:v("sFerm")||"19:00", samediFermeture:v("sSam")||"", pas:+v("sPas")||30, postes:Math.max(1, +v("sPostes")||1),
     joursOuvres:$$("[data-jour]", f).filter(x => x.checked).map(x => +x.dataset.jour),
@@ -2191,7 +2199,7 @@ function queueSync(){
 function publicAgenda(){
   const c = cfg();
   return {actif:!!c.resaActive, horizon:+c.resaHorizon || 21, delaiH:+c.resaDelai || 0, nom:c.nom || "", telFixe:c.telFixe || "", telMobile:c.telMobile || "",
-    adresse:c.adresse || "", ouverture:c.ouverture, fermeture:c.fermeture, samediFermeture:c.samediFermeture || "", pas:Math.max(10, +c.pas || 30),
+    adresse:c.adresse || "", maps:mapsUrl(c), wa:waNumber(c.telMobile), ouverture:c.ouverture, fermeture:c.fermeture, samediFermeture:c.samediFermeture || "", pas:Math.max(10, +c.pas || 30),
     joursOuvres:(c.joursOuvres || []).map(Number)};
 }
 function syncResa(){

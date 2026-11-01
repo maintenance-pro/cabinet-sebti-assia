@@ -112,9 +112,23 @@ input[type=text],input[type=tel]{border:1px solid var(--line-strong);background:
 .done h2{font-family:var(--f-display);font-size:24px;margin:0}
 .done .when{font-family:var(--f-display);font-weight:700;font-size:21px;color:var(--accent-ink);margin:0}
 .done p{margin:0}
-.contact{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink-2)}
-.contact a{color:var(--accent-ink);font-weight:600;text-decoration:none}
-.contact a:hover{text-decoration:underline}
+.contact{display:flex;flex-direction:column;gap:12px;font-size:14px;color:var(--ink-2)}
+.contact a{color:var(--accent-ink);text-decoration:none}
+.cbtns{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.cbtn{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);background:var(--accent-soft);min-height:52px}
+.cbtn svg{width:22px;height:22px;flex:none}
+.cbtn span{display:flex;flex-direction:column;line-height:1.2}
+.cbtn b{font-family:var(--f-mono);font-weight:500;font-size:15px;color:var(--ink)}
+.cbtn small{font-size:12px;font-weight:600}
+.cbtn.wa{background:color-mix(in srgb,#25D366 14%,var(--surface));border-color:color-mix(in srgb,#25D366 45%,transparent);color:color-mix(in srgb,#1FA855 75%,var(--ink))}
+.cbtn.wa b{font-family:var(--f-body);font-weight:700}
+.cbtn:hover,.addr:hover{filter:brightness(.97)}
+.addr{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2)}
+.addr svg{width:22px;height:22px;flex:none;color:var(--tape);margin-top:1px}
+.addr span{display:flex;flex-direction:column;gap:4px}
+.addr b{color:var(--accent-ink);font-size:14px}
+.waze{font-size:13px;font-weight:600;align-self:flex-start}
+.waze:hover{text-decoration:underline}
 @media (prefers-reduced-motion:no-preference){ .slot,.cd{transition:background-color .15s,border-color .15s} }
 </style>
 </head>
@@ -215,12 +229,21 @@ function calendar(){
 }
 
 const TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+// Contact : un toucher sur un numéro appelle le cabinet, un toucher sur l'adresse ouvre l'itinéraire
+const SVG = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const I_TEL = SVG('<path d="M6.5 4h3l1.5 4-2 1.3a10 10 0 0 0 5.7 5.7l1.3-2 4 1.5v3a2 2 0 0 1-2.2 2A16 16 0 0 1 4.5 6.2 2 2 0 0 1 6.5 4z"/>');
+const I_MOB = SVG('<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>');
+const I_WA = SVG('<path d="M4 19.5l1.4-4A7.8 7.8 0 1 1 8.6 19z"/>');
+const I_PIN = SVG('<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10" r="2.4"/>');
 function renderContact(){
   const a = P.ag, el = $("#contact"); if (!a){ el.hidden = true; return; }
-  const tel = n => n ? `<a href="tel:${esc(n.replace(/[^\d+]/g, ""))}">${esc(n)}</a>` : "";
-  const tels = [tel(a.telFixe), tel(a.telMobile)].filter(Boolean).join(" · ");
-  el.innerHTML = `<b>Une question ? Appelez le cabinet</b>${tels ? `<span>${tels}</span>` : ""}${a.adresse ? `<span>${esc(a.adresse)}</span>` : ""}`;
-  el.hidden = !tels && !a.adresse;
+  const tel = (n, icon) => n ? `<a class="cbtn" href="tel:${esc(n.replace(/[^\d+]/g, ""))}">${icon}<span><b>${esc(n)}</b><small>Appeler</small></span></a>` : "";
+  const btns = tel(a.telFixe, I_TEL) + tel(a.telMobile, I_MOB) + (a.wa ? `<a class="cbtn wa" href="https://wa.me/${esc(a.wa)}" target="_blank" rel="noopener">${I_WA}<span><b>WhatsApp</b><small>Écrire un message</small></span></a>` : "");
+  const route = a.maps || (a.adresse ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(a.adresse + ", Maroc")}` : "");
+  el.innerHTML = `<b>Une question ? Contactez le cabinet</b>${btns ? `<div class="cbtns">${btns}</div>` : ""}
+    ${a.adresse ? `<a class="addr" href="${esc(route)}" target="_blank" rel="noopener">${I_PIN}<span>${esc(a.adresse)}<b>Itinéraire avec Google Maps →</b></span></a>
+      <a class="waze" href="https://waze.com/ul?q=${encodeURIComponent(a.adresse + ", Maroc")}&navigate=yes" target="_blank" rel="noopener">Ou ouvrir l'itinéraire dans Waze</a>` : ""}`;
+  el.hidden = !btns && !a.adresse;
 }
 function render(){
   // les créneaux se mettent à jour en direct : on garde ce que le patient a déjà tapé
