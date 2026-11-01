@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cabinet Sebti Assia</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0D6858">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sebti Assia">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Kufi+Arabic:wght@600;700&family=Public+Sans:wght@400;500;600;700&family=Roboto+Condensed:wght@500;700&display=swap">
@@ -579,6 +585,16 @@ button.hchip:hover{background:rgba(255,255,255,.22)}
 .box-dem{--bc:var(--tape);border-color:color-mix(in srgb,var(--tape) 35%,var(--line));background:linear-gradient(180deg,var(--tape-soft),var(--surface) 55%)}
 .box-wa{--bc:var(--good)}
 .box-ordo{--bc:var(--logo-blue)}
+.box-app{--bc:var(--accent)}
+
+/* installer l'application */
+.install-btn{width:100%;justify-content:flex-start;border-style:dashed;border-color:color-mix(in srgb,var(--accent) 50%,transparent);color:var(--accent-ink);background:var(--accent-soft)}
+.install-link{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);background:var(--accent-soft);color:var(--accent-ink);font:inherit;font-weight:600;font-size:13.5px;cursor:pointer;animation:fadeUp .6s .3s ease-out both}
+.install-link:hover{text-decoration:underline}
+.install-link svg{width:16px;height:16px;flex:none}
+.banner>span>svg{width:16px;height:16px;vertical-align:-3px;margin-right:6px}
+.appqr{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.appqr svg{width:180px;height:auto;display:block;border:1px solid var(--line);border-radius:8px}
 
 /* arrivée sur une page ou un jour */
 #view.enter .hero,#view.enter .daybar,#view.enter .stats,#view.enter .tl,#view.enter .side>*,#view.enter>section,#view.enter>form,#view.enter>div{animation:fadeUp .5s ease-out both}
@@ -703,6 +719,7 @@ button.hchip:hover{background:rgba(255,255,255,.22)}
       <div class="form" id="gateBody"></div>
       <p class="gate-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>Accès réservé au cabinet. Les dossiers patients sont protégés et hébergés en Europe.</p>
     </form>
+    <button type="button" class="install-link" data-action="install" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5"/><path d="M5 19.5h14"/></svg>Installer l'application sur cet appareil</button>
     <a class="patient-link" href="rdv.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Patient ? Prendre rendez-vous en ligne →</a>
   </div>
 </div>
@@ -769,6 +786,7 @@ const ICONS = {
   resultat:'<path d="M4 20V11M10 20V5M16 20v-6M3 20.5h18"/>',
   reglages:'<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
   bell:'<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
+  download:'<path d="M12 4v11M7 10.5l5 5 5-5"/><path d="M5 19.5h14"/>',
   plus:'<path d="M12 5v14M5 12h14"/>', check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
   left:'<path d="M14.5 6l-6 6 6 6"/>', right:'<path d="M9.5 6l6 6-6 6"/>', close:'<path d="M6 6l12 12M18 6L6 18"/>',
   search:'<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/>', chat:'<path d="M4 19.5l1.4-4A7.8 7.8 0 1 1 8.6 19z"/>',
@@ -976,7 +994,8 @@ function renderNav(){
   const c = cfg();
   const who = S.fbUser ? S.fbUser.email : "";
   const nd = [...S.demandes.values()].filter(x => x.date >= TODAY).length;
-  const nk = [S.view, S.mode || "", who, nd, c.tarifDefaut, c.telFixe, c.telMobile, c.email, c.adresse].join("|");
+  const inst = S.mode === "firebase" && canInstall();
+  const nk = [S.view, S.mode || "", who, nd, inst, c.tarifDefaut, c.telFixe, c.telMobile, c.email, c.adresse].join("|");
   if (S.navKey === nk) return; S.navKey = nk;
   const badge = r => r === "agenda" && nd ? `<span class="nbadge" aria-label="${nd} demande${nd>1?"s":""} en ligne">${nd}</span>` : "";
   const links = ROUTES.map(r => `<a href="#${r}" ${S.view===r?'aria-current="page"':""}>${ic(r)}<span>${TITLES[r]}</span>${badge(r)}</a>`).join("");
@@ -986,6 +1005,7 @@ function renderNav(){
     + (c.email ? `<li>${ic("mail")}<a href="mailto:${esc(c.email)}">${esc(c.email)}</a></li>` : "")
     + (c.adresse ? `<li>${ic("home")}<span>${esc(c.adresse)}</span></li>` : "");
   $("#railFoot").innerHTML = `${contact ? `<ul class="contact">${contact}</ul>` : ""}<div>Tarif séance : ${fmtDH(c.tarifDefaut)}</div>`
+    + (inst ? `<button type="button" class="btn install-btn" data-action="install">${ic("download")}Installer l'application</button>` : "")
     + (who ? `<div class="who"><span>Données en ligne · ${esc(who)}</span><button type="button" class="linkbtn" data-action="logout">Se déconnecter</button></div>` : "");
 }
 function renderHeader(){
@@ -1013,6 +1033,9 @@ function renderBanners(){
   if (S.status === "slow") b.push(`<div class="banner warn">Les données mettent du temps à arriver. Ce qui s'affiche peut ne pas être à jour.</div>`);
   if (S.status === "lost") b.push(`<div class="banner bad">${esc(S.lostMsg)}</div>`);
   if (S.readonly) b.push(`<div class="banner warn">Lecture seule : ton accès ne permet pas de modifier les données.</div>`);
+  if (S.started && S.mode === "firebase" && canInstall() && !installLater() && matchMedia("(max-width:860px)").matches)
+    b.push(`<div class="banner info"><span>${ic("download")}Installe l'application sur ce téléphone : elle s'ouvre comme une vraie appli, en plein écran.</span>
+      <span style="display:flex;gap:6px"><button class="btn sm" data-action="install-later">Plus tard</button><button class="btn sm primary" data-action="install">Installer</button></span></div>`);
   const lg = S.legacy;
   if (lg) b.push(`<div class="banner warn"><span>${lg.nPat} patient${lg.nPat>1?"s":""} et ${lg.nRdv} rendez-vous saisis avec l'ancienne version sont encore dans ce navigateur, pas dans la base en ligne.</span>
     <span style="display:flex;gap:6px"><button class="btn sm" data-action="legacy-skip">Ignorer</button><button class="btn sm primary" data-action="legacy-send" data-write>Les envoyer en ligne</button></span></div>`);
@@ -1033,7 +1056,7 @@ function render(){
     $("#plistWrap").innerHTML = patientsList(D);
   } else if (S.view === "reglages"){
     const fs = $("#fSettings"); const editing = fs && fs.contains(document.activeElement);
-    if (S.shellKey !== key || (!S.settingsDirty && !editing)){ v.innerHTML = settingsView(D); S.shellKey = key; S.settingsDirty = false; resaQr(); }
+    if (S.shellKey !== key || (!S.settingsDirty && !editing)){ v.innerHTML = settingsView(D); S.shellKey = key; S.settingsDirty = false; resaQr(); appQr(); }
   } else {
     v.innerHTML = ({agenda:viewAgenda, caisse:viewCaisse, charges:viewCharges, resultat:viewResultat})[S.view](D);
     S.shellKey = key;
@@ -1462,6 +1485,11 @@ function settingsView(D){
         <a class="btn" href="https://wa.me/?text=${encodeURIComponent("Prenez rendez-vous au cabinet de kinésithérapie Sebti Assia : " + RESA_URL)}" target="_blank" rel="noopener">${ic("chat")}Partager sur WhatsApp</a>
         <button type="button" class="btn" data-action="resa-print">${ic("qr")}Imprimer l'affiche QR code</button></div></div>
       <div class="resa-qr" id="resaQr"></div></div></section>
+    <section class="box wide box-app"><h3><span class="bt">${ic("download")}Installer l'application</span></h3><div class="resa"><div class="form">
+      <p class="hint">Installe l'application sur l'ordinateur de l'accueil et sur ton téléphone : elle s'ouvre comme une vraie appli, en plein écran, avec l'icône du cabinet, et l'agenda reste consultable sans internet.</p>
+      ${isStandalone() ? `<div class="banner info" style="margin:0">Déjà installée sur cet appareil.</div>` : `<div><button type="button" class="btn primary" data-action="install">${ic("download")}Installer sur cet appareil</button></div>`}
+      ${installSteps()}</div>
+      <div class="resa-qr"><div class="app-qr-slot"></div><small>Scanne pour ouvrir l'application sur le téléphone</small></div></div></section>
     <section class="box wide"><h3>Données d'exemple</h3>
       ${exCount ? `<p class="hint" style="margin-bottom:10px">${exCount} éléments d'exemple (patients fictifs, rendez-vous, encaissements, dépenses). Les supprimer ne touche pas aux données que tu as saisies.</p>
       <button type="button" class="btn danger" data-action="clear-examples" data-confirm data-write>Effacer les exemples</button>` : `<p class="hint">Aucune donnée d'exemple.</p>`}</section>
@@ -1789,6 +1817,9 @@ async function onAction(btn, e){
     case "notif-on": try { await Notification.requestPermission(); } catch(e){} if (S.drawer && S.drawer.type === "notifs") openNotifs(); break;
     case "resa-copy": try { await navigator.clipboard.writeText(RESA_URL); toast("Lien copié : " + RESA_URL); } catch(e){ toast(RESA_URL); } break;
     case "resa-print": await resaPoster(); break;
+    case "install": await installApp(); break;
+    case "install-help": installHelp(); break;
+    case "install-later": try { localStorage.setItem(INSTALL_LATER, String(Date.now())); } catch(e){} schedule(); break;
     case "lier-cancel": S.lier = null; if (S.fbAuth.currentUser) await onAuth(S.fbAuth.currentUser); else showGate("login"); break;
     case "reload": location.reload(); break;
   }
@@ -2266,8 +2297,43 @@ async function resaPoster(){
   window.print();
 }
 
+/* ================= Installer l'application (PWA) ================= */
+// Chrome, Edge et Android proposent l'installation (« beforeinstallprompt ») ; sur iPhone, elle passe par Safari › Partager.
+const APP_URL = "https://cabinet-sebti-assia.web.app/";
+const INSTALL_LATER = "cabinet-sebti-assia:installer-plus-tard";
+let installEvt = null;
+const isStandalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const canInstall = () => !isStandalone() && (!!installEvt || isIOS);
+const installLater = () => { try { return Date.now() - (+localStorage.getItem(INSTALL_LATER) || 0) < 14 * 86400000; } catch(e){ return false; } };
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; installChanged(); });
+window.addEventListener("appinstalled", () => { installEvt = null; toast("Application installée : retrouve-la sur l'écran d'accueil ou le bureau."); installChanged(); });
+function installChanged(){ const b = $(".install-link"); if (b) b.hidden = !canInstall(); S.navKey = ""; schedule(); }
+async function installApp(){
+  if (isStandalone()) return toast("L'application est déjà installée sur cet appareil.");
+  if (installEvt){
+    const e = installEvt; installEvt = null; e.prompt();
+    try { if ((await e.userChoice).outcome !== "accepted") toast("Installation annulée : tu peux la relancer depuis Réglages."); } catch(err){}
+    installChanged(); return;
+  }
+  if (!S.started) return toast(isIOS ? "Sur iPhone : dans Safari, touche Partager (carré avec une flèche) puis « Sur l'écran d'accueil »." : "Ouvre le menu du navigateur (⋮) puis « Installer l'application ».");
+  installHelp();
+}
+const installSteps = () => `<section><h3 class="lbl">Téléphone Android (Chrome)</h3><ol class="steps"><li>Ouvre <b>${esc(APP_URL.replace("https://", ""))}</b> dans Chrome, ou scanne le QR code.</li><li>Touche <b>⋮</b> en haut à droite, puis <b>« Installer l'application »</b>.</li></ol></section>
+  <section><h3 class="lbl">iPhone ou iPad (Safari)</h3><ol class="steps"><li>Ouvre le site dans <b>Safari</b>.</li><li>Touche <b>Partager</b> (carré avec une flèche), puis <b>« Sur l'écran d'accueil »</b>.</li></ol></section>
+  <section><h3 class="lbl">Ordinateur (Chrome ou Edge)</h3><ol class="steps"><li>Clique sur l'icône <b>Installer</b> à droite de la barre d'adresse, ou <b>⋮ › « Installer Cabinet Sebti Assia »</b>.</li></ol></section>`;
+function installHelp(){
+  openDrawer("install", dHead("Installer l'application", "Elle s'ouvre ensuite comme une vraie appli, en plein écran, avec l'icône du cabinet") + `<div class="form">
+    ${isStandalone() ? `<div class="banner info" style="margin:0">L'application est déjà installée sur cet appareil.</div>` : installEvt ? `<button type="button" class="btn primary" data-action="install">${ic("download")}Installer sur cet appareil</button>` : ""}
+    ${installSteps()}
+    <div class="appqr"><div class="app-qr-slot"></div><p class="hint">Scanne ce QR code avec l'appareil photo du téléphone pour ouvrir l'application, puis installe-la.</p></div></div>`);
+  appQr();
+}
+function appQr(){ loadOnce(QRGEN).then(() => $$(".app-qr-slot").forEach(el => { if (!el.firstChild) el.innerHTML = qrSvg(APP_URL); })).catch(() => {}); }
+
 /* ================= Démarrage ================= */
 (async function init(){
+  if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(e => console.warn(e)); // application installable et ouverte hors ligne
   // QR code scanné sur un ordinateur : #lier=<id>.<clé>. On retire la clé de l'adresse aussitôt lue.
   const lm = /^#lier=([\w-]{16,})\.([\w-]{40,})$/.exec(location.hash);
   if (lm){ S.lier = {id:lm[1], key:lm[2]}; history.replaceState(null, "", location.pathname + location.search); }
@@ -2283,7 +2349,7 @@ async function resaPoster(){
   }
   // Site du cabinet : base Firebase, après connexion du compte autorisé
   S.mode = "firebase"; S.canWrite = true;
-  showGate("loading");
+  showGate("loading"); installChanged();
   try { for (const src of FB_SDK) await loadScript(src); }
   catch(e){ console.error(e); showGate("offline"); return; }
   firebase.initializeApp(FIREBASE_CONFIG);

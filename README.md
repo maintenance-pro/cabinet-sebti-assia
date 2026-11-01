@@ -15,6 +15,10 @@ Tout tient dans `index.html`. Les données sont dans **Firestore** (projet Fireb
 - Les données saisies avec l'ancienne version (stockées dans le navigateur) sont proposées une fois à l'envoi en ligne.
 - `exemple-cabinet-sebti-assia.json` est une sauvegarde d'exemple (patients fictifs) à importer depuis les Réglages.
 
+## Application installable
+
+Le site s'installe comme une application (PWA) : `manifest.webmanifest`, icônes dans `icons/`, `sw.js` (pages en ligne d'abord, copie hors ligne ; bibliothèques versionnées gardées en cache ; les données ne passent jamais par le service worker). Bouton « Installer l'application » sur l'écran de connexion, dans le menu, en bannière sur téléphone et dans Réglages (avec QR code).
+
 ## Mise en ligne
 
 ```sh
