@@ -479,6 +479,143 @@ legend{font-size:12.5px;font-weight:600;color:var(--ink-2);padding:0 4px}
   .sheet{animation:slidein .2s ease-out}
   @keyframes slidein{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}
 }
+
+/* ================= Thème kiné : identité, lisibilité, mouvement =================
+   Fond légèrement teinté, cartes plus douces, couleurs par statut, bandeau d'accueil animé.
+   Les animations ne jouent qu'à l'arrivée sur une page ou un jour (#view.enter), jamais à chaque mise à jour. */
+body{background:radial-gradient(1100px 380px at 75% -120px,color-mix(in srgb,var(--accent) 10%,transparent),transparent),var(--bg) fixed}
+.box,.tl,.kpi,.plist{border-radius:16px;box-shadow:0 1px 2px rgba(27,47,78,.04),0 6px 18px rgba(27,47,78,.05)}
+.top h1{display:flex;align-items:center;gap:10px}
+.btn.primary{background:linear-gradient(160deg,var(--accent),var(--accent-ink));border-color:transparent;box-shadow:0 4px 12px color-mix(in srgb,var(--accent) 30%,transparent)}
+.btn:active{transform:translateY(1px)}
+
+/* menu : onglet actif marqué, compteur des demandes en ligne */
+.nav a{position:relative;transition:background-color .15s,color .15s,transform .15s}
+.nav a:hover{transform:translateX(2px)}
+.nav a[aria-current="page"]{background:linear-gradient(90deg,var(--accent-soft),transparent);box-shadow:inset 3px 0 0 var(--accent)}
+.nav a[aria-current="page"] svg{color:var(--accent)}
+.nbadge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--tape);color:var(--surface);font-size:11px;font-weight:700;display:inline-grid;place-items:center;line-height:1}
+
+/* bandeau d'accueil */
+.hero{--accent-ink:#9FE6D5;--tape:#F3A6DA;--accent:#5FD3BA;--logo-blue:#C9D6F7;position:relative;overflow:hidden;display:flex;align-items:center;gap:16px;margin-bottom:14px;padding:18px 8px 18px 22px;border-radius:18px;color:#fff;
+  background:radial-gradient(60% 100% at 96% 0%,rgba(243,166,218,.28),transparent 70%),radial-gradient(50% 90% at 0% 100%,rgba(95,211,186,.24),transparent 70%),linear-gradient(135deg,#0D6858 0%,#124C5C 55%,#1B2F4E 100%);
+  box-shadow:0 10px 28px rgba(13,104,88,.22)}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1.6px);background-size:20px 20px}
+.hero-txt{position:relative;z-index:1;flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.hello{margin:0;font-family:var(--f-display);font-weight:700;font-size:26px;line-height:1.15}
+.hello .ar{font-size:15px;color:var(--tape);margin-left:12px}
+.hero .sum{margin:0;color:rgba(255,255,255,.9);font-size:14.5px}
+.hero-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.hchip{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font:inherit;font-size:13px;font-weight:600}
+.hchip svg{width:15px;height:15px}
+button.hchip{cursor:pointer}
+button.hchip:hover{background:rgba(255,255,255,.22)}
+.hchip.hot{background:#F3A6DA;border-color:transparent;color:#4A1240}
+.hchip .dot{width:8px;height:8px;border-radius:50%;background:#A8368B;animation:ping 1.6s ease-out infinite}
+.hero-fig{position:relative;z-index:1;width:150px;height:150px;flex:none;margin:-16px 0}
+.hero-fig .kine{width:100%;height:100%;max-height:none}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(168,54,139,.6)}100%{box-shadow:0 0 0 10px rgba(168,54,139,0)}}
+
+/* semaine : jour choisi plein, charge du jour, aujourd'hui et demandes marqués */
+.wd{position:relative;border-radius:14px;padding:8px 4px 8px;gap:1px}
+.wd .c{font-weight:600}
+.wd .load{width:62%;height:4px;margin-top:4px;border-radius:2px;background:var(--grid);overflow:hidden}
+.wd .load i{display:block;height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--tape));transition:width .6s ease}
+.wd:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(27,47,78,.08)}
+.wd[aria-pressed="true"]{background:linear-gradient(160deg,#13826D,#0D6858);border-color:transparent;color:#fff;box-shadow:0 8px 18px rgba(19,130,109,.32)}
+.wd[aria-pressed="true"] .l,.wd[aria-pressed="true"] .c,.wd[aria-pressed="true"].today .n{color:#fff}
+.wd[aria-pressed="true"] .load{background:rgba(255,255,255,.25)}
+.wd[aria-pressed="true"] .load i{background:#fff}
+.wd .wdot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--tape);animation:ping 1.8s ease-out infinite}
+.wd.closed{opacity:.7;background:repeating-linear-gradient(135deg,var(--sunken) 0 6px,var(--surface) 6px 12px)}
+.wd.closed[aria-pressed="true"]{opacity:1;background:linear-gradient(160deg,#6B7A92,#3B4F6E);box-shadow:0 8px 18px rgba(27,47,78,.25)}
+
+/* chiffres du jour : tuiles colorées */
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;padding:0;background:none;border:0;border-radius:0}
+.stats .st{flex-direction:row;align-items:center;gap:11px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:16px;min-width:0;box-shadow:0 1px 2px rgba(27,47,78,.04)}
+.stats .st>div{display:flex;flex-direction:column;min-width:0}
+.stats .st span:not(.si){font-size:11px;font-weight:600}
+.stats .st b{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1.15;white-space:nowrap}
+.stats .si{width:38px;height:38px;flex:none;border-radius:12px;display:grid;place-items:center;color:var(--c);background:color-mix(in srgb,var(--c) 15%,transparent)}
+.si svg{width:19px;height:19px}
+.st-prev{--c:var(--logo-blue)} .st-eff{--c:var(--good)} .st-abs{--c:var(--bad)} .st-real{--c:var(--accent)} .st-enc{--c:var(--tape)}
+.st-enc b{color:var(--tape)}
+
+/* journée : créneaux, « maintenant », cartes avec avatar et couleur de statut */
+.tl-head{background:linear-gradient(90deg,var(--accent-soft),transparent 70%);color:var(--ink-2);font-weight:600}
+.slot{transition:background-color .2s}
+.slot:hover{background:color-mix(in srgb,var(--accent) 4%,transparent)}
+.slot>time{font-size:13px;color:var(--ink-2)}
+.slot.now{box-shadow:inset 4px 0 0 var(--tape);background:color-mix(in srgb,var(--tape) 6%,transparent)}
+.slot.now>time::after{content:"Maintenant";display:block;width:max-content;margin-top:5px;padding:1px 7px;border-radius:999px;background:var(--tape);color:var(--surface);font:700 10px var(--f-body);letter-spacing:.02em}
+.cards{align-items:start}
+.add{border-color:color-mix(in srgb,var(--line-strong) 70%,transparent);opacity:.75;border-radius:12px;min-height:44px}
+.add:hover{opacity:1;transform:translateY(-1px)}
+.rdv{--sc:var(--logo-blue);position:relative;border-radius:14px;padding:9px 11px 10px 14px;gap:6px;box-shadow:inset 4px 0 0 var(--sc),0 1px 2px rgba(27,47,78,.05);transition:transform .15s,box-shadow .15s}
+.rdv:hover{transform:translateY(-2px);box-shadow:inset 4px 0 0 var(--sc),0 8px 20px rgba(27,47,78,.1)}
+.rdv.s-effectue{--sc:var(--good)} .rdv.s-absent{--sc:var(--bad)} .rdv.s-annule{--sc:var(--line-strong)} .rdv.demande{--sc:var(--tape)}
+.pw{display:flex;gap:10px;align-items:center;min-width:0}
+.pwn{display:flex;flex-direction:column;gap:1px;min-width:0}
+.av{width:36px;height:36px;flex:none;border-radius:50%;display:grid;place-items:center;font:700 13px var(--f-display);letter-spacing:.02em;color:#fff;background:linear-gradient(150deg,hsl(var(--h,170) 52% 46%),hsl(calc(var(--h,170) + 30) 48% 34%))}
+.av-dem{background:linear-gradient(150deg,#C14FAE,#7A2A6A)}
+.nm{font-size:15px}
+.pcell{display:flex;gap:12px;align-items:center;min-width:0}
+.prow{transition:background-color .15s}
+.prow:hover .av{transform:scale(1.06)}
+.av{transition:transform .15s}
+.rdv .ra{gap:6px}
+
+/* jour de fermeture : illustration et raccourci */
+.closed-day{display:flex;flex-direction:column;align-items:center;gap:6px;padding:28px 16px 30px}
+.closed-day .fig{--accent-ink:#9FE6D5;--tape:#F3A6DA;--accent:#5FD3BA;--logo-blue:#C9D6F7;width:104px;height:104px;border-radius:50%;margin-bottom:8px;overflow:hidden;background:linear-gradient(155deg,#0D6858,#1B2F4E);display:grid;place-items:center;box-shadow:0 10px 24px rgba(13,104,88,.25)}
+.closed-day .fig .kine{width:86px;height:96px;max-height:none}
+.closed-day .btn{margin-top:10px}
+.kine.still *{animation:none!important}
+.kine.still .rom,.kine.still .deg{display:none}
+
+/* encadrés latéraux : icône et couleur par sujet */
+.box h3 .bt{display:inline-flex;align-items:center;gap:8px}
+.box h3 .bt svg{width:16px;height:16px;padding:5px;box-sizing:content-box;border-radius:8px;color:var(--bc,var(--accent));background:color-mix(in srgb,var(--bc,var(--accent)) 14%,transparent)}
+.box-dem{--bc:var(--tape);border-color:color-mix(in srgb,var(--tape) 35%,var(--line));background:linear-gradient(180deg,var(--tape-soft),var(--surface) 55%)}
+.box-wa{--bc:var(--good)}
+.box-ordo{--bc:var(--logo-blue)}
+
+/* arrivée sur une page ou un jour */
+#view.enter .hero,#view.enter .daybar,#view.enter .stats,#view.enter .tl,#view.enter .side>*,#view.enter>section,#view.enter>form,#view.enter>div{animation:fadeUp .5s ease-out both}
+#view.enter .daybar{animation-delay:.05s}#view.enter .stats{animation-delay:.1s}#view.enter .tl{animation-delay:.15s}
+#view.enter .side>:nth-child(1){animation-delay:.2s}#view.enter .side>:nth-child(2){animation-delay:.26s}#view.enter .side>:nth-child(3){animation-delay:.32s}
+#view.enter .wd .load i{animation:grow .8s .2s ease-out both}
+@keyframes grow{from{width:0}}
+
+@media (max-width:1180px){ .stats{grid-template-columns:repeat(5,minmax(0,1fr))} }
+@media (max-width:860px){
+  .tabbar{box-shadow:0 -6px 20px rgba(27,47,78,.08)}
+  .tabbar a{position:relative;transition:color .15s}
+  .tabbar a[aria-current="page"]{background:linear-gradient(160deg,var(--accent-soft),transparent)}
+  .tabbar a[aria-current="page"] svg{color:var(--accent);animation:pop .35s ease-out}
+  .tabbar .nbadge{position:absolute;top:1px;left:calc(50% + 4px);margin:0;min-width:18px;height:18px;font-size:10px;border:2px solid var(--surface)}
+  .stats{display:flex;flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:4px;margin-left:-2px;margin-right:-2px}
+  .stats .st{flex:0 0 auto;min-width:150px;scroll-snap-align:start}
+  @keyframes pop{0%{transform:scale(.8)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+}
+@media (max-width:640px){
+  .hero{padding:14px 4px 14px 16px;gap:6px}
+  .hello{font-size:20px}
+  .hello .ar{display:block;margin:2px 0 0}
+  .hero .sum{font-size:13.5px}
+  .hero-chips{gap:6px}
+  .hchip{font-size:12px;padding:5px 10px}
+  .hero-fig{width:84px;height:112px;margin:-8px 0}
+  .daybar>.navpair:first-child{order:1}
+  .daybar>.navpair:last-child{order:2;margin-left:auto}
+  .daybar>.week{order:3;flex-basis:100%}
+  .av{width:32px;height:32px;font-size:12px}
+}
+@media (prefers-reduced-motion:reduce){
+  #view.enter *,.hero *,.wd .wdot,.hchip .dot,.closed-day *{animation:none!important}
+  .rdv,.wd,.nav a,.add{transition:none}
+  .rdv:hover,.wd:hover,.add:hover,.nav a:hover{transform:none}
+}
 </style>
 </head>
 <body>
@@ -838,9 +975,11 @@ function schedule(){ if (!raf) raf = requestAnimationFrame(() => { raf = 0; rend
 function renderNav(){
   const c = cfg();
   const who = S.fbUser ? S.fbUser.email : "";
-  const nk = [S.view, S.mode || "", who, c.tarifDefaut, c.telFixe, c.telMobile, c.email, c.adresse].join("|");
+  const nd = [...S.demandes.values()].filter(x => x.date >= TODAY).length;
+  const nk = [S.view, S.mode || "", who, nd, c.tarifDefaut, c.telFixe, c.telMobile, c.email, c.adresse].join("|");
   if (S.navKey === nk) return; S.navKey = nk;
-  const links = ROUTES.map(r => `<a href="#${r}" ${S.view===r?'aria-current="page"':""}>${ic(r)}<span>${TITLES[r]}</span></a>`).join("");
+  const badge = r => r === "agenda" && nd ? `<span class="nbadge" aria-label="${nd} demande${nd>1?"s":""} en ligne">${nd}</span>` : "";
+  const links = ROUTES.map(r => `<a href="#${r}" ${S.view===r?'aria-current="page"':""}>${ic(r)}<span>${TITLES[r]}</span>${badge(r)}</a>`).join("");
   $("#nav").innerHTML = links; $("#tabbar").innerHTML = links;
   const tel = (n, icon) => n ? `<li>${ic(icon)}<a class="tel" href="tel:${esc(n.replace(/[^\d+]/g,""))}">${esc(n)}</a></li>` : "";
   const contact = tel(c.telFixe, "phone") + tel(c.telMobile, "mobile")
@@ -887,6 +1026,7 @@ function render(){
   renderNav(); renderHeader(); renderBanners();
   const v = $("#view");
   const key = S.view + "|" + (S.view === "agenda" ? S.day : S.month);
+  const entering = S.shellKey !== key; // nouvelle page ou nouveau jour (pas une simple mise à jour des données)
   if (S.status === "loading" && !S.patientsReady){ v.innerHTML = `<div class="loading">Chargement des données du cabinet…</div>`; S.shellKey = ""; }
   else if (S.view === "patients"){
     if (S.shellKey !== key){ v.innerHTML = patientsShell(); S.shellKey = key; }
@@ -900,7 +1040,20 @@ function render(){
   }
   if (S.drawer && S.drawer.type === "patient" && S.drawer.id) { const lb = $("#pLive"); if (lb) lb.innerHTML = patientLive(S.drawer.id, D); }
   if (S.drawer && S.drawer.type === "notifs"){ const nb = $("#notifBody"), h = notifsBody(D); if (nb && nb.dataset.h !== h){ nb.innerHTML = h; nb.dataset.h = h; } }
+  if (entering && S.shellKey === key) animateIn(v); else v.classList.remove("enter");
   queueSync();
+}
+// Apparition douce de la page et chiffres qui défilent — seulement en changeant de page ou de jour
+function animateIn(v){
+  v.classList.remove("enter"); void v.offsetWidth; v.classList.add("enter");
+  clearTimeout(S.enterT); S.enterT = setTimeout(() => v.classList.remove("enter"), 900);
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  $$("[data-count]", v).forEach(el => {
+    const to = +el.dataset.count || 0, unit = el.dataset.unit || "", t0 = performance.now();
+    if (!to) return;
+    const step = t => { const k = Math.min(1, (t - t0) / 700); el.textContent = fmt(to * (1 - Math.pow(1 - k, 3))) + unit; if (k < 1 && el.isConnected) requestAnimationFrame(step); };
+    el.textContent = fmt(0) + unit; requestAnimationFrame(step);
+  });
 }
 
 /* ================= Agenda ================= */
@@ -913,6 +1066,49 @@ function slotsFor(day){
   return {open, slots:out, step};
 }
 const active = r => r.statut === "prevu" || r.statut === "effectue";
+const initials = n => String(n || "").trim().split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join("").toUpperCase() || "?";
+const hueOf = s => [...String(s || "")].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) % 360, 7); // couleur stable par patient
+// Le sportif du logo en exercice de rééducation (bras levés, flexion de hanche à 90°) — mêmes animations que l'écran de connexion
+const KINE_FIG = `<svg class="kine" viewBox="140 56 180 248" aria-hidden="true">
+  <circle class="halo" cx="225" cy="178" r="118"/><rect class="mat" x="150" y="287" width="160" height="9" rx="4.5"/>
+  <path class="rom" d="M220 252A56 56 0 0 0 276 196"/><text class="deg" x="284" y="266">90°</text>
+  <g class="lim b" stroke-width="13"><polyline points="220,196 210,240 207,283 194,283"/></g>
+  <g class="armL lim b" stroke-width="11"><polyline points="220,124 197,158 190,192"/></g>
+  <line class="lim t" x1="220" y1="122" x2="220" y2="196" stroke-width="16"/>
+  <g class="thigh lim t" stroke-width="13"><line x1="220" y1="196" x2="232" y2="240"/><g class="shin"><polyline points="232,240 234,283 248,283"/></g></g>
+  <g class="armR lim b" stroke-width="11"><polyline points="220,124 243,158 250,192"/></g>
+  <circle class="head" cx="220" cy="92" r="17"/></svg>`;
+// Bandeau d'accueil : la journée d'aujourd'hui en un coup d'œil
+function agendaHero(D){
+  const c = cfg(), now = new Date(), h = now.getHours(), nowMin = h * 60 + now.getMinutes();
+  const name = String(c.praticien || "").trim();
+  const today = (D.byDay.get(TODAY) || []).filter(active);
+  const next = today.find(r => r.statut === "prevu" && toMin(r.heure) >= nowMin - 10);
+  const p = next && S.patients.get(next.patientId);
+  const nd = [...S.demandes.values()].filter(x => x.date >= TODAY).length;
+  const enc = sum(D.rdv.filter(r => r.reglement && r.reglement.date === TODAY), r => r.reglement.montant) + sum(D.pays.filter(x => x.date === TODAY), x => x.montant);
+  const resume = !slotsFor(TODAY).open && !today.length ? "Le cabinet est fermé aujourd'hui. Bon repos !"
+    : today.length ? `${today.length} rendez-vous aujourd'hui${next ? ` · prochain à ${next.heure}${p ? " avec " + p.nom : ""}` : " · tous passés"}`
+    : "Aucun rendez-vous aujourd'hui pour l'instant.";
+  return `<section class="hero" aria-label="Aujourd'hui">
+    <div class="hero-txt">
+      <p class="hello">${h < 12 ? "Bonjour" : h < 18 ? "Bon après-midi" : "Bonsoir"}${name ? ", " + esc(name) : ""}<span class="ar" lang="ar" dir="rtl">${h < 12 ? "صباح الخير" : "مساء الخير"}</span></p>
+      <p class="sum">${esc(resume)}</p>
+      <div class="hero-chips">
+        ${nd ? `<button type="button" class="hchip hot" data-action="notifs"><i class="dot" aria-hidden="true"></i>${nd} demande${nd>1?"s":""} en ligne à confirmer</button>` : `<span class="hchip">${ic("bell")}Aucune demande en attente</span>`}
+        <span class="hchip">${ic("caisse")}Encaissé aujourd'hui <b data-count="${enc}" data-unit=" DH">${fmtDH(enc)}</b></span>
+      </div>
+    </div>
+    <div class="hero-fig">${KINE_FIG}</div>
+  </section>`;
+}
+function closedDay(day){
+  let nextOpen = null;
+  for (let i = 1; i <= 14 && !nextOpen; i++){ const d = addDays(day, i); if (slotsFor(d).open) nextOpen = d; }
+  return `<div class="empty closed-day"><div class="fig">${KINE_FIG.replace('class="kine"', 'class="kine still"')}</div>
+    <b>Jour de fermeture</b><span>Le cabinet est fermé ce jour. Bon repos !</span>
+    ${nextOpen ? `<button type="button" class="btn primary" data-action="day" data-day="${nextOpen}">Jour ouvert suivant : ${esc(parseYmd(nextOpen).toLocaleDateString("fr-FR",{weekday:"long", day:"numeric"}))} ${ic("right")}</button>` : ""}</div>`;
+}
 function viewAgenda(D){
   const c = cfg(); const day = S.day;
   const {open, slots, step} = slotsFor(day);
@@ -921,16 +1117,19 @@ function viewAgenda(D){
   let week = "";
   for (let i=0;i<7;i++){
     const d = addDays(monday, i); const dd = parseYmd(d);
-    const n = (D.byDay.get(d)||[]).filter(active).length + [...S.demandes.values()].filter(x => x.date === d).length;
+    const dn = [...S.demandes.values()].filter(x => x.date === d).length;
+    const n = (D.byDay.get(d)||[]).filter(active).length + dn;
     const isOpen = (c.joursOuvres||[]).map(Number).includes(dd.getDay());
-    week += `<button class="wd ${d===TODAY?"today":""} ${isOpen?"":"closed"}" aria-pressed="${d===day}" data-action="day" data-day="${d}">
-      <span class="l">${esc(dd.toLocaleDateString("fr-FR",{weekday:"short"}).replace(".",""))}</span><span class="n">${dd.getDate()}</span><span class="c">${n ? n+" rdv" : "—"}</span></button>`;
+    const capa = isOpen ? slotsFor(d).slots.length : 0, load = capa ? Math.min(100, Math.round(n / capa * 100)) : 0; // charge du jour
+    week += `<button class="wd ${d===TODAY?"today":""} ${isOpen?"":"closed"}" aria-pressed="${d===day}" data-action="day" data-day="${d}" aria-label="${esc(dayLabel(d))} : ${n} rendez-vous${dn ? `, ${dn} demande${dn>1?"s":""} en ligne` : ""}">
+      ${dn ? `<span class="wdot" aria-hidden="true"></span>` : ""}<span class="l">${esc(dd.toLocaleDateString("fr-FR",{weekday:"short"}).replace(".",""))}</span><span class="n">${dd.getDate()}</span>
+      <span class="c">${n ? n+" rdv" : isOpen ? "libre" : "fermé"}</span>${isOpen ? `<span class="load" aria-hidden="true"><i style="width:${load}%"></i></span>` : ""}</button>`;
   }
   const prev = list.filter(r => r.statut === "prevu").length, eff = list.filter(r => r.statut === "effectue"), abs = list.filter(r => r.statut === "absent").length;
   const encDay = sum(D.rdv.filter(r => r.reglement && r.reglement.date === day), r => r.reglement.montant) + sum(D.pays.filter(p => p.date === day), p => p.montant);
-  const stats = `<div class="stats">
-    <div><span>Prévus</span><b>${prev}</b></div><div><span>Effectués</span><b>${eff.length}</b></div><div><span>Absents</span><b>${abs}</b></div>
-    <div><span>Réalisé</span><b>${fmtDH(sum(eff, r => r.montant))}</b></div><div><span>Encaissé</span><b>${fmtDH(encDay)}</b></div></div>`;
+  const tile = (cls, icon, label, val, unit) => `<div class="st ${cls}"><span class="si">${ic(icon)}</span><div><span>${label}</span><b data-count="${val}"${unit ? ` data-unit="${unit}"` : ""}>${unit ? fmtDH(val) : val}</b></div></div>`;
+  const stats = `<div class="stats">${tile("st-prev","agenda","Prévus",prev)}${tile("st-eff","check","Effectués",eff.length)}${tile("st-abs","close","Absents",abs)}
+    ${tile("st-real","resultat","Réalisé",sum(eff, r => r.montant)," DH")}${tile("st-enc","caisse","Encaissé",encDay," DH")}</div>`;
   const bySlot = new Map(slots.map(s => [s, []])); const outside = [];
   list.forEach(r => {
     const t = toMin(r.heure); let s = null;
@@ -952,8 +1151,8 @@ function viewAgenda(D){
   });
   const tl = `<section class="tl" aria-label="Rendez-vous du jour">
     <div class="tl-head"><span>${open ? `${slots[0]||""} – ${fromMin(toMin(slots[slots.length-1]||"0:0")+step)} · ${postes} patient${postes>1?"s":""} en parallèle` : "Cabinet fermé ce jour"}</span><span>${list.filter(active).length} rendez-vous</span></div>
-    ${(open || list.length) ? rows : `<div class="empty"><b>Jour de fermeture</b>Choisis un autre jour dans la semaine.</div>`}</section>`;
-  return `<div class="daybar">
+    ${(open || list.length) ? rows : closedDay(day)}</section>`;
+  return `${agendaHero(D)}<div class="daybar">
       <div class="navpair"><button class="btn icon-btn" data-action="day-shift" data-n="-7" aria-label="Semaine précédente">${ic("left")}</button></div>
       <div class="week">${week}</div>
       <div class="navpair"><button class="btn icon-btn" data-action="day-shift" data-n="7" aria-label="Semaine suivante">${ic("right")}</button>
@@ -972,8 +1171,9 @@ function demandeCard([id, x]){
   const wa = waNumber(x.tel), conflit = demandeConflit(x);
   return `<article class="rdv demande">
     <div class="rh"><span class="t">${esc(x.heure)}</span><span class="chip tape">En ligne</span><span class="chip st warn">À confirmer</span></div>
-    <span class="dn">${esc(x.nom)}</span>
-    <div class="mt">${esc([x.tel, x.motif].filter(Boolean).join(" · "))}</div>
+    <div class="pw"><span class="av av-dem" aria-hidden="true">${esc(initials(x.nom))}</span><div class="pwn">
+      <span class="dn">${esc(x.nom)}</span>
+      <div class="mt">${esc([x.tel, x.motif].filter(Boolean).join(" · "))}</div></div></div>
     ${conflit ? `<div class="hw">${esc(conflit)}</div>` : ""}
     <div class="ra"><button class="btn sm ok" data-action="dem-ok" data-id="${esc(id)}" data-write>${ic("check")}Confirmer</button>
       ${wa ? `<a class="btn sm" href="https://wa.me/${wa}" target="_blank" rel="noopener">${ic("chat")}WhatsApp</a>` : ""}
@@ -982,7 +1182,7 @@ function demandeCard([id, x]){
 function demandesBox(){
   const list = [...S.demandes.entries()].filter(([,x]) => x.date >= TODAY).sort((a,b) => (a[1].date + a[1].heure).localeCompare(b[1].date + b[1].heure));
   if (!list.length) return "";
-  return `<section class="box"><h3>Demandes en ligne<span class="chip tape">${list.length}</span></h3><ul class="alist">${list.map(([,x]) => `<li>
+  return `<section class="box box-dem"><h3><span class="bt">${ic("bell")}Demandes en ligne</span><span class="chip tape">${list.length}</span></h3><ul class="alist">${list.map(([,x]) => `<li>
     <div class="r1"><button class="linkish" data-action="day" data-day="${esc(x.date)}">${esc(x.nom)}</button><span class="mono">${esc(dayShort(x.date))} · ${esc(x.heure)}</span></div>
     <div class="r2">${esc(x.tel)}${x.motif ? " · " + esc(x.motif) : ""}</div></li>`).join("")}</ul>
     <button type="button" class="btn sm" data-action="notifs" style="margin-top:10px">${ic("bell")}Tout voir et confirmer</button></section>`;
@@ -1000,8 +1200,9 @@ function rdvCard(r, D){
   }
   return `<article class="rdv s-${r.statut} ${hors?"hors":""}">
     <div class="rh"><span class="t">${esc(r.heure)}</span>${n ? `<span class="sn" title="Séance ${n}${pres?" sur "+pres+" prescrites":""}">S${n}${pres?"/"+pres:""}</span>` : ""}${r.type && r.type !== "Séance" ? `<span class="chip accent">${esc(r.type)}</span>` : ""}${r.enLigne ? `<span class="chip tape">En ligne</span>` : ""}<span class="chip st ${ST_CLASS[r.statut]}">${STATUTS[r.statut]||""}</span></div>
-    <button class="nm" data-action="open-rdv" data-id="${r.id}" data-m="${r.m}">${esc(p ? p.nom : "Patient supprimé")}</button>
-    <div class="mt">${esc([p && p.motif, p && COUV_SHORT[p.couverture]].filter(Boolean).join(" · "))}</div>
+    <div class="pw"><span class="av" style="--h:${hueOf(r.patientId)}" aria-hidden="true">${esc(initials(p ? p.nom : "?"))}</span><div class="pwn">
+      <button class="nm" data-action="open-rdv" data-id="${r.id}" data-m="${r.m}">${esc(p ? p.nom : "Patient supprimé")}</button>
+      <div class="mt">${esc([p && p.motif, p && COUV_SHORT[p.couverture]].filter(Boolean).join(" · "))}</div></div></div>
     ${hors ? `<div class="hw">Hors ordonnance : non remboursable</div>` : ""}
     ${acts ? `<div class="ra">${acts}</div>` : ""}</article>`;
 }
@@ -1018,7 +1219,7 @@ function reminderText(r, p, when){
 function remindersBox(D){
   let target = null;
   for (let i=1;i<=7;i++){ const d = addDays(TODAY, i); if ((D.byDay.get(d)||[]).some(r => r.statut === "prevu")){ target = d; break; } }
-  if (!target) return `<section class="box"><h3>Rappels</h3><p class="hint">Aucun rendez-vous prévu dans les 7 prochains jours.</p></section>`;
+  if (!target) return `<section class="box box-wa"><h3><span class="bt">${ic("chat")}Rappels</span></h3><p class="hint">Aucun rendez-vous prévu dans les 7 prochains jours.</p></section>`;
   const when = target === addDays(TODAY,1) ? "demain" : "le " + parseYmd(target).toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
   const rs = (D.byDay.get(target)||[]).filter(r => r.statut === "prevu");
   const items = rs.map(r => {
@@ -1027,7 +1228,7 @@ function remindersBox(D){
     return `<li><div class="r1"><button class="linkish" data-action="open-patient" data-id="${esc(r.patientId)}">${esc(p ? p.nom : "Patient supprimé")}</button><span class="mono">${esc(r.heure)}</span></div>
       <div class="r2"><span class="mono">${esc(p && p.tel || "")}</span>${link}</div></li>`;
   }).join("");
-  return `<section class="box"><h3>Rappels · ${esc(cap(when))}<span class="chip">${rs.length}</span></h3><ul class="alist">${items}</ul>
+  return `<section class="box box-wa"><h3><span class="bt">${ic("chat")}Rappels · ${esc(cap(when))}</span><span class="chip">${rs.length}</span></h3><ul class="alist">${items}</ul>
     <p class="hint" style="margin-top:10px">Le lien ouvre WhatsApp avec le message prêt. Vérifie qu'il est bien parti.</p></section>`;
 }
 function followBox(D){
@@ -1038,7 +1239,7 @@ function followBox(D){
     return `<li><div class="r1"><button class="linkish" data-action="open-patient" data-id="${esc(pid)}">${esc(p.nom)}</button><span class="mono">${st.eff}/${st.pres}</span></div>
       <div class="r2">${st.alerts.map(a => `<span class="chip ${a.c}">${esc(a.t)}</span>`).join("")}</div></li>`; }).join("");
   if (!S.patients.size) return `<section class="box"><h3>Premiers pas</h3><p class="hint">Ajoute un patient avec son ordonnance (nombre de séances prescrites), puis planifie sa série de séances depuis un créneau.</p></section>`;
-  return `<section class="box"><h3>Suivi des ordonnances${rows.length?`<span class="chip">${rows.length}</span>`:""}</h3>${items ? `<ul class="alist">${items}</ul>` : `<p class="hint">Aucune ordonnance à renouveler ni feuille de soins en attente.</p>`}</section>`;
+  return `<section class="box box-ordo"><h3><span class="bt">${ic("charges")}Suivi des ordonnances</span>${rows.length?`<span class="chip">${rows.length}</span>`:""}</h3>${items ? `<ul class="alist">${items}</ul>` : `<p class="hint">Aucune ordonnance à renouveler ni feuille de soins en attente.</p>`}</section>`;
 }
 
 /* ================= Patients ================= */
@@ -1063,7 +1264,7 @@ function patientsList(D){
       const over = pres && st.eff + st.plan > pres;
       const solde = st.solde > 0.5 ? `<b style="color:var(--bad)">${fmtDH(st.solde)}</b><small class="muted">à encaisser</small>` : st.solde < -0.5 ? `<b>${fmtDH(-st.solde)}</b><small class="muted">d'avance</small>` : `<b class="muted">0 DH</b>`;
       return `<button class="prow" data-action="open-patient" data-id="${esc(id)}">
-        <span class="pn"><b>${esc(p.nom)}</b><span class="tags">${p.couverture?`<span class="chip">${esc(COUV_SHORT[p.couverture]||p.couverture)}</span>`:""}${st.done?`<span class="chip good">Traitement terminé</span>`:""}${st.alerts.map(a => `<span class="chip ${a.c}">${esc(a.t)}</span>`).join("")}${p.exemple?`<span class="chip ex">Exemple</span>`:""}</span></span>
+        <span class="pcell"><span class="av" style="--h:${hueOf(id)}" aria-hidden="true">${esc(initials(p.nom))}</span><span class="pn"><b>${esc(p.nom)}</b><span class="tags">${p.couverture?`<span class="chip">${esc(COUV_SHORT[p.couverture]||p.couverture)}</span>`:""}${st.done?`<span class="chip good">Traitement terminé</span>`:""}${st.alerts.map(a => `<span class="chip ${a.c}">${esc(a.t)}</span>`).join("")}${p.exemple?`<span class="chip ex">Exemple</span>`:""}</span></span></span>
         <span class="pn pmot"><small>${esc(p.motif||"Motif non renseigné")}</small><small>${p.dateOrdonnance?"Ordonnance du "+esc(dayShort(p.dateOrdonnance)):""}${p.prescripteur?" · "+esc(p.prescripteur):""}</small></span>
         <span class="prog"><span class="bar" aria-hidden="true"><i style="width:${w1}%"></i><i class="plan ${over?"over":""}" style="width:${w2}%"></i></span>
           <span>${st.eff} faite${st.eff>1?"s":""}${st.plan?` + ${st.plan} prévue${st.plan>1?"s":""}`:""}${pres?` / ${pres}`:""}${st.next?` · prochaine ${esc(dayShort(st.next.date))}`:""}</span></span>
