@@ -554,10 +554,29 @@ button.hchip:hover{background:rgba(255,255,255,.22)}
 .slot>time{font-size:13px;color:var(--ink-2)}
 .slot.now{box-shadow:inset 4px 0 0 var(--tape);background:color-mix(in srgb,var(--tape) 6%,transparent)}
 .slot.now>time::after{content:"Maintenant";display:block;width:max-content;margin-top:5px;padding:1px 7px;border-radius:999px;background:var(--tape);color:var(--surface);font:700 10px var(--f-body);letter-spacing:.02em}
-.cards{align-items:start}
-.add{border-color:color-mix(in srgb,var(--line-strong) 70%,transparent);opacity:.75;border-radius:12px;min-height:44px}
+.cards{align-items:start;padding-top:5px;padding-bottom:5px}
+.slot>time{padding-top:10px}
+.add{border-color:color-mix(in srgb,var(--line-strong) 70%,transparent);opacity:.75;border-radius:12px;min-height:36px}
 .add:hover{opacity:1;transform:translateY(-1px)}
-.rdv{--sc:var(--logo-blue);position:relative;border-radius:14px;padding:9px 11px 10px 14px;gap:6px;box-shadow:inset 4px 0 0 var(--sc),0 1px 2px rgba(27,47,78,.05);transition:transform .15s,box-shadow .15s}
+/* créneaux libres regroupés : une ligne, des petits boutons d'heure */
+.frees{display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:5px 8px 5px 0;min-width:0}
+.frees .fl{font-size:12px;font-weight:600;color:var(--muted);margin-right:4px}
+.add.fc{min-height:30px;padding:0 10px;border-radius:999px;font:500 12px var(--f-mono);opacity:.85}
+.add.fc.cur{border-style:solid;border-color:var(--tape);color:var(--tape);opacity:1}
+.slot.free>time{padding-top:11px}
+.rdv{--sc:var(--logo-blue);position:relative;border-radius:14px;padding:7px 10px 8px 13px;gap:4px;box-shadow:inset 4px 0 0 var(--sc),0 1px 2px rgba(27,47,78,.05);transition:transform .15s,box-shadow .15s}
+.rdv .av{width:30px;height:30px;font-size:12px}
+.rdv .nm{font-size:14px}
+/* carte compacte : le patient à gauche, étiquettes et boutons à droite ; les boutons passent dessous si la place manque */
+.rdv{flex-direction:row;flex-wrap:wrap;align-items:center;column-gap:12px;row-gap:5px}
+.rdv>.pw{flex:1 1 200px;min-width:0;order:-1}
+.rdv>.rh{justify-content:flex-end}
+.rdv>.ra{margin-top:0}
+.rdv>.hw{flex-basis:100%}
+.rdv .mt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cards{grid-template-columns:minmax(0,1fr);gap:5px}
+.cards>.add{justify-self:start;min-height:30px;padding:0 12px;border-radius:999px;font:500 12px var(--f-mono)}
+@media (max-width:640px){ .rdv>.pw{flex-basis:150px} }
 .rdv:hover{transform:translateY(-2px);box-shadow:inset 4px 0 0 var(--sc),0 8px 20px rgba(27,47,78,.1)}
 .rdv.s-effectue{--sc:var(--good)} .rdv.s-absent{--sc:var(--bad)} .rdv.s-annule{--sc:var(--line-strong)} .rdv.demande{--sc:var(--tape)}
 .pw{display:flex;gap:10px;align-items:center;min-width:0}
@@ -1167,15 +1186,27 @@ function viewAgenda(D){
   for (const [id, x] of S.demandes) if (x.date === day) push(dems, bySlot.has(x.heure) ? x.heure : "", [id, x]);
   const postes = Math.max(1, +c.postes || 1);
   const nowMin = new Date().getHours()*60 + new Date().getMinutes();
+  const nowSlot = day === TODAY ? slots.find(s => nowMin >= toMin(s) && nowMin < toMin(s) + step) : null;
   let rows = "";
   const outDems = dems.get("") || [];
-  if (outside.length || outDems.length) rows += `<div class="slot"><time>Hors<br>horaire</time><div class="cards" style="--postes:${postes}">${outside.map(r => rdvCard(r, D)).join("")}${outDems.map(demandeCard).join("")}</div></div>`;
+  if (outside.length || outDems.length) rows += `<div class="slot"><time>Hors<br>horaire</time><div class="cards" style="--postes:${postes}">${outside.map(r => rdvCard(r, D)).join("")}${outDems.map(x => demandeCard(x)).join("")}</div></div>`;
+  // Les créneaux vides qui se suivent tiennent sur une seule ligne compacte : un petit bouton par créneau pour y ajouter un rendez-vous
+  let free = [];
+  const flush = () => {
+    if (!free.length) return;
+    const end = fromMin(toMin(free[free.length-1]) + step);
+    rows += `<div class="slot free ${free[0]===nowSlot?"now":""}"><time>${free[0]}</time><div class="frees"><span class="fl">Libre jusqu'à ${end}</span>${free.map(s =>
+      `<button class="add fc ${s===nowSlot?"cur":""}" data-action="new-rdv" data-date="${day}" data-time="${s}" data-write aria-label="Ajouter un rendez-vous à ${s}">+ ${s}</button>`).join("")}</div></div>`;
+    free = [];
+  };
   slots.forEach(s => {
     const rs = bySlot.get(s); const ds = dems.get(s) || []; const used = rs.filter(active).length + ds.length;
-    const isNow = day === TODAY && nowMin >= toMin(s) && nowMin < toMin(s) + step;
+    if (!rs.length && !ds.length){ if (s === nowSlot) flush(); free.push(s); return; }
+    flush();
     const addBtn = used < postes ? `<button class="add" data-action="new-rdv" data-date="${day}" data-time="${s}" data-write aria-label="Ajouter un rendez-vous à ${s}">+ ${s}</button>` : "";
-    rows += `<div class="slot ${isNow?"now":""}"><time>${s}</time><div class="cards" style="--postes:${postes}">${rs.map(r => rdvCard(r, D)).join("")}${ds.map(demandeCard).join("")}${addBtn}</div></div>`;
+    rows += `<div class="slot ${s===nowSlot?"now":""}"><time>${s}</time><div class="cards" style="--postes:${postes}">${rs.map(r => rdvCard(r, D, s)).join("")}${ds.map(x => demandeCard(x, s)).join("")}${addBtn}</div></div>`;
   });
+  flush();
   const tl = `<section class="tl" aria-label="Rendez-vous du jour">
     <div class="tl-head"><span>${open ? `${slots[0]||""} – ${fromMin(toMin(slots[slots.length-1]||"0:0")+step)} · ${postes} patient${postes>1?"s":""} en parallèle` : "Cabinet fermé ce jour"}</span><span>${list.filter(active).length} rendez-vous</span></div>
     ${(open || list.length) ? rows : closedDay(day)}</section>`;
@@ -1194,10 +1225,11 @@ function demandeConflit(x){
   const same = [...S.demandes.values()].filter(y => y.date === x.date && y.heure === x.heure).length;
   return busy ? "Créneau déjà pris dans l'agenda" : same > 1 ? `${same} demandes pour ce créneau` : "";
 }
-function demandeCard([id, x]){
+// slot : heure de la ligne de l'agenda ; l'heure n'est répétée dans la carte que si elle en diffère
+function demandeCard([id, x], slot){
   const wa = waNumber(x.tel), conflit = demandeConflit(x);
   return `<article class="rdv demande">
-    <div class="rh"><span class="t">${esc(x.heure)}</span><span class="chip tape">En ligne</span><span class="chip st warn">À confirmer</span></div>
+    <div class="rh">${x.heure !== slot ? `<span class="t">${esc(x.heure)}</span>` : ""}<span class="chip tape">En ligne</span><span class="chip st warn">À confirmer</span></div>
     <div class="pw"><span class="av av-dem" aria-hidden="true">${esc(initials(x.nom))}</span><div class="pwn">
       <span class="dn">${esc(x.nom)}</span>
       <div class="mt">${esc([x.tel, x.motif].filter(Boolean).join(" · "))}</div></div></div>
@@ -1214,7 +1246,7 @@ function demandesBox(){
     <div class="r2">${esc(x.tel)}${x.motif ? " · " + esc(x.motif) : ""}</div></li>`).join("")}</ul>
     <button type="button" class="btn sm" data-action="notifs" style="margin-top:10px">${ic("bell")}Tout voir et confirmer</button></section>`;
 }
-function rdvCard(r, D){
+function rdvCard(r, D, slot){
   const p = S.patients.get(r.patientId); const st = D.pstats.get(r.patientId);
   const n = st && st.num.get(r.id); const pres = st ? st.pres : 0;
   const hors = n && pres && n > pres;
@@ -1226,7 +1258,7 @@ function rdvCard(r, D){
     else acts = `<button class="btn sm" data-action="rdv-pay" data-id="${r.id}" data-m="${r.m}" data-write>Encaisser ${fmtDH(r.montant)}</button>`;
   }
   return `<article class="rdv s-${r.statut} ${hors?"hors":""}">
-    <div class="rh"><span class="t">${esc(r.heure)}</span>${n ? `<span class="sn" title="Séance ${n}${pres?" sur "+pres+" prescrites":""}">S${n}${pres?"/"+pres:""}</span>` : ""}${r.type && r.type !== "Séance" ? `<span class="chip accent">${esc(r.type)}</span>` : ""}${r.enLigne ? `<span class="chip tape">En ligne</span>` : ""}${r.deplaceParPatient ? `<span class="chip tape" title="Déplacé par le patient avec son lien">Déplacé par le patient</span>` : ""}<span class="chip st ${ST_CLASS[r.statut]}">${STATUTS[r.statut]||""}</span></div>
+    <div class="rh">${r.heure !== slot ? `<span class="t">${esc(r.heure)}</span>` : ""}${n ? `<span class="sn" title="Séance ${n}${pres?" sur "+pres+" prescrites":""}">S${n}${pres?"/"+pres:""}</span>` : ""}${r.type && r.type !== "Séance" ? `<span class="chip accent">${esc(r.type)}</span>` : ""}${r.enLigne ? `<span class="chip tape">En ligne</span>` : ""}${r.deplaceParPatient ? `<span class="chip tape" title="Déplacé par le patient avec son lien">Déplacé par le patient</span>` : ""}<span class="chip st ${ST_CLASS[r.statut]}">${STATUTS[r.statut]||""}</span></div>
     <div class="pw"><span class="av" style="--h:${hueOf(r.patientId)}" aria-hidden="true">${esc(initials(p ? p.nom : "?"))}</span><div class="pwn">
       <button class="nm" data-action="open-rdv" data-id="${r.id}" data-m="${r.m}">${esc(p ? p.nom : "Patient supprimé")}</button>
       <div class="mt">${esc([p && p.motif, p && COUV_SHORT[p.couverture]].filter(Boolean).join(" · "))}</div></div></div>
