@@ -43,6 +43,27 @@ service cloud.firestore {
       allow read: if true;
       allow write: if cabinet();
     }
+    // ---------- Lien personnel du patient (rdv.html#g=…) : changer ou annuler lui-même son rendez-vous ----------
+    // Lecture avec la clé secrète du lien seulement (pas de liste). Le patient ne touche qu'à la date, l'heure ou
+    // l'annulation, pas le jour même, et seulement vers un créneau libre ; l'application du cabinet applique ensuite.
+    match /gestion/{token} {
+      allow get: if token.size() >= 20;
+      allow list, create, delete: if cabinet();
+      allow update: if cabinet() || (
+        resource.data.statut == 'confirme'
+        && timestamp.date(int(resource.data.date[0:4]), int(resource.data.date[5:7]), int(resource.data.date[8:10])) > request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['date', 'heure', 'statut', 'par', 'maj', 'avant'])
+        && request.resource.data.par == 'patient' && request.resource.data.maj == request.time
+        && request.resource.data.avant == {'date': resource.data.date, 'heure': resource.data.heure}
+        && (
+          (request.resource.data.statut == 'annule'
+            && request.resource.data.date == resource.data.date && request.resource.data.heure == resource.data.heure)
+          || (request.resource.data.statut == 'confirme' && agendaPublic().actif == true
+            && jourReservable(request.resource.data.date)
+            && request.resource.data.heure is string && request.resource.data.heure.matches('^[0-2][0-9]:[0-5][0-9]$')
+            && creneauLibre(request.resource.data.date, request.resource.data.heure))
+        ));
+    }
     match /verrous/{id} { // anciennes demandes qui bloquaient le créneau : le cabinet les retire en les traitant
       allow read, delete: if cabinet();
     }

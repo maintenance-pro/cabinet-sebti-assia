@@ -82,6 +82,16 @@ h1 .ar{font-size:18px;color:var(--tape)}
 .cd[aria-pressed="true"]{background:linear-gradient(160deg,#13826D,#0D6858);border-color:transparent;color:#fff;box-shadow:0 6px 14px rgba(19,130,109,.3)}
 .cd[aria-pressed="true"] .dn{color:#fff}
 .hint-card{border-style:dashed;text-align:center}
+.mine{border-top:3px solid var(--accent);display:flex;flex-direction:column;gap:10px}
+.mine .step{margin:0}
+.when2{margin:0;font-family:var(--f-display);font-weight:700;font-size:25px;line-height:1.15;color:var(--accent-ink)}
+.when2.barre{text-decoration:line-through;color:var(--muted)}
+.acts{display:flex;flex-wrap:wrap;gap:8px}
+.btn.danger{border-color:var(--bad);color:var(--bad)}
+.lnk{all:unset;cursor:pointer;margin-left:auto;font-family:var(--f-body);font-size:13px;font-weight:600;color:var(--accent-ink)}
+.lnk:hover{text-decoration:underline}
+.slot.own:disabled{border-color:var(--tape);background:var(--tape-soft);color:var(--tape);cursor:default;opacity:1}
+.slot.own:disabled b{text-decoration:none}
 @media (max-width:440px){ .cal-grid{gap:4px} .cd{height:48px;border-radius:10px} .cd .dn{font-size:16px} .cd .fr .w{display:none} }
 .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
 .slot{border:1.5px solid var(--accent);background:var(--surface);color:var(--accent-ink);border-radius:10px;padding:8px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;min-height:56px;justify-content:center}
@@ -150,8 +160,8 @@ input[type=text],input[type=tel]{border:1px solid var(--line-strong);background:
     <div class="ar" lang="ar" dir="rtl">عيادة الترويض الطبي <b>السبتي أسية</b></div>
   </header>
   <div>
-    <h1>Prendre rendez-vous <span class="ar" lang="ar" dir="rtl">حجز موعد</span></h1>
-    <p class="lead">Choisissez un jour puis un créneau libre, et envoyez votre demande : le cabinet vous confirmera le rendez-vous. Les créneaux déjà pris sont grisés.</p>
+    <h1><span id="h1t">Prendre rendez-vous</span> <span class="ar" id="h1ar" lang="ar" dir="rtl">حجز موعد</span></h1>
+    <p class="lead" id="lead">Choisissez un jour puis un créneau libre, et envoyez votre demande : le cabinet vous confirmera le rendez-vous. Les créneaux déjà pris sont grisés.</p>
   </div>
   <div id="app"><p class="hint center">Chargement des créneaux…</p></div>
   <footer class="card contact" id="contact" hidden></footer>
@@ -253,6 +263,7 @@ function render(){
   renderContact();
   if (P.err){ app.innerHTML = `<p class="err">${esc(P.err)}</p>`; return; }
   if (!P.ready.ag){ app.innerHTML = `<p class="hint center">Chargement des créneaux…</p>`; return; }
+  if (P.g) return renderGestion(app);
   if (!P.ag || !P.ag.actif){ app.innerHTML = `<div class="card"><p><b>La réservation en ligne n'est pas ouverte pour le moment.</b></p><p class="hint">Appelez le cabinet pour prendre rendez-vous.</p></div>`; return; }
   if (P.done){
     app.innerHTML = `<div class="card done"><div class="tick">${TICK}</div><h2>Demande envoyée</h2>
@@ -271,14 +282,7 @@ function render(){
   if (P.slot && !P.sending && (taken(P.day, P.slot) || tooSoon(P.day, P.slot))){ P.slot = null; P.msg = "Ce créneau vient d'être confirmé pour un autre patient : choisissez-en un autre."; }
   const cal = `<section class="card"><h2 class="step">1. Choisissez un jour</h2>${calendar()}</section>`;
   if (!P.day){ app.innerHTML = cal + `<section class="card hint-card" id="hours"><p class="hint">Touchez un jour du calendrier : les heures libres de ce jour s'afficheront ici.</p></section>`; return; }
-  const {slots, step} = slotsFor(P.day);
-  const shown = slots.filter(s => !tooSoon(P.day, s));
-  app.innerHTML = `${cal}
-    <section class="card" id="hours"><h2 class="step">2. Choisissez l'heure <small>${esc(dayLong(P.day))} · séance de ${step} min</small></h2>
-      ${P.msg && !P.slot ? `<p class="err" role="alert" style="margin-bottom:10px">${esc(P.msg)}</p>` : ""}
-      <div class="slots">${shown.map(s => { const t = taken(P.day, s);
-        return `<button class="slot" data-slot="${s}" aria-pressed="${s === P.slot}" ${t ? "disabled" : ""} aria-label="${s}, ${t ? "occupé" : "libre"}"><b>${s}</b><small>${t ? "Occupé" : "Libre"}</small></button>`; }).join("")}</div>
-      <div class="legend"><span><i></i>Libre</span><span><i class="x"></i>Occupé : déjà confirmé pour un autre patient</span></div></section>
+  app.innerHTML = `${cal}${hoursSection()}
     ${P.slot ? `<section class="card"><h2 class="step">3. Vos coordonnées</h2>
       <form id="fResa" class="form" novalidate>
         <p class="sum">Rendez-vous <b>${esc(dayLong(P.day))} à ${esc(P.slot)}</b></p>
@@ -294,6 +298,78 @@ function render(){
   for (const [id, v] of Object.entries(keep)){ const el = $("#"+id); if (el) el.value = v; }
   if ($("#fOk")) $("#fOk").checked = okc;
   if (focusId && $("#"+focusId)){ const el = $("#"+focusId); el.focus(); if (typeof sel === "number" && el.setSelectionRange) try { el.setSelectionRange(sel, sel); } catch(e){} }
+}
+
+// Heures du jour choisi ; « mine » = rendez-vous actuel du patient (lien personnel), affiché « Le vôtre »
+function hoursSection(mine){
+  const {slots, step} = slotsFor(P.day);
+  const shown = slots.filter(s => !tooSoon(P.day, s));
+  return `<section class="card" id="hours"><h2 class="step">${mine ? "2. Nouvelle heure" : "2. Choisissez l'heure"} <small>${esc(dayLong(P.day))} · séance de ${step} min</small></h2>
+      ${P.msg && !P.slot ? `<p class="err" role="alert" style="margin-bottom:10px">${esc(P.msg)}</p>` : ""}
+      <div class="slots">${shown.map(s => { const own = mine && mine.date === P.day && mine.heure === s, t = taken(P.day, s);
+        return `<button class="slot ${own ? "own" : ""}" data-slot="${s}" aria-pressed="${s === P.slot}" ${t || own ? "disabled" : ""} aria-label="${s}, ${own ? "votre rendez-vous actuel" : t ? "occupé" : "libre"}"><b>${s}</b><small>${own ? "Le vôtre" : t ? "Occupé" : "Libre"}</small></button>`; }).join("")}</div>
+      <div class="legend"><span><i></i>Libre</span><span><i class="x"></i>Occupé : déjà confirmé pour un autre patient</span></div></section>`;
+}
+
+/* ---------- Lien personnel (rdv.html#g=…) : le patient change ou annule lui-même son rendez-vous ---------- */
+// Le cabinet est prévenu et son agenda se met à jour tout seul. Pas de changement en ligne le jour même.
+function renderGestion(app){
+  const g = P.g, d = g.data, err = m => m ? `<p class="err" role="alert">${esc(m)}</p>` : "";
+  if (!g.loaded){ app.innerHTML = `<p class="hint center">Chargement de votre rendez-vous…</p>`; return; }
+  if (!d){ app.innerHTML = `<div class="card"><p><b>Ce lien de rendez-vous n'est plus valable.</b></p><p class="hint">Appelez le cabinet pour toute question sur votre rendez-vous.</p></div>`; return; }
+  const when = `${dayLong(d.date)} à ${d.heure}`, c = d.changement || {};
+  const editable = d.statut === "confirme" && d.date > TODAY;
+  if (g.done){
+    const annule = g.done === "annule";
+    app.innerHTML = `<div class="card done"><div class="tick">${TICK}</div><h2>${annule ? "Rendez-vous annulé" : "Rendez-vous déplacé"}</h2>
+      ${annule ? "" : `<p class="when">${esc(when)}</p>`}
+      <p>Le cabinet est prévenu automatiquement.${annule ? " Vous pouvez reprendre rendez-vous quand vous voulez." : ""}</p>
+      <p class="ar" lang="ar" dir="rtl">${annule ? "تم إلغاء موعدك، وتم إخبار العيادة." : "تم تغيير موعدك، وتم إخبار العيادة."}</p>
+      ${annule ? `<a class="btn" href="rdv.html">Prendre un nouveau rendez-vous</a>` : `<button class="btn" data-act="g-back">Voir mon rendez-vous</button>`}</div>`;
+    return;
+  }
+  let html = `<section class="card mine"><h2 class="step">Votre rendez-vous${d.nom ? ` <small>Bonjour ${esc(d.nom)}</small>` : ""}</h2>
+    <p class="when2 ${d.statut === "annule" ? "barre" : ""}">${esc(when)}</p>
+    <p class="hint">Séance de ${esc(d.duree || 30)} min · Cabinet de kinésithérapie Sebti Assia</p>
+    ${d.statut === "annule" ? `<p class="err">Ce rendez-vous est annulé.</p><a class="btn" href="rdv.html">Prendre un nouveau rendez-vous</a>` : ""}
+    ${d.statut === "effectue" ? `<p class="sum">Séance effectuée. Merci de votre visite !</p>` : ""}
+    ${c.type === "refuse" && d.statut === "confirme" ? err(`Le créneau que vous aviez choisi (${dayLong(c.vers.date)} à ${c.vers.heure}) venait d'être pris : votre rendez-vous reste ${when}. Le cabinet va vous contacter.`) : ""}
+    ${d.par === "patient" ? `<p class="sum">Changement enregistré : le cabinet est prévenu.</p>` : ""}
+    ${d.statut === "confirme" && !editable ? `<p class="hint">Le rendez-vous est aujourd'hui : pour un changement, appelez le cabinet.</p>` : ""}
+    ${editable && !g.changing ? (g.confirmCancel
+      ? `<p class="sum">Annuler définitivement ce rendez-vous ?</p><div class="acts"><button class="btn danger" data-act="g-cancel-yes" ${P.sending ? "disabled" : ""}>${P.sending ? "Annulation…" : "Oui, annuler"}</button><button class="btn" data-act="g-cancel-no">Non, le garder</button></div>`
+      : `<div class="acts"><button class="btn primary" data-act="g-change">Changer la date ou l'heure</button><button class="btn" data-act="g-cancel">Annuler le rendez-vous</button></div>`) : ""}
+    ${!g.changing ? err(P.msg) : ""}</section>`;
+  if (editable && g.changing){
+    if (!P.ag || !P.ag.actif) html += `<div class="card"><p class="hint">Le changement en ligne n'est pas disponible pour le moment : appelez le cabinet.</p></div>`;
+    else if (!P.ready.occ) html += `<p class="hint center">Chargement des créneaux…</p>`;
+    else {
+      if (!monthsInRange().includes(P.month)) P.month = TODAY.slice(0, 7);
+      if (P.day && !dayInfo(P.day).inRange){ P.day = null; P.slot = null; }
+      if (P.slot && !P.sending && (taken(P.day, P.slot) || tooSoon(P.day, P.slot))){ P.slot = null; P.msg = "Ce créneau vient d'être confirmé pour un autre patient : choisissez-en un autre."; }
+      html += `<section class="card" id="cal"><h2 class="step">1. Nouveau jour <button type="button" class="lnk" data-act="g-stop">Ne rien changer</button></h2>${calendar()}</section>`
+        + (P.day ? hoursSection(d) : `<section class="card hint-card" id="hours"><p class="hint">Touchez un jour du calendrier : les heures libres s'afficheront ici.</p></section>`)
+        + (P.slot ? `<section class="card" id="gConfirm"><h2 class="step">3. Confirmer le changement</h2>
+            <p class="sum">${esc(when)} → <b>${esc(dayLong(P.day))} à ${esc(P.slot)}</b></p>${err(P.msg)}
+            <button type="button" class="btn primary" data-act="g-move" ${P.sending ? "disabled" : ""}>${P.sending ? "Enregistrement…" : "Déplacer mon rendez-vous"}</button></section>` : "");
+    }
+  }
+  app.innerHTML = html;
+}
+async function gUpdate(fields, done){
+  const d = P.g.data;
+  P.sending = true; P.msg = ""; render();
+  try {
+    const up = P.db.doc("gestion/" + P.g.token).update(Object.assign({par:"patient", maj:firebase.firestore.FieldValue.serverTimestamp(), avant:{date:d.date, heure:d.heure}}, fields));
+    await Promise.race([up, new Promise((_, ko) => setTimeout(() => ko({code:"timeout"}), 20000))]);
+    Object.assign(P.g, {done, changing:false, confirmCancel:false}); P.day = null; P.slot = null;
+  } catch(e){
+    console.error(e);
+    if (e.code === "permission-denied") P.slot = null;
+    P.msg = e.code === "permission-denied" ? (done === "annule" ? "L'annulation en ligne n'est plus possible : appelez le cabinet." : "Ce créneau n'est plus disponible, ou le changement n'est plus possible en ligne : choisissez un autre créneau ou appelez le cabinet.")
+      : e.code === "timeout" ? "La connexion est trop lente : vérifiez internet puis réessayez." : "Le changement n'a pas abouti. Réessayez ou appelez le cabinet.";
+  }
+  P.sending = false; render(); window.scrollTo({top:0, behavior:"smooth"});
 }
 
 async function submit(){
@@ -324,18 +400,37 @@ document.addEventListener("click", e => {
   const mo = e.target.closest("[data-mo]");
   if (mo && !mo.disabled){ const ms = monthsInRange(), i = ms.indexOf(P.month) + +mo.dataset.mo; if (ms[i]){ P.month = ms[i]; render(); } }
   else if (d && !d.disabled){ P.day = d.dataset.day; P.slot = null; P.msg = ""; render(); const h = $("#hours"); if (h) h.scrollIntoView({behavior:"smooth", block:"start"}); }
-  else if (s && !s.disabled){ P.slot = s.dataset.slot; P.msg = ""; render(); const f = $("#fResa"); if (f) f.scrollIntoView({behavior:"smooth", block:"start"}); }
-  else if (a && a.dataset.act === "again"){ P.done = null; P.msg = ""; render(); }
+  else if (s && !s.disabled){ P.slot = s.dataset.slot; P.msg = ""; render(); const f = $("#fResa") || $("#gConfirm"); if (f) f.scrollIntoView({behavior:"smooth", block:"start"}); }
+  else if (a){
+    const act = a.dataset.act, g = P.g;
+    if (act === "again"){ P.done = null; P.msg = ""; render(); }
+    else if (!g || P.sending) return;
+    else if (act === "g-change"){ Object.assign(g, {changing:true, confirmCancel:false}); P.day = null; P.slot = null; P.msg = ""; render(); const c = $("#cal"); if (c) c.scrollIntoView({behavior:"smooth", block:"start"}); }
+    else if (act === "g-stop"){ g.changing = false; P.day = null; P.slot = null; P.msg = ""; render(); }
+    else if (act === "g-cancel"){ g.confirmCancel = true; P.msg = ""; render(); }
+    else if (act === "g-cancel-no"){ g.confirmCancel = false; render(); }
+    else if (act === "g-cancel-yes") gUpdate({statut:"annule"}, "annule");
+    else if (act === "g-move" && P.day && P.slot) gUpdate({date:P.day, heure:P.slot}, "deplace");
+    else if (act === "g-back"){ g.done = null; render(); }
+  }
 });
 document.addEventListener("submit", e => { if (e.target.id === "fResa"){ e.preventDefault(); if (!P.sending) submit(); } });
 setInterval(render, 60000); // les créneaux trop proches disparaissent au fil de la journée
 
 (async function init(){
+  const gm = /^#g=([\w-]{20,})$/.exec(location.hash); // lien personnel envoyé par le cabinet
+  if (gm){
+    P.g = {token:gm[1], data:null, loaded:false, changing:false, confirmCancel:false, done:null};
+    $("#h1t").textContent = "Mon rendez-vous"; $("#h1ar").textContent = "موعدي";
+    $("#lead").textContent = "Changez la date ou l'heure de votre rendez-vous, ou annulez-le : le cabinet est prévenu automatiquement.";
+  }
   try { for (const src of SDK) await loadScript(src); }
   catch(e){ P.err = "Impossible de charger la page. Vérifiez la connexion internet puis rechargez."; return render(); }
   firebase.initializeApp(FIREBASE_CONFIG);
   P.db = firebase.firestore();
   const fail = e => { console.error(e); P.err = "Impossible de charger les créneaux. Vérifiez la connexion internet puis rechargez la page."; render(); };
+  if (P.g) P.db.doc("gestion/" + P.g.token).onSnapshot(s => { P.g.data = s.exists ? s.data() : null; P.g.loaded = true; render(); },
+    e => { console.error(e); P.g.data = null; P.g.loaded = true; render(); });
   P.db.doc("public/agenda").onSnapshot(snap => {
     P.ag = snap.exists ? snap.data() : null; P.ready.ag = true;
     if (P.ag && !P.subbed){

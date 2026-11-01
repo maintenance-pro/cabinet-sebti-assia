@@ -586,6 +586,8 @@ button.hchip:hover{background:rgba(255,255,255,.22)}
 .box-wa{--bc:var(--good)}
 .box-ordo{--bc:var(--logo-blue)}
 .box-app{--bc:var(--accent)}
+.glink{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:12px;background:var(--accent-soft)}
+.glink .btn{align-self:flex-start}
 
 /* installer l'application */
 .install-btn{width:100%;justify-content:flex-start;border-style:dashed;border-color:color-mix(in srgb,var(--accent) 50%,transparent);color:var(--accent-ink);background:var(--accent-soft)}
@@ -803,6 +805,7 @@ const S = {
   db:null, user:null, canWrite:null, readonly:false,
   fdb:null, fbAuth:null, fbUser:null, gate:null, started:false, legacy:null, verifySent:false, leaving:false, qr:null, lier:null,
   demandes:new Map(), demLoaded:false, occ:new Map(), occLoaded:false, pub:null, pubLoaded:false, syncT:0,
+  gestion:new Map(), gestLoaded:false, chgSeen:new Set(), applying:new Set(),
   status:"loading", loadTimer:null, lostMsg:"",
   config:null, patients:new Map(), patientsReady:false,
   months:new Map(),
@@ -993,11 +996,11 @@ function schedule(){ if (!raf) raf = requestAnimationFrame(() => { raf = 0; rend
 function renderNav(){
   const c = cfg();
   const who = S.fbUser ? S.fbUser.email : "";
-  const nd = [...S.demandes.values()].filter(x => x.date >= TODAY).length;
+  const nd = pendingCount();
   const inst = S.mode === "firebase" && canInstall();
   const nk = [S.view, S.mode || "", who, nd, inst, c.tarifDefaut, c.telFixe, c.telMobile, c.email, c.adresse].join("|");
   if (S.navKey === nk) return; S.navKey = nk;
-  const badge = r => r === "agenda" && nd ? `<span class="nbadge" aria-label="${nd} demande${nd>1?"s":""} en ligne">${nd}</span>` : "";
+  const badge = r => r === "agenda" && nd ? `<span class="nbadge" aria-label="${nd} nouveauté${nd>1?"s":""} en ligne">${nd}</span>` : "";
   const links = ROUTES.map(r => `<a href="#${r}" ${S.view===r?'aria-current="page"':""}>${ic(r)}<span>${TITLES[r]}</span>${badge(r)}</a>`).join("");
   $("#nav").innerHTML = links; $("#tabbar").innerHTML = links;
   const tel = (n, icon) => n ? `<li>${ic(icon)}<a class="tel" href="tel:${esc(n.replace(/[^\d+]/g,""))}">${esc(n)}</a></li>` : "";
@@ -1021,8 +1024,8 @@ function renderHeader(){
   if (S.view === "patients") act = `<button class="btn" data-action="new-patient" data-write>${ic("plus")}Patient</button> ` + act;
   if (S.view === "caisse") act = `<button class="btn primary" data-action="new-payment" data-write>${ic("plus")}Encaissement</button>`;
   if (S.view === "charges") act = `<button class="btn primary" data-action="new-charge" data-write>${ic("plus")}Charge</button>`;
-  // cloche : demandes de rendez-vous en ligne à confirmer, sur toutes les pages
-  const nd = [...S.demandes.values()].filter(x => x.date >= TODAY).length;
+  // cloche : demandes en ligne à confirmer + changements faits par les patients, sur toutes les pages
+  const nd = pendingCount();
   const bell = S.mode === "firebase" && S.fbUser ? `<button class="btn icon-btn bell" data-action="notifs" title="Rendez-vous en ligne" aria-label="Rendez-vous en ligne${nd ? ` : ${nd} à confirmer` : ""}">${ic("bell")}${nd ? `<span class="badge">${nd}</span>` : ""}</button>` : "";
   $("#topActions").innerHTML = bell + act;
   document.title = (nd ? `(${nd}) ` : "") + "Cabinet Sebti Assia";
@@ -1108,7 +1111,7 @@ function agendaHero(D){
   const today = (D.byDay.get(TODAY) || []).filter(active);
   const next = today.find(r => r.statut === "prevu" && toMin(r.heure) >= nowMin - 10);
   const p = next && S.patients.get(next.patientId);
-  const nd = [...S.demandes.values()].filter(x => x.date >= TODAY).length;
+  const nd = [...S.demandes.values()].filter(x => x.date >= TODAY).length, nc = [...S.gestion.values()].filter(g => g.vu === false).length;
   const enc = sum(D.rdv.filter(r => r.reglement && r.reglement.date === TODAY), r => r.reglement.montant) + sum(D.pays.filter(x => x.date === TODAY), x => x.montant);
   const resume = !slotsFor(TODAY).open && !today.length ? "Le cabinet est fermé aujourd'hui. Bon repos !"
     : today.length ? `${today.length} rendez-vous aujourd'hui${next ? ` · prochain à ${next.heure}${p ? " avec " + p.nom : ""}` : " · tous passés"}`
@@ -1119,6 +1122,7 @@ function agendaHero(D){
       <p class="sum">${esc(resume)}</p>
       <div class="hero-chips">
         ${nd ? `<button type="button" class="hchip hot" data-action="notifs"><i class="dot" aria-hidden="true"></i>${nd} demande${nd>1?"s":""} en ligne à confirmer</button>` : `<span class="hchip">${ic("bell")}Aucune demande en attente</span>`}
+        ${nc ? `<button type="button" class="hchip hot" data-action="notifs"><i class="dot" aria-hidden="true"></i>${nc} changement${nc>1?"s":""} fait${nc>1?"s":""} par les patients</button>` : ""}
         <span class="hchip">${ic("caisse")}Encaissé aujourd'hui <b data-count="${enc}" data-unit=" DH">${fmtDH(enc)}</b></span>
       </div>
     </div>
@@ -1222,7 +1226,7 @@ function rdvCard(r, D){
     else acts = `<button class="btn sm" data-action="rdv-pay" data-id="${r.id}" data-m="${r.m}" data-write>Encaisser ${fmtDH(r.montant)}</button>`;
   }
   return `<article class="rdv s-${r.statut} ${hors?"hors":""}">
-    <div class="rh"><span class="t">${esc(r.heure)}</span>${n ? `<span class="sn" title="Séance ${n}${pres?" sur "+pres+" prescrites":""}">S${n}${pres?"/"+pres:""}</span>` : ""}${r.type && r.type !== "Séance" ? `<span class="chip accent">${esc(r.type)}</span>` : ""}${r.enLigne ? `<span class="chip tape">En ligne</span>` : ""}<span class="chip st ${ST_CLASS[r.statut]}">${STATUTS[r.statut]||""}</span></div>
+    <div class="rh"><span class="t">${esc(r.heure)}</span>${n ? `<span class="sn" title="Séance ${n}${pres?" sur "+pres+" prescrites":""}">S${n}${pres?"/"+pres:""}</span>` : ""}${r.type && r.type !== "Séance" ? `<span class="chip accent">${esc(r.type)}</span>` : ""}${r.enLigne ? `<span class="chip tape">En ligne</span>` : ""}${r.deplaceParPatient ? `<span class="chip tape" title="Déplacé par le patient avec son lien">Déplacé par le patient</span>` : ""}<span class="chip st ${ST_CLASS[r.statut]}">${STATUTS[r.statut]||""}</span></div>
     <div class="pw"><span class="av" style="--h:${hueOf(r.patientId)}" aria-hidden="true">${esc(initials(p ? p.nom : "?"))}</span><div class="pwn">
       <button class="nm" data-action="open-rdv" data-id="${r.id}" data-m="${r.m}">${esc(p ? p.nom : "Patient supprimé")}</button>
       <div class="mt">${esc([p && p.motif, p && COUV_SHORT[p.couverture]].filter(Boolean).join(" · "))}</div></div></div>
@@ -1243,7 +1247,8 @@ function waNumber(tel){
 }
 function reminderText(r, p, when){
   const c = cfg();
-  return String(c.messageRappel||DEFAULTS.messageRappel).replace(/\{patient\}/g, p ? p.nom : "").replace(/\{jour\}/g, when).replace(/\{heure\}/g, r.heure.replace(":","h"));
+  return String(c.messageRappel||DEFAULTS.messageRappel).replace(/\{patient\}/g, p ? p.nom : "").replace(/\{jour\}/g, when).replace(/\{heure\}/g, r.heure.replace(":","h"))
+    + (r.gestion && S.gestion.has(r.gestion) ? ` Pour changer ou annuler vous-même : ${gestionUrl(r.gestion)}` : "");
 }
 function remindersBox(D){
   let target = null;
@@ -1560,6 +1565,8 @@ function rdvDrawer(opts){
       <label class="f">Type<select id="rType">${TYPES.map(t => `<option ${t===(r.type||"Séance")?"selected":""}>${t}</option>`).join("")}</select></label>
       <label class="f">Montant (DH)<input id="rMontant" type="number" min="0" step="1" value="${esc(montant)}"></label></div>
     <p class="hint" id="rCap"></p>
+    ${edit && r.statut === "prevu" && S.mode === "firebase" ? `<div class="glink"><button type="button" class="btn sm" data-action="gestion-link">${ic("chat")}Envoyer au patient son lien « changer ou annuler »</button>
+      <span class="hint">${r.gestion ? "Lien déjà créé." : ""} Le patient pourra déplacer ou annuler ce rendez-vous lui-même ; tu seras prévenu.</span></div>` : ""}
     ${edit ? `<div class="f">Statut<div class="radios">${Object.entries(STATUTS).map(([k,l]) => `<label><input type="radio" name="rSt" value="${k}" ${r.statut===k?"checked":""}>${l}</label>`).join("")}</div></div>
       <label class="f">Douleur ressentie (EVA)<select id="rEva"><option value="">Non évaluée</option>${Array.from({length:11},(_,i) => `<option value="${i}" ${r.eva!==undefined&&r.eva!==null&&r.eva!==""&&+r.eva===i?"selected":""}>${i}${i===0?" — aucune douleur":i===10?" — douleur maximale":""}</option>`).join("")}</select></label>${reg}` : ""}
     <label class="f">Note de séance<textarea id="rNote" rows="2" placeholder="Exercices, technique, observation…">${esc(r.note)}</textarea></label>
@@ -1641,12 +1648,19 @@ async function saveRdv(edit){
     if (!dates.length){ toast("Choisis au moins un jour pour la série.", true); return; }
     const btn = $('#fRdv [type=submit]'); btn.disabled = true;
     const now = new Date().toISOString();
-    const tasks = dates.map(d => () => { const m = monthOf(d); ensureMonth(m); return S.db.collection(`mois/${m}/rdv`).doc().set(Object.assign({}, base, {date:d, statut:"prevu", createdAt:now})); });
+    const refs = dates.map(d => { const m = monthOf(d); ensureMonth(m); return {d, m, ref:S.db.collection(`mois/${m}/rdv`).doc()}; });
+    const tasks = refs.map(({d, ref}) => () => ref.set(Object.assign({}, base, {date:d, statut:"prevu", createdAt:now})));
     const ok = await write(() => pool(tasks, 3, k => { if (dates.length > 1) btn.textContent = `Création ${k}/${dates.length}…`; }),
       dates.length > 1 ? `${dates.length} rendez-vous créés` : "Rendez-vous créé");
     if (ok){
       const x = o && o.demande ? S.demandes.get(o.demande) : null;
-      if (x){ closeDemande(o.demande, true).catch(e => console.warn(e)); demDoneDrawer(x, true); } else closeDrawer();
+      if (x){
+        closeDemande(o.demande, true).catch(e => console.warn(e));
+        // lien personnel : le patient pourra changer ou annuler lui-même ce rendez-vous
+        const r0 = refs[0]; let link = "";
+        try { link = await createGestion(r0.ref.id, r0.m, Object.assign({}, base, {date:r0.d}), x.nom); } catch(e){ console.warn(e); }
+        demDoneDrawer(x, true, link);
+      } else closeDrawer();
       S.day = dates[0]; if (S.view === "agenda") schedule();
     } else btn.disabled = false;
   }
@@ -1826,6 +1840,19 @@ async function onAction(btn, e){
     case "resa-copy": try { await navigator.clipboard.writeText(RESA_URL); toast("Lien copié : " + RESA_URL); } catch(e){ toast(RESA_URL); } break;
     case "resa-print": await resaPoster(); break;
     case "install": await installApp(); break;
+    case "gestion-link": {
+      const o = S.drawer, r = o && S.months.get(o.m)?.rdv.get(o.id); if (!r) break;
+      const p = S.patients.get(r.patientId);
+      btn.disabled = true;
+      let link = "";
+      try { link = r.gestion && S.gestion.has(r.gestion) ? gestionUrl(r.gestion) : await createGestion(o.id, o.m, r, p && p.nom); } catch(e){ writeError(e); }
+      if (link) messageDrawer("Lien du patient", `${esc(p ? p.nom : "")} · ${esc(dayLabel(r.date))} à ${esc(r.heure)}`,
+        "Avec ce lien, le patient change la date ou l'heure, ou annule, lui-même. Son rendez-vous se met à jour dans l'agenda et tu es prévenu.",
+        `Bonjour ${p ? p.nom : ""}, voici votre lien pour changer la date ou l'heure de votre rendez-vous du ${dayLabel(r.date).toLowerCase()} à ${r.heure.replace(":", "h")} au cabinet de kinésithérapie Sebti Assia, ou pour l'annuler : ${link}`,
+        p && p.tel);
+      break; }
+    case "chg-vu": await write(() => S.db.doc(`gestion/${ds.id}`).update({vu:true})); break;
+    case "copy-msg": { const m = $("#dmMsg"); try { await navigator.clipboard.writeText(m ? m.value : ""); toast("Message copié"); } catch(e){ if (m){ m.select(); toast("Sélectionne puis copie le message."); } } break; }
     case "install-help": installHelp(); break;
     case "install-later": try { localStorage.setItem(INSTALL_LATER, String(Date.now())); } catch(e){} schedule(); break;
     case "lier-cancel": S.lier = null; if (S.fbAuth.currentUser) await onAuth(S.fbAuth.currentUser); else showGate("login"); break;
@@ -2194,7 +2221,7 @@ const RESA_URL = "https://cabinet-sebti-assia.web.app/rdv.html";
 const stable = o => JSON.stringify(Object.keys(o || {}).sort().map(k => [k, o[k]]));
 function queueSync(){
   if (S.mode !== "firebase" || !S.fbUser || S.readonly) return;
-  clearTimeout(S.syncT); S.syncT = setTimeout(syncResa, 1500);
+  clearTimeout(S.syncT); S.syncT = setTimeout(() => { syncResa(); syncGestion(); }, 1500);
 }
 function publicAgenda(){
   const c = cfg();
@@ -2257,7 +2284,19 @@ function notifsBody(D){
   const conf = r => { const p = S.patients.get(r.patientId);
     return `<li class="nitem"><div class="r1"><button type="button" class="linkish" data-action="open-rdv" data-id="${esc(r.id)}" data-m="${esc(r.m)}">${esc(p ? p.nom : "Patient")}</button><span class="chip good">Confirmé</span></div>
       <div class="r2">${esc(dayLabel(r.date))} à ${esc(r.heure)}${p && p.tel ? " · " + esc(p.tel) : ""}</div></li>`; };
+  // changements faits par les patients avec leur lien personnel (déjà appliqués à l'agenda)
+  const chg = [...S.gestion.entries()].filter(([,g]) => g.vu === false && g.changement).sort((a,b) => String(b[1].changement.cle).localeCompare(String(a[1].changement.cle)));
+  const chgItem = ([t, g]) => { const c = g.changement, f = findRdv(g.rdvId), p = f && S.patients.get(f.r.patientId), wa = p && waNumber(p.tel);
+    const lab = c.type === "deplace" ? ["tape", "Déplacé"] : c.type === "annule" ? ["bad", "Annulé"] : ["warn", "Créneau déjà pris"];
+    return `<li class="nitem"><div class="r1"><b>${esc(p ? p.nom : g.nom)}</b><span class="chip ${lab[0]}">${lab[1]}</span></div>
+      <div class="r2">${c.type === "deplace" ? `${esc(fmtQuand(c.de))} → <b>${esc(fmtQuand(c.vers))}</b> · déjà mis à jour dans l'agenda`
+        : c.type === "annule" ? `Rendez-vous du ${esc(fmtQuand(c.de))} annulé par le patient : le créneau est libéré`
+        : `Voulait passer au ${esc(fmtQuand(c.vers))}, créneau pris entre-temps : rendez-vous maintenu le ${esc(fmtQuand(c.de))}. Rappelle le patient.`}</div>
+      <div class="ra"><button type="button" class="btn sm ok" data-action="chg-vu" data-id="${esc(t)}">${ic("check")}Vu</button>
+        ${wa ? `<a class="btn sm" href="https://wa.me/${wa}" target="_blank" rel="noopener">${ic("chat")}WhatsApp</a>` : ""}
+        <button type="button" class="btn sm ghost" data-action="dem-day" data-day="${esc((c.vers && c.type === "deplace" ? c.vers : c.de).date)}">Voir le jour</button></div></li>`; };
   return `${alert}
+    ${chg.length ? `<section><h3 class="lbl">Changements faits par les patients <span class="chip tape">${chg.length}</span></h3><ul class="nlist">${chg.map(chgItem).join("")}</ul></section>` : ""}
     <section><h3 class="lbl">À confirmer <span class="chip tape">${pend.length}</span></h3>
       ${pend.length ? `<ul class="nlist">${pend.map(item).join("")}</ul>` : `<p class="hint">Aucune demande en attente.</p>`}</section>
     <section><h3 class="lbl">Réservés en ligne, à venir <span class="chip">${done.length}</span></h3>
@@ -2266,25 +2305,98 @@ function notifsBody(D){
       <button type="button" class="btn sm" data-action="resa-copy" style="margin-left:6px">Copier</button></p>`;
 }
 // Après « Confirmer » ou « Refuser » : message WhatsApp prêt pour prévenir le patient
-function demDoneDrawer(x, confirmed){
-  const c = cfg(), wa = waNumber(x.tel), when = `${dayLabel(x.date).toLowerCase()} à ${x.heure.replace(":", "h")}`;
+function demDoneDrawer(x, confirmed, link){
+  const c = cfg(), when = `${dayLabel(x.date).toLowerCase()} à ${x.heure.replace(":", "h")}`;
   const text = confirmed
-    ? `Bonjour ${x.nom}, votre rendez-vous au cabinet de kinésithérapie Sebti Assia est confirmé le ${when}.${c.adresse ? " Adresse : " + c.adresse + "." : ""} Merci de nous prévenir en cas d'empêchement.`
+    ? `Bonjour ${x.nom}, votre rendez-vous au cabinet de kinésithérapie Sebti Assia est confirmé le ${when}.${c.adresse ? " Adresse : " + c.adresse + "." : ""}`
+      + (link ? ` Pour changer la date ou l'heure, ou annuler, vous-même : ${link}` : " Merci de nous prévenir en cas d'empêchement.")
     : `Bonjour ${x.nom}, le créneau du ${when} n'est malheureusement plus disponible au cabinet Sebti Assia. Vous pouvez choisir un autre horaire ici : ${RESA_URL}`;
-  openDrawer("dem-done", dHead(confirmed ? "Rendez-vous confirmé" : "Demande refusée", `${esc(x.nom)} · ${esc(x.tel)}`) + `<div class="form">
-    <p class="hint">${confirmed ? "Le rendez-vous est dans l'agenda." : "Le créneau est de nouveau libre sur la page de réservation."} Préviens le patient :</p>
-    <label class="f">Message<textarea id="dmMsg" rows="5">${esc(text)}</textarea></label>
-    <div class="dfoot"><span></span><div class="r"><button type="button" class="btn" data-action="close">Fermer</button>
-      ${wa ? `<a class="btn primary" id="dmWa" href="https://wa.me/${wa}?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">${ic("chat")}Envoyer par WhatsApp</a>` : `<span class="chip warn">Numéro non reconnu pour WhatsApp</span>`}</div></div></div>`, {wa});
+  messageDrawer(confirmed ? "Rendez-vous confirmé" : "Demande refusée", `${esc(x.nom)} · ${esc(x.tel)}`,
+    confirmed ? `Le rendez-vous est dans l'agenda.${link ? " Le message contient le lien personnel du patient : il pourra changer ou annuler lui-même, et tu seras prévenu." : ""} Préviens le patient :`
+      : "Le créneau est de nouveau libre sur la page de réservation. Préviens le patient :", text, x.tel);
 }
-function newDemande(id, x){
-  toast(`Nouvelle demande en ligne : ${x.nom}, ${dayShort(x.date)} à ${x.heure}`);
-  try { // notification de l'ordinateur quand l'onglet n'est pas au premier plan
+function sysNotify(title, body, tag){ // notification de l'ordinateur quand l'onglet n'est pas au premier plan
+  try {
     if ("Notification" in window && Notification.permission === "granted" && document.visibilityState !== "visible"){
-      const n = new Notification("Nouvelle demande de rendez-vous", {body:`${x.nom} — ${dayLabel(x.date)} à ${x.heure}`, tag:"demande-" + id});
+      const n = new Notification(title, {body, tag, icon:"icons/icon-192.png"});
       n.onclick = () => { window.focus(); openNotifs(); n.close(); };
     }
   } catch(e){ console.warn(e); }
+}
+function newDemande(id, x){
+  toast(`Nouvelle demande en ligne : ${x.nom}, ${dayShort(x.date)} à ${x.heure}`);
+  sysNotify("Nouvelle demande de rendez-vous", `${x.nom} — ${dayLabel(x.date)} à ${x.heure}`, "demande-" + id);
+}
+
+/* ---------- Lien personnel du patient : changer ou annuler lui-même un rendez-vous confirmé ---------- */
+// gestion/{clé} = copie publique minimale du rendez-vous (prénom, date, heure), lisible avec la clé du lien seulement.
+// Le patient y écrit son changement (par:"patient") ; l'application l'applique au vrai rendez-vous puis le signale.
+const gestionUrl = t => `${SITE}/rdv.html#g=${t}`;
+const pendingCount = () => [...S.demandes.values()].filter(x => x.date >= TODAY).length + [...S.gestion.values()].filter(g => g.vu === false).length;
+function findRdv(id){ for (const [m, e] of S.months){ const r = e.rdv.get(id); if (r) return {m, r, e}; } return null; }
+async function createGestion(rdvId, m, r, nom){
+  const token = b64u(crypto.getRandomValues(new Uint8Array(18))), ts = firebase.firestore.FieldValue.serverTimestamp();
+  const b = S.db.batch();
+  b.set(S.db.doc(`gestion/${token}`), {rdvId, m, nom:String(nom || "").trim().split(/\s+/)[0] || "", date:r.date, heure:r.heure, duree:+r.duree || 30,
+    statut:"confirme", par:"cabinet", vu:true, cree:ts, maj:ts});
+  b.update(rdvRef(m, rdvId), {gestion:token});
+  await settle(b.commit());
+  return gestionUrl(token);
+}
+function syncGestion(){
+  if (S.mode !== "firebase" || !S.db || !S.gestLoaded || S.status !== "ready" || !S.D) return;
+  for (const [t, g] of S.gestion){
+    if (!g.rdvId) continue;
+    if (!S.months.has(g.m)) ensureMonth(g.m);
+    const f = findRdv(g.rdvId); if (!f || !f.e.rdvFresh) continue;
+    if (g.par === "patient"){ if (!S.applying.has(t)){ S.applying.add(t); applyPatientChange(t, f).finally(() => S.applying.delete(t)); } continue; }
+    // un changement fait au cabinet (déplacement, annulation, séance faite) se reporte sur la page du patient
+    const want = {m:f.m, date:f.r.date, heure:f.r.heure, duree:+f.r.duree || 30, statut:f.r.statut === "prevu" ? "confirme" : f.r.statut};
+    if (Object.keys(want).some(k => want[k] !== g[k]))
+      S.db.doc(`gestion/${t}`).update(Object.assign(want, {par:"cabinet", maj:firebase.firestore.FieldValue.serverTimestamp()})).catch(e => console.warn(e));
+  }
+}
+async function applyPatientChange(t, {m, r}){
+  const gref = S.db.doc(`gestion/${t}`);
+  try {
+    await S.db.runTransaction(async tx => { // une seule fois, même si plusieurs appareils du cabinet sont ouverts
+      const gs = await tx.get(gref), g = gs.exists ? gs.data() : null;
+      if (!g || g.par !== "patient") return;
+      const de = {date:r.date, heure:r.heure}, cle = String(Date.now());
+      if (g.statut === "annule"){
+        tx.update(rdvRef(m, g.rdvId), {statut:"annule", annuleParPatient:true});
+        tx.update(gref, {par:"cabinet", vu:false, changement:{type:"annule", de, cle}});
+        return;
+      }
+      const vers = {date:g.date, heure:g.heure}, step = slotsFor(g.date).step, a = toMin(g.heure);
+      const pris = (S.D.byDay.get(g.date) || []).some(x => x.id !== g.rdvId && active(x) && toMin(x.heure) < a + step && toMin(x.heure) + (+x.duree || step) > a);
+      if (pris){ // un autre rendez-vous a pris ce créneau entre-temps : on garde l'ancien et on prévient
+        tx.update(gref, {date:r.date, heure:r.heure, m, par:"cabinet", vu:false, changement:{type:"refuse", de, vers, cle}});
+        return;
+      }
+      const nm = monthOf(g.date);
+      if (nm === m) tx.update(rdvRef(m, g.rdvId), {date:g.date, heure:g.heure, deplaceParPatient:true});
+      else { tx.set(rdvRef(nm, g.rdvId), Object.assign({}, r, {date:g.date, heure:g.heure, deplaceParPatient:true})); tx.delete(rdvRef(m, g.rdvId)); ensureMonth(nm); }
+      tx.update(gref, {m:nm, par:"cabinet", vu:false, changement:{type:"deplace", de, vers, cle}});
+    });
+  } catch(e){ console.warn("Changement du patient pas encore appliqué", e); }
+}
+const fmtQuand = q => q ? `${dayShort(q.date)} à ${q.heure}` : "";
+function changeText(g){
+  const c = g.changement || {}, nom = g.nom || "Un patient";
+  return c.type === "deplace" ? `${nom} a déplacé son rendez-vous du ${fmtQuand(c.de)} au ${fmtQuand(c.vers)}`
+    : c.type === "annule" ? `${nom} a annulé son rendez-vous du ${fmtQuand(c.de)}`
+    : `${nom} voulait passer au ${fmtQuand(c.vers)}, mais le créneau était pris : rendez-vous maintenu le ${fmtQuand(c.de)}`;
+}
+function newChange(g){ toast(changeText(g)); sysNotify("Rendez-vous modifié par un patient", changeText(g), "chg-" + (g.changement || {}).cle); }
+// Message prêt à envoyer (WhatsApp) : confirmation, refus, lien personnel…
+function messageDrawer(title, sub, intro, text, tel){
+  const wa = waNumber(tel);
+  openDrawer("dem-done", dHead(title, sub) + `<div class="form">
+    <p class="hint">${intro}</p>
+    <label class="f">Message<textarea id="dmMsg" rows="6">${esc(text)}</textarea></label>
+    <div class="dfoot"><button type="button" class="btn" data-action="copy-msg">Copier</button><div class="r"><button type="button" class="btn" data-action="close">Fermer</button>
+      ${wa ? `<a class="btn primary" id="dmWa" href="https://wa.me/${wa}?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">${ic("chat")}Envoyer par WhatsApp</a>` : `<span class="chip warn">Numéro non reconnu pour WhatsApp</span>`}</div></div></div>`, {wa});
 }
 function resaQr(){
   if (!$("#resaQr")) return;
@@ -2391,6 +2503,12 @@ function start(db){
         S.occ = map; if (!snap.metadata.fromCache) S.occLoaded = true; queueSync();
       });
       watch(db.doc("public/agenda"), snap => { S.pub = snap.exists ? snap.data() : null; if (!snap.metadata.fromCache) S.pubLoaded = true; queueSync(); });
+      watch(db.collection("gestion"), snap => { // liens personnels des patients : changements à appliquer et à signaler
+        const map = new Map(); snap.docs.forEach(d => map.set(d.id, d.data()));
+        S.gestion = map; if (!snap.metadata.fromCache) S.gestLoaded = true;
+        for (const [t, g] of map) if (g.vu === false && g.changement && !S.chgSeen.has(t + g.changement.cle)){ S.chgSeen.add(t + g.changement.cle); newChange(g); }
+        schedule();
+      });
     }
   }catch(e){ console.error(e); }
   baseWindow().forEach(ensureMonth);
