@@ -21,8 +21,8 @@ service cloud.firestore {
 
     // ---------- Réservation en ligne (page publique rdv.html) ----------
     // Le public lit les horaires (public/agenda) et l'occupation des créneaux (nombres, jamais de noms).
-    // Une réservation = une demande + un verrou « jour_hhmm » écrits ensemble ; le verrou n'est accepté que si
-    // la réservation est ouverte, le jour proche et le créneau libre (aucun rendez-vous, aucun autre verrou).
+    // Une demande ne bloque pas le créneau : il ne se ferme qu'à la confirmation du cabinet (occupation).
+    // Elle n'est acceptée que si la réservation est ouverte, le jour proche et le créneau sans rendez-vous confirmé.
     function agendaPublic() {
       return get(/databases/$(database)/documents/public/agenda).data;
     }
@@ -43,27 +43,20 @@ service cloud.firestore {
       allow read: if true;
       allow write: if cabinet();
     }
-    match /verrous/{id} {
-      allow read: if true;
-      allow delete: if cabinet();
-      allow create: if agendaPublic().actif == true
-        && request.resource.data.keys().hasOnly(['date', 'heure', 'demande'])
-        && jourReservable(request.resource.data.date)
-        && request.resource.data.heure is string && request.resource.data.heure.matches('^[0-2][0-9]:[0-5][0-9]$')
-        && id == request.resource.data.date + '_' + request.resource.data.heure.replace(':', '')
-        && creneauLibre(request.resource.data.date, request.resource.data.heure)
-        && existsAfter(/databases/$(database)/documents/demandes/$(request.resource.data.demande));
+    match /verrous/{id} { // anciennes demandes qui bloquaient le créneau : le cabinet les retire en les traitant
+      allow read, delete: if cabinet();
     }
     match /demandes/{id} {
       allow read, update, delete: if cabinet();
-      allow create: if request.resource.data.keys().hasOnly(['nom', 'tel', 'motif', 'date', 'heure', 'verrou', 'creeLe'])
+      allow create: if agendaPublic().actif == true
+        && request.resource.data.keys().hasOnly(['nom', 'tel', 'motif', 'date', 'heure', 'creeLe'])
         && request.resource.data.nom is string && request.resource.data.nom.size() >= 2 && request.resource.data.nom.size() <= 80
         && request.resource.data.tel is string && request.resource.data.tel.matches('^[0-9 +.()-]{8,20}$')
         && request.resource.data.motif is string && request.resource.data.motif.size() <= 200
-        && request.resource.data.creeLe == request.time
-        && getAfter(/databases/$(database)/documents/verrous/$(request.resource.data.verrou)).data.demande == id
-        && getAfter(/databases/$(database)/documents/verrous/$(request.resource.data.verrou)).data.date == request.resource.data.date
-        && getAfter(/databases/$(database)/documents/verrous/$(request.resource.data.verrou)).data.heure == request.resource.data.heure;
+        && jourReservable(request.resource.data.date)
+        && request.resource.data.heure is string && request.resource.data.heure.matches('^[0-2][0-9]:[0-5][0-9]$')
+        && creneauLibre(request.resource.data.date, request.resource.data.heure)
+        && request.resource.data.creeLe == request.time;
     }
 
     // Connexion d'un ordinateur par QR code : le téléphone connecté dépose une autorisation chiffrée,

@@ -334,17 +334,92 @@ legend{font-size:12.5px;font-weight:600;color:var(--ink-2);padding:0 4px}
 @media (max-width:640px){ .resa{grid-template-columns:minmax(0,1fr)} }
 
 /* ---------- Connexion (au-dessus de l'app, sous les toasts) ---------- */
-.gate{position:fixed;inset:0;z-index:70;background:var(--bg);display:grid;place-items:center;overflow-y:auto;
-  padding:calc(24px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
-.gate-card{width:min(400px,100%);background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--tape);border-radius:14px;padding:24px 22px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:18px}
-.gate-card h2{font-family:var(--f-display);font-weight:700;font-size:21px;margin:0}
+.gate{position:fixed;inset:0;z-index:70;background:var(--bg);overflow-y:auto;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
+/* volet illustré : couleurs claires de la marque sur fond vert d'eau → bleu marine */
+.gate-hero{--accent-ink:#9FE6D5;--tape:#F3A6DA;--accent:#5FD3BA;--logo-blue:#C9D6F7;
+  position:relative;overflow:hidden;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;
+  padding:calc(40px + env(safe-area-inset-top,0px)) 40px 40px max(40px,env(safe-area-inset-left,0px));
+  background:radial-gradient(55% 45% at 88% 6%,rgba(243,166,218,.30),transparent 70%),radial-gradient(60% 50% at 4% 98%,rgba(95,211,186,.30),transparent 70%),
+    linear-gradient(155deg,#0D6858 0%,#124C5C 48%,#1B2F4E 100%)}
+.gate-hero::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1.6px);background-size:22px 22px}
+.hero-in{position:relative;z-index:1;width:min(470px,100%);display:flex;flex-direction:column;gap:20px}
+.hero-in .brand svg{width:54px;height:54px}
+.hero-in .brand-row b{font-size:28px}
+.hero-in .brand small{font-size:11.5px}
+.hero-in .brand .ar{font-size:13px;border-top-color:rgba(255,255,255,.3)}
+.motto{margin:0;font-family:var(--f-display);font-weight:700;font-size:28px;line-height:1.15}
+.motto .ar{display:block;margin-top:6px;font-size:17px;color:var(--tape)}
+.hero-feats{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px;font-size:13.5px;color:rgba(255,255,255,.88)}
+.hero-feats li{display:flex;gap:9px;align-items:center}
+.hero-feats svg{width:18px;height:18px;flex:none;color:var(--accent-ink)}
+.gate-side{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px max(24px,env(safe-area-inset-right,0px)) calc(40px + env(safe-area-inset-bottom,0px)) 24px}
+.patient-link{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;background:var(--tape-soft);color:var(--tape);font-weight:600;font-size:13.5px;text-decoration:none;animation:fadeUp .6s .35s ease-out both}
+.patient-link:hover{text-decoration:underline}
+.patient-link svg{width:16px;height:16px;flex:none}
+.gate-card{position:relative;width:min(410px,100%);background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px 26px 20px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:18px}
+.gate-card::before{content:"";position:absolute;left:24px;right:24px;top:-1px;height:3px;border-radius:0 0 3px 3px;background:linear-gradient(90deg,var(--accent),var(--tape))}
+.gate-card h2{font-family:var(--f-display);font-weight:700;font-size:26px;line-height:1.1;margin:0}
 .gate-card p{margin:0}
+.gate-card .lead{margin-top:6px;color:var(--muted);font-size:14px}
+.gate-foot{display:flex;gap:8px;align-items:flex-start;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;line-height:1.45}
+.gate-foot svg{width:15px;height:15px;flex:none;color:var(--accent);margin-top:1px}
+.loader{display:flex;gap:7px;justify-content:center;padding:8px 0 2px}
+.loader span{width:9px;height:9px;border-radius:50%;background:var(--accent);animation:bob 1s ease-in-out infinite}
+.loader span:nth-child(2){background:var(--logo-blue);animation-delay:.15s}
+.loader span:nth-child(3){background:var(--tape);animation-delay:.3s}
+/* illustration animée (boucle de 5,2 s : bras levés + genou à 90°, colonne qui ondule, pouls, particules) */
+.kine{width:100%;height:auto;max-height:330px;display:block}
+.kine .halo{fill:rgba(255,255,255,.06)}
+.kine .ring{fill:none;stroke:rgba(255,255,255,.22);stroke-width:1.5;stroke-dasharray:2 9;transform-box:view-box;transform-origin:225px 178px;animation:spin 40s linear infinite}
+.kine .mat{fill:rgba(255,255,255,.14)}
+.kine .lim{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.kine .t{stroke:#7DE0C8}
+.kine .b{stroke:#C9D6F7}
+.kine .head{fill:#C9D6F7}
+.kine .armL,.kine .armR{transform-box:view-box;transform-origin:220px 124px}
+.kine .armL{animation:armL 5.2s ease-in-out infinite}
+.kine .armR{animation:armR 5.2s ease-in-out infinite}
+.kine .thigh{transform-box:view-box;transform-origin:220px 196px;animation:thigh 5.2s ease-in-out infinite}
+.kine .shin{transform-box:view-box;transform-origin:232px 240px;animation:shin 5.2s ease-in-out infinite}
+.kine .rom{fill:none;stroke:#F3A6DA;stroke-width:3;stroke-linecap:round;stroke-dasharray:88;animation:rom 5.2s ease-in-out infinite}
+.kine .deg{fill:#F3A6DA;font:700 15px var(--f-display);animation:deg 5.2s ease-in-out infinite}
+.kine .vert rect{fill:rgba(255,255,255,.88)}
+.kine .vert ellipse{fill:#F3A6DA}
+.kine .vert{animation:vert 4s ease-in-out infinite;animation-delay:calc(var(--i) * -.22s)}
+.kine .pulse{fill:none;stroke:#7DE0C8;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:150;animation:pulse 3.4s linear infinite}
+.kine .pt{fill:rgba(255,255,255,.55);animation:rise 7s linear infinite;animation-delay:calc(var(--i) * -1s)}
+@keyframes armL{0%,12%{transform:rotate(0)}45%,62%{transform:rotate(105deg)}95%,100%{transform:rotate(0)}}
+@keyframes armR{0%,12%{transform:rotate(0)}45%,62%{transform:rotate(-105deg)}95%,100%{transform:rotate(0)}}
+@keyframes thigh{0%,12%{transform:rotate(0)}45%,62%{transform:rotate(-72deg)}95%,100%{transform:rotate(0)}}
+@keyframes shin{0%,12%{transform:rotate(0)}45%,62%{transform:rotate(78deg)}95%,100%{transform:rotate(0)}}
+@keyframes rom{0%,12%{stroke-dashoffset:88}45%,62%{stroke-dashoffset:0}95%,100%{stroke-dashoffset:88}}
+@keyframes deg{0%,30%{opacity:0}48%,62%{opacity:1}80%,100%{opacity:0}}
+@keyframes vert{0%,100%{transform:translateX(-3px)}50%{transform:translateX(3px)}}
+@keyframes pulse{0%{stroke-dashoffset:150;opacity:1}60%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+@keyframes rise{0%{transform:translateY(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-130px);opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bob{0%,80%,100%{transform:translateY(0);opacity:.5}40%{transform:translateY(-7px);opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.hero-in>*{animation:fadeUp .7s ease-out both}
+.hero-in>:nth-child(2){animation-delay:.1s}.hero-in>:nth-child(3){animation-delay:.2s}.hero-in>:nth-child(4){animation-delay:.3s}
+.gate-card{animation:fadeUp .6s .15s ease-out both}
+@media (prefers-reduced-motion:reduce){ .gate *,.gate *::before{animation:none!important} }
+@media (max-width:860px){
+  .gate{grid-template-columns:minmax(0,1fr);align-content:start}
+  .gate-hero{min-height:0;padding:calc(22px + env(safe-area-inset-top,0px)) 20px 76px}
+  .hero-in{gap:12px}
+  .kine{max-height:190px}
+  .motto{font-size:21px}
+  .motto .ar{font-size:15px}
+  .hero-feats{display:none}
+  .gate-side{position:relative;z-index:2;justify-content:flex-start;margin-top:-58px;padding:0 max(16px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+}
 .gate-links{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 14px}
 .linkbtn{all:unset;cursor:pointer;color:var(--accent-ink);font-weight:600;font-size:13px}
 .linkbtn:hover{text-decoration:underline}
 .linkbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
 .gate .err{color:var(--bad);font-size:13px;font-weight:600}
-.gbtn{min-height:44px;font-size:14.5px}
+.gbtn{min-height:46px;font-size:14.5px;white-space:normal;line-height:1.25;text-align:center}
 .gbtn svg{width:18px;height:18px}
 .gate .or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px}
 .gate .or::before,.gate .or::after{content:"";flex:1;border-top:1px solid var(--line)}
@@ -441,13 +516,58 @@ legend{font-size:12.5px;font-weight:600;color:var(--ink-2);padding:0 4px}
 <nav class="tabbar" id="tabbar" aria-label="Navigation"></nav>
 <div class="drawer" id="drawer" hidden><div class="scrim" data-action="close"></div><section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="dTitle"></section></div>
 <div class="gate" id="gate" hidden>
-  <form class="gate-card" id="fLogin" autocomplete="on" novalidate>
-    <div class="brand">
-      <div class="brand-row"><svg aria-hidden="true"><use href="#logo"/></svg><div><small>Cabinet de kinésithérapie</small><b>Sebti Assia</b></div></div>
-      <div class="ar" lang="ar" dir="rtl">عيادة الترويض الطبي <b>السبتي أسية</b></div>
+  <!-- Volet illustré : exercice de rééducation (élévation des bras + flexion de hanche à 90°), colonne vertébrale, pouls -->
+  <section class="gate-hero">
+    <div class="hero-in">
+      <div class="brand">
+        <div class="brand-row"><svg aria-hidden="true"><use href="#logo"/></svg><div><small>Cabinet de kinésithérapie</small><b>Sebti Assia</b></div></div>
+        <div class="ar" lang="ar" dir="rtl">عيادة الترويض الطبي <b>السبتي أسية</b></div>
+      </div>
+      <svg class="kine" viewBox="0 0 420 310" aria-hidden="true">
+        <circle class="halo" cx="225" cy="178" r="118"/>
+        <circle class="ring" cx="225" cy="178" r="136"/>
+        <polyline class="pulse" points="298,58 326,58 334,46 344,76 353,38 362,58 406,58"/>
+        <g class="spine">
+          <g class="vert" style="--i:0"><rect x="52" y="50" width="20" height="13" rx="5"/><ellipse cx="60" cy="68.5" rx="9" ry="2.6"/></g>
+          <g class="vert" style="--i:1"><rect x="47" y="74" width="22" height="14" rx="5"/><ellipse cx="56.5" cy="93.5" rx="10" ry="2.6"/></g>
+          <g class="vert" style="--i:2"><rect x="43" y="99" width="24" height="15" rx="6"/><ellipse cx="54.5" cy="119.5" rx="11" ry="2.8"/></g>
+          <g class="vert" style="--i:3"><rect x="41.5" y="125" width="25" height="16" rx="6"/><ellipse cx="54.5" cy="146.5" rx="11" ry="2.8"/></g>
+          <g class="vert" style="--i:4"><rect x="41.5" y="152" width="27" height="16" rx="6"/><ellipse cx="56.5" cy="173.5" rx="12" ry="3"/></g>
+          <g class="vert" style="--i:5"><rect x="44" y="179" width="28" height="17" rx="6"/><ellipse cx="60" cy="201.5" rx="13" ry="3"/></g>
+          <g class="vert" style="--i:6"><rect x="47" y="207" width="30" height="17" rx="7"/><ellipse cx="63" cy="230" rx="14" ry="3.2"/></g>
+          <g class="vert" style="--i:7"><rect x="48" y="236" width="32" height="18" rx="7"/><ellipse cx="62.5" cy="259.5" rx="14" ry="3.2"/></g>
+          <g class="vert" style="--i:8"><rect x="45" y="265" width="32" height="18" rx="7"/></g>
+        </g>
+        <rect class="mat" x="112" y="287" width="230" height="9" rx="4.5"/>
+        <path class="rom" d="M220 252A56 56 0 0 0 276 196"/>
+        <text class="deg" x="284" y="266">90°</text>
+        <g class="lim b" stroke-width="13"><polyline points="220,196 210,240 207,283 194,283"/></g>
+        <g class="armL lim b" stroke-width="11"><polyline points="220,124 197,158 190,192"/></g>
+        <line class="lim t" x1="220" y1="122" x2="220" y2="196" stroke-width="16"/>
+        <g class="thigh lim t" stroke-width="13"><line x1="220" y1="196" x2="232" y2="240"/><g class="shin"><polyline points="232,240 234,283 248,283"/></g></g>
+        <g class="armR lim b" stroke-width="11"><polyline points="220,124 243,158 250,192"/></g>
+        <circle class="head" cx="220" cy="92" r="17"/>
+        <circle class="pt" style="--i:0" cx="128" cy="270" r="3"/><circle class="pt" style="--i:1" cx="330" cy="262" r="2.5"/>
+        <circle class="pt" style="--i:2" cx="160" cy="282" r="2"/><circle class="pt" style="--i:3" cx="372" cy="240" r="3"/>
+        <circle class="pt" style="--i:4" cx="292" cy="284" r="2.2"/><circle class="pt" style="--i:5" cx="110" cy="220" r="2.4"/>
+        <circle class="pt" style="--i:6" cx="388" cy="282" r="2"/>
+      </svg>
+      <p class="motto">Le mouvement, c'est la vie.<span class="ar" lang="ar" dir="rtl">الحركة هي الحياة</span></p>
+      <ul class="hero-feats">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Agenda et rappels WhatsApp</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c.6-3.8 3.8-5.8 7.5-5.8s6.9 2 7.5 5.8"/></svg>Dossiers et ordonnances</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>Réservation en ligne</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V11M10 20V5M16 20v-6M3 20.5h18"/></svg>Caisse et résultat</li>
+      </ul>
     </div>
-    <div class="form" id="gateBody"></div>
-  </form>
+  </section>
+  <div class="gate-side">
+    <form class="gate-card" id="fLogin" autocomplete="on" novalidate>
+      <div class="form" id="gateBody"></div>
+      <p class="gate-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>Accès réservé au cabinet. Les dossiers patients sont protégés et hébergés en Europe.</p>
+    </form>
+    <a class="patient-link" href="rdv.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Patient ? Prendre rendez-vous en ligne →</a>
+  </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
@@ -841,12 +961,20 @@ function viewAgenda(D){
     </div>${stats}
     <div class="ag">${tl}<aside class="side stack">${demandesBox()}${remindersBox(D)}${followBox(D)}</aside></div>`;
 }
+// Une demande ne bloque pas le créneau : plusieurs patients peuvent demander le même, ou un créneau déjà pris entre-temps
+function demandeConflit(x){
+  const step = slotsFor(x.date).step, a = toMin(x.heure);
+  const busy = ((S.D && S.D.byDay.get(x.date)) || []).filter(r => active(r) && toMin(r.heure) < a + step && toMin(r.heure) + (+r.duree || step) > a).length;
+  const same = [...S.demandes.values()].filter(y => y.date === x.date && y.heure === x.heure).length;
+  return busy ? "Créneau déjà pris dans l'agenda" : same > 1 ? `${same} demandes pour ce créneau` : "";
+}
 function demandeCard([id, x]){
-  const wa = waNumber(x.tel);
+  const wa = waNumber(x.tel), conflit = demandeConflit(x);
   return `<article class="rdv demande">
     <div class="rh"><span class="t">${esc(x.heure)}</span><span class="chip tape">En ligne</span><span class="chip st warn">À confirmer</span></div>
     <span class="dn">${esc(x.nom)}</span>
     <div class="mt">${esc([x.tel, x.motif].filter(Boolean).join(" · "))}</div>
+    ${conflit ? `<div class="hw">${esc(conflit)}</div>` : ""}
     <div class="ra"><button class="btn sm ok" data-action="dem-ok" data-id="${esc(id)}" data-write>${ic("check")}Confirmer</button>
       ${wa ? `<a class="btn sm" href="https://wa.me/${wa}" target="_blank" rel="noopener">${ic("chat")}WhatsApp</a>` : ""}
       <button class="btn sm danger" data-action="dem-no" data-id="${esc(id)}" data-confirm data-write>Refuser</button></div></article>`;
@@ -1127,7 +1255,7 @@ function settingsView(D){
       <div class="checks"><label><input type="checkbox" id="sResa" ${c.resaActive ? "checked" : ""}>Les patients peuvent réserver en ligne</label></div>
       <div class="g2"><label class="f">Réservable jusqu'à<select id="sResaH">${[7,14,21,30].map(v => `<option value="${v}" ${+c.resaHorizon === v ? "selected" : ""}>${v} jours à l'avance</option>`).join("")}</select></label>
       <label class="f">Réservation au plus tard<select id="sResaD">${[[0,"jusqu'au dernier moment"],[1,"1 h avant"],[2,"2 h avant"],[4,"4 h avant"],[24,"la veille (24 h avant)"]].map(([v,l]) => `<option value="${v}" ${+c.resaDelai === v ? "selected" : ""}>${l}</option>`).join("")}</select></label></div>
-      <p class="hint">Un créneau de ${esc(Math.max(10, +c.pas || 30))} min n'est proposé en ligne que s'il est entièrement libre dans l'agenda ; dès qu'un patient le réserve, il n'est plus proposé. Les patients ne voient jamais les noms. Les demandes arrivent dans l'agenda, à confirmer ou refuser.</p>
+      <p class="hint">Un créneau de ${esc(Math.max(10, +c.pas || 30))} min n'est proposé en ligne que s'il est entièrement libre dans l'agenda. Une demande ne le bloque pas : il ne se ferme que quand tu confirmes. Les patients ne voient jamais les noms. Les demandes arrivent dans l'agenda et sous la cloche, à confirmer ou refuser.</p>
       <div style="display:flex;flex-wrap:wrap;gap:8px"><a class="btn" href="${RESA_URL}" target="_blank" rel="noopener">Ouvrir la page</a>
         <button type="button" class="btn" data-action="resa-copy">Copier le lien</button>
         <a class="btn" href="https://wa.me/?text=${encodeURIComponent("Prenez rendez-vous au cabinet de kinésithérapie Sebti Assia : " + RESA_URL)}" target="_blank" rel="noopener">${ic("chat")}Partager sur WhatsApp</a>
@@ -1622,15 +1750,11 @@ function readLegacy(){
 function legacyDone(how){ S.legacy = null; try { localStorage.setItem(LS_LEGACY, how + " " + new Date().toISOString()); } catch(e){} }
 
 /* ================= Connexion ================= */
-const AUTH_OFF = "La connexion par e-mail n'est pas encore activée dans la console Firebase (Authentication › Sign-in method › E-mail/Mot de passe).";
+const AUTH_OFF = "Ce mode de connexion n'est pas activé dans la console Firebase (Authentication › Sign-in method).";
 const AUTH_ERR = {
-  "auth/invalid-credential":"E-mail ou mot de passe incorrect.", "auth/wrong-password":"E-mail ou mot de passe incorrect.",
-  "auth/user-not-found":"Aucun compte avec cet e-mail : utilise « Première fois : créer le compte ».",
-  "auth/invalid-email":"Adresse e-mail invalide.", "auth/missing-password":"Saisis le mot de passe.",
-  "auth/too-many-requests":"Trop d'essais. Attends quelques minutes ou réinitialise le mot de passe.",
+  "auth/invalid-credential":"Connexion refusée : réessaie avec Google.", "auth/user-disabled":"Ce compte a été désactivé.",
+  "auth/too-many-requests":"Trop d'essais. Attends quelques minutes puis réessaie.",
   "auth/network-request-failed":"Pas de connexion internet. Vérifie le réseau puis réessaie.",
-  "auth/email-already-in-use":"Ce compte existe déjà : connecte-toi avec son mot de passe.",
-  "auth/weak-password":"Mot de passe trop court : 8 caractères minimum.",
   "auth/operation-not-allowed":AUTH_OFF, "auth/configuration-not-found":AUTH_OFF,
   "auth/popup-blocked":"Le navigateur a bloqué la fenêtre Google : autorise les fenêtres pop-up pour ce site, puis réessaie.",
   "auth/operation-not-supported-in-this-environment":"La connexion Google marche sur le site https://cabinet-sebti-assia.web.app ouvert dans Chrome (pas depuis un fichier ni dans WhatsApp).",
@@ -1647,28 +1771,15 @@ function showGate(step, err){
   if (!step){ g.hidden = true; return; }
   g.hidden = false;
   const u = S.fbAuth && S.fbAuth.currentUser;
-  const mail = `<label class="f">E-mail<input id="gMail" type="email" autocomplete="username" value="${esc(u ? u.email : "")}"></label>`;
   const errHtml = err ? `<p class="err" role="alert">${esc(err)}</p>` : "";
   const H = {
-    loading: `<p class="hint">Connexion à la base du cabinet…</p>`,
+    loading: `<div class="loader" aria-hidden="true"><span></span><span></span><span></span></div><p class="hint" style="text-align:center">Connexion à la base du cabinet…</p>`,
     offline: `<h2>Base en ligne injoignable</h2><p class="hint">Vérifie la connexion internet puis recharge la page.</p>
       <button type="button" class="btn primary" data-action="reload">Recharger</button>`,
-    login: `<h2>Connexion</h2>${errHtml}
+    login: `<div><h2>Bienvenue</h2><p class="lead">Connecte-toi avec le compte Gmail du cabinet pour ouvrir l'agenda et les dossiers patients.</p></div>${errHtml}
       <button type="button" class="btn gbtn" data-action="google-login">${GOOGLE_G}Continuer avec Google</button>
-      <button type="button" class="btn" data-action="qr-start">${ic("qr")}Se connecter avec le téléphone (QR code)</button>
-      <div class="or">ou avec e-mail et mot de passe</div>${mail}
-      <label class="f">Mot de passe<input id="gPass" type="password" autocomplete="current-password"></label>
-      <button type="submit" class="btn primary">Se connecter</button>
-      <div class="gate-links"><button type="button" class="linkbtn" data-action="gate-step" data-step="reset">Mot de passe oublié ?</button>
-      <button type="button" class="linkbtn" data-action="gate-step" data-step="create">Première fois : créer le compte</button></div>`,
-    create: `<h2>Créer le compte du cabinet</h2>${mail}
-      <label class="f">Mot de passe (8 caractères minimum)<input id="gPass" type="password" autocomplete="new-password"></label>
-      <label class="f">Confirmer le mot de passe<input id="gPass2" type="password" autocomplete="new-password"></label>${errHtml}
-      <button type="submit" class="btn primary">Créer le compte</button>
-      <div class="gate-links"><button type="button" class="linkbtn" data-action="gate-step" data-step="login">J'ai déjà un compte</button></div>`,
-    reset: `<h2>Mot de passe oublié</h2><p class="hint">Un lien pour choisir un nouveau mot de passe sera envoyé à cette adresse.</p>${mail}${errHtml}
-      <button type="submit" class="btn primary">Envoyer le lien</button>
-      <div class="gate-links"><button type="button" class="linkbtn" data-action="gate-step" data-step="login">Retour à la connexion</button></div>`,
+      <div class="or">ou</div>
+      <button type="button" class="btn gbtn" data-action="qr-start">${ic("qr")}Se connecter par QR code</button>`,
     verify: `<h2>Confirme l'adresse e-mail</h2><p class="hint">Un lien de confirmation a été envoyé à <b>${esc(u ? u.email : "")}</b>. Ouvre la boîte mail (regarde aussi dans les spams), clique sur le lien, puis reviens ici.</p>${errHtml}
       <button type="button" class="btn primary" data-action="gate-verified">J'ai cliqué sur le lien</button>
       <div class="or">ou, sans e-mail de confirmation</div>
@@ -1695,26 +1806,11 @@ function showGate(step, err){
       <div class="gate-links"><button type="button" class="linkbtn" data-action="lier-cancel">Annuler</button></div>`
   };
   body.innerHTML = H[step] || "";
-  // pas de clavier qui surgit sur téléphone : on ne place le curseur que sur ordinateur
-  const f = $("#gPass", body) || $("#gMail", body); if (f && matchMedia("(pointer:fine)").matches) f.focus();
 }
-async function gateSubmit(){
-  const step = S.gate, a = S.fbAuth;
-  if (step === "verify" && $("#gLink") && $("#gLink").value.trim()) return gateLink($('[data-action="gate-link"]'));
-  if (!a || !["login","create","reset"].includes(step)) return;
-  const mail = ($("#gMail") ? $("#gMail").value : "").trim().toLowerCase(), pass = $("#gPass") ? $("#gPass").value : "";
-  const fail = msg => { showGate(step, msg); $("#gMail").value = mail; };
-  if (!mail) return fail("Saisis l'adresse e-mail.");
-  if (step === "create"){
-    if (pass.length < 8) return fail("Mot de passe trop court : 8 caractères minimum.");
-    if (pass !== $("#gPass2").value) return fail("Les deux mots de passe ne sont pas identiques.");
-  }
-  $("#fLogin button[type=submit]").disabled = true;
-  try {
-    if (step === "login") await a.signInWithEmailAndPassword(mail, pass);
-    else if (step === "create") await a.createUserWithEmailAndPassword(mail, pass); // l'e-mail de confirmation part depuis onAuth
-    else { await a.sendPasswordResetEmail(mail); showGate("login"); toast(`Lien envoyé à ${mail}. Regarde aussi dans les spams.`); }
-  } catch(e){ console.error(e); fail(authMsg(e)); }
+// La connexion se fait avec Google ou le QR code ; le formulaire ne sert plus qu'à valider un lien de confirmation collé
+// (anciens comptes e-mail + mot de passe pas encore confirmés).
+function gateSubmit(){
+  if (S.gate === "verify" && $("#gLink") && $("#gLink").value.trim()) gateLink($('[data-action="gate-link"]'));
 }
 async function gateVerified(btn){
   const a = S.fbAuth; if (!a.currentUser) return showGate("login");
@@ -1910,9 +2006,10 @@ function notifsBody(D){
   const alert = perm === "default" ? `<div class="banner info" style="margin:0"><span>Être prévenu par une notification de l'ordinateur dès qu'un patient réserve, même si l'onglet est en arrière-plan.</span><button type="button" class="btn sm" data-action="notif-on">Activer</button></div>`
     : perm === "granted" ? `<p class="hint">Notifications activées sur cet appareil : tu es prévenu à chaque réservation tant que l'application est ouverte.</p>`
     : perm === "denied" ? `<p class="hint">Les notifications sont bloquées dans ce navigateur : autorise-les dans les réglages du site pour être prévenu.</p>` : "";
-  const item = ([id, x]) => { const wa = waNumber(x.tel), past = x.date < TODAY;
+  const item = ([id, x]) => { const wa = waNumber(x.tel), past = x.date < TODAY, conflit = past ? "" : demandeConflit(x);
     return `<li class="nitem"><div class="r1"><b>${esc(x.nom)}</b><span class="chip ${past ? "" : "warn"}">${past ? "Date passée" : "À confirmer"}</span></div>
       <div class="r2">${esc(dayLabel(x.date))} à ${esc(x.heure)} · ${esc(x.tel)}${x.motif ? " · " + esc(x.motif) : ""}</div>
+      ${conflit ? `<div class="hw">${esc(conflit)}</div>` : ""}
       <div class="ra">${past ? "" : `<button type="button" class="btn sm ok" data-action="dem-ok" data-id="${esc(id)}" data-write>${ic("check")}Confirmer</button>`}
         ${wa ? `<a class="btn sm" href="https://wa.me/${wa}" target="_blank" rel="noopener">${ic("chat")}WhatsApp</a>` : ""}
         <button type="button" class="btn sm ghost" data-action="dem-day" data-day="${esc(x.date)}">Voir le jour</button>

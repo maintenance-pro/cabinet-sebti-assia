@@ -123,7 +123,7 @@ input[type=text],input[type=tel]{border:1px solid var(--line-strong);background:
   </header>
   <div>
     <h1>Prendre rendez-vous <span class="ar" lang="ar" dir="rtl">حجز موعد</span></h1>
-    <p class="lead">Choisissez un jour puis un créneau libre. Les créneaux déjà pris sont grisés et ne peuvent pas être choisis.</p>
+    <p class="lead">Choisissez un jour puis un créneau libre, et envoyez votre demande : le cabinet vous confirmera le rendez-vous. Les créneaux déjà pris sont grisés.</p>
   </div>
   <div id="app"><p class="hint center">Chargement des créneaux…</p></div>
   <footer class="card contact" id="contact" hidden></footer>
@@ -131,7 +131,7 @@ input[type=text],input[type=tel]{border:1px solid var(--line-strong);background:
 <script>
 "use strict";
 // Même projet Firebase que l'application du cabinet. Ces clés sont publiques par nature : l'accès est contrôlé
-// par firestore.rules (lecture des créneaux seulement ; une réservation n'est acceptée que sur un créneau libre).
+// par firestore.rules (lecture des créneaux seulement ; une demande n'est acceptée que sur un créneau libre).
 const FIREBASE_CONFIG = {
   apiKey:"AIzaSyC5jTvvTllfAo_K9uaFR_Ckg1OK8DJN9YA", authDomain:"cabinet-sebti-assia.web.app", projectId:"cabinet-sebti-assia",
   storageBucket:"cabinet-sebti-assia.firebasestorage.app", messagingSenderId:"255493261882", appId:"1:255493261882:web:aba15d530ecad769b38303"
@@ -151,8 +151,8 @@ const dayLong = s => cap(parseYmd(s).toLocaleDateString("fr-FR",{weekday:"long",
 const TODAY = ymd(new Date());
 const loadScript = src => new Promise((ok, ko) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = () => ko(new Error(src)); document.head.appendChild(s); });
 
-const P = {db:null, ag:undefined, occ:new Map(), locks:new Set(), day:null, slot:null, done:null, sending:false, msg:"", err:"", subbed:false,
-  ready:{ag:false, occ:false, locks:false}};
+const P = {db:null, ag:undefined, occ:new Map(), day:null, slot:null, done:null, sending:false, msg:"", err:"", subbed:false,
+  ready:{ag:false, occ:false}};
 
 function slotsFor(day){
   const a = P.ag, dow = parseYmd(day).getDay();
@@ -162,8 +162,9 @@ function slotsFor(day){
   for (let t = toMin(a.ouverture); t < toMin(end); t += step) out.push(fromMin(t));
   return {open, slots:out, step};
 }
-// occupé : un rendez-vous du cabinet touche ce créneau, ou un autre patient vient de le réserver
-const taken = (d, s) => ((P.occ.get(d) || {})[s] || 0) > 0 || P.locks.has(d + "_" + s.replace(":", ""));
+// occupé : un rendez-vous confirmé par le cabinet touche ce créneau. Une simple demande ne le bloque pas :
+// le créneau ne se ferme qu'à la confirmation du cabinet.
+const taken = (d, s) => ((P.occ.get(d) || {})[s] || 0) > 0;
 const tooSoon = (d, s) => { const [y,m,j] = d.split("-").map(Number), [h,mi] = s.split(":").map(Number);
   return new Date(y, m-1, j, h, mi).getTime() < Date.now() + (+P.ag.delaiH || 0) * 3600e3; };
 function dayList(){
@@ -196,17 +197,17 @@ function render(){
   if (!P.ready.ag){ app.innerHTML = `<p class="hint center">Chargement des créneaux…</p>`; return; }
   if (!P.ag || !P.ag.actif){ app.innerHTML = `<div class="card"><p><b>La réservation en ligne n'est pas ouverte pour le moment.</b></p><p class="hint">Appelez le cabinet pour prendre rendez-vous.</p></div>`; return; }
   if (P.done){
-    app.innerHTML = `<div class="card done"><div class="tick">${TICK}</div><h2>Votre créneau est réservé</h2>
+    app.innerHTML = `<div class="card done"><div class="tick">${TICK}</div><h2>Demande envoyée</h2>
       <p class="when">${esc(dayLong(P.done.date))} à ${esc(P.done.heure)}</p>
-      <p>Le cabinet vous contactera par téléphone ou WhatsApp pour confirmer le rendez-vous.</p>
-      <p class="ar" lang="ar" dir="rtl">تم حجز موعدك، ستتصل بك العيادة للتأكيد.</p>
-      <button class="btn" data-act="again">Réserver un autre créneau</button></div>`;
+      <p>Le cabinet va vous contacter par téléphone ou WhatsApp pour <b>confirmer</b> ce rendez-vous. Il n'est réservé qu'après cette confirmation.</p>
+      <p class="ar" lang="ar" dir="rtl">تم إرسال طلبك، ستتصل بك العيادة لتأكيد الموعد.</p>
+      <button class="btn" data-act="again">Demander un autre créneau</button></div>`;
     return;
   }
-  if (!P.ready.occ || !P.ready.locks){ app.innerHTML = `<p class="hint center">Chargement des créneaux…</p>`; return; }
+  if (!P.ready.occ){ app.innerHTML = `<p class="hint center">Chargement des créneaux…</p>`; return; }
   const days = dayList();
   if (!days.some(x => x.d === P.day && x.free)) { P.day = (days.find(x => x.free) || {}).d || null; P.slot = null; }
-  if (P.slot && !P.sending && (taken(P.day, P.slot) || tooSoon(P.day, P.slot))){ P.slot = null; P.msg = "Ce créneau vient d'être réservé : choisissez-en un autre."; }
+  if (P.slot && !P.sending && (taken(P.day, P.slot) || tooSoon(P.day, P.slot))){ P.slot = null; P.msg = "Ce créneau vient d'être confirmé pour un autre patient : choisissez-en un autre."; }
   if (!P.day){ app.innerHTML = `<div class="card"><p><b>Aucun créneau libre dans les ${esc(P.ag.horizon)} prochains jours.</b></p><p class="hint">Appelez le cabinet : nous trouverons un moment ensemble.</p></div>`; return; }
   const {slots, step} = slotsFor(P.day);
   const shown = slots.filter(s => !tooSoon(P.day, s));
@@ -219,7 +220,7 @@ function render(){
       ${P.msg && !P.slot ? `<p class="err" role="alert" style="margin-bottom:10px">${esc(P.msg)}</p>` : ""}
       <div class="slots">${shown.map(s => { const t = taken(P.day, s);
         return `<button class="slot" data-slot="${s}" aria-pressed="${s === P.slot}" ${t ? "disabled" : ""} aria-label="${s}, ${t ? "occupé" : "libre"}"><b>${s}</b><small>${t ? "Occupé" : "Libre"}</small></button>`; }).join("")}</div>
-      <div class="legend"><span><i></i>Libre</span><span><i class="x"></i>Occupé : impossible de le choisir</span></div></section>
+      <div class="legend"><span><i></i>Libre</span><span><i class="x"></i>Occupé : déjà confirmé pour un autre patient</span></div></section>
     ${P.slot ? `<section class="card"><h2 class="step">3. Vos coordonnées</h2>
       <form id="fResa" class="form" novalidate>
         <p class="sum">Rendez-vous <b>${esc(dayLong(P.day))} à ${esc(P.slot)}</b></p>
@@ -229,7 +230,8 @@ function render(){
         <input id="fSite" class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
         <label class="okbox"><input type="checkbox" id="fOk">J'accepte que le cabinet utilise ces informations uniquement pour gérer mon rendez-vous.</label>
         ${P.msg ? `<p class="err" role="alert">${esc(P.msg)}</p>` : ""}
-        <button class="btn primary" type="submit" ${P.sending ? "disabled" : ""}>${P.sending ? "Réservation…" : "Réserver ce créneau"}</button>
+        <p class="hint">Le cabinet vous confirmera le rendez-vous par téléphone ou WhatsApp.</p>
+        <button class="btn primary" type="submit" ${P.sending ? "disabled" : ""}>${P.sending ? "Envoi…" : "Envoyer la demande"}</button>
       </form></section>` : ""}`;
   for (const [id, v] of Object.entries(keep)){ const el = $("#"+id); if (el) el.value = v; }
   if ($("#fOk")) $("#fOk").checked = okc;
@@ -243,19 +245,17 @@ async function submit(){
   if (nom.length < 2) return fail("Indiquez votre nom et prénom.");
   if (!/^[0-9 +.()-]{8,20}$/.test(tel) || tel.replace(/\D/g, "").length < 9) return fail("Indiquez un numéro de téléphone valide.");
   if (!$("#fOk").checked) return fail("Cochez la case d'accord pour continuer.");
-  const day = P.day, slot = P.slot; // la réservation apparaît aussitôt comme « occupée » : on fige le créneau choisi
+  const day = P.day, slot = P.slot;
   P.sending = true; P.msg = ""; render();
-  const db = P.db, dref = db.collection("demandes").doc(), vid = day + "_" + slot.replace(":", "");
-  const b = db.batch(); // le verrou et la demande partent ensemble : les règles refusent tout si le créneau est pris
-  b.set(db.collection("verrous").doc(vid), {date:day, heure:slot, demande:dref.id});
-  b.set(dref, {nom, tel, motif, date:day, heure:slot, verrou:vid, creeLe:firebase.firestore.FieldValue.serverTimestamp()});
+  // une simple demande : les règles la refusent si le créneau est déjà confirmé pour quelqu'un d'autre
+  const req = P.db.collection("demandes").add({nom, tel, motif, date:day, heure:slot, creeLe:firebase.firestore.FieldValue.serverTimestamp()});
   try {
-    await Promise.race([b.commit(), new Promise((_, ko) => setTimeout(() => ko({code:"timeout"}), 20000))]);
+    await Promise.race([req, new Promise((_, ko) => setTimeout(() => ko({code:"timeout"}), 20000))]);
     P.done = {date:day, heure:slot}; P.slot = null;
   } catch(e){
     console.error(e);
-    if (e.code === "permission-denied"){ P.slot = null; P.msg = "Ce créneau n'est plus disponible : il vient d'être pris. Choisissez-en un autre."; }
-    else P.msg = e.code === "timeout" ? "La connexion est trop lente : vérifiez internet puis réessayez." : "La réservation n'a pas abouti. Réessayez ou appelez le cabinet.";
+    if (e.code === "permission-denied"){ P.slot = null; P.msg = "Ce créneau n'est plus disponible : il vient d'être confirmé pour un autre patient. Choisissez-en un autre."; }
+    else P.msg = e.code === "timeout" ? "La connexion est trop lente : vérifiez internet puis réessayez." : "La demande n'a pas abouti. Réessayez ou appelez le cabinet.";
   }
   P.sending = false; render();
   window.scrollTo({top:0, behavior:"smooth"});
@@ -282,8 +282,6 @@ setInterval(render, 60000); // les créneaux trop proches disparaissent au fil d
       P.subbed = true; const end = addDays(TODAY, +P.ag.horizon || 21);
       P.db.collection("occupation").where("date", ">=", TODAY).where("date", "<=", end).onSnapshot(s => {
         P.occ = new Map(s.docs.map(d => [d.id, (d.data() || {}).creneaux || {}])); P.ready.occ = true; render(); }, fail);
-      P.db.collection("verrous").where("date", ">=", TODAY).where("date", "<=", end).onSnapshot(s => {
-        P.locks = new Set(s.docs.map(d => d.id)); P.ready.locks = true; render(); }, fail);
     }
     render();
   }, fail);
