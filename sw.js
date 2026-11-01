@@ -2,11 +2,11 @@
 // Pages : toujours la version en ligne d'abord (mises à jour immédiates), la copie gardée seulement hors ligne.
 // Bibliothèques Firebase et polices (adresses versionnées, qui ne changent jamais) : gardées une fois pour toutes.
 // Les données du cabinet ne passent jamais par ici : Firestore garde son propre cache, protégé par la connexion.
-const CACHE = "cabinet-sebti-assia-v1";
+const CACHE = "cabinet-sebti-assia-v2";
 const SHELL = ["/", "/index.html", "/rdv.html", "/manifest.webmanifest", "/icons/icon-192.png"];
 
 self.addEventListener("install", e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL.map(u => new Request(u, {cache:"reload"})))).then(() => self.skipWaiting()));
 });
 self.addEventListener("activate", e => {
   e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
@@ -16,7 +16,7 @@ self.addEventListener("fetch", e => {
   if (r.method !== "GET") return;
   const url = new URL(r.url);
   if (r.mode === "navigate"){
-    e.respondWith(fetch(r).then(res => { const copy = res.clone(); caches.open(CACHE).then(c => c.put(url.pathname === "/" ? "/" : r, copy)); return res; })
+    e.respondWith(fetch(r, {cache:"no-cache"}).then(res => { // toujours redemander au serveur, jamais une copie du navigateur const copy = res.clone(); caches.open(CACHE).then(c => c.put(url.pathname === "/" ? "/" : r, copy)); return res; })
       .catch(() => caches.match(r, {ignoreSearch:true}).then(m => m || caches.match(url.pathname.endsWith("rdv.html") ? "/rdv.html" : "/"))));
     return;
   }
